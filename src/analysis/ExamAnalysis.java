@@ -6,17 +6,13 @@ import Exams.ExamSchool;
 import Exams.ExamTeam;
 import io.ExamInput;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ExamAnalysis
 {
-  private final String[] SCHOOLS = {"BEST", "Cefyrekon", "EKEN", "Ekonomisektionen", "Esekon", "Eurekha", "Gavlecon"
+  public final static String[] SCHOOLS = {"BEST", "Cefyrekon", "EKEN", "Ekonomisektionen", "Esekon", "Eurekha", "Gavlecon"
       , "HHGS", "IMF", "Kalmar ESS", "KarlEkon", "Mälekon", "Novitas", "Safir", "Sesam", "SköEkon",
       "Sundekon", "SÖFRE", "VisEkon", "VästEko"};
-
-  private int[] CODES;
 
   private ExamInput input;
   private ExamTeam[] examTeams;
@@ -37,105 +33,14 @@ public class ExamAnalysis
     this.examSchools = this.input.getExamSchools();
     this.examTeams = input.getExamTeams();
 
-    this.CODES = this.input.getExamCodes();
-    Arrays.sort(this.CODES);
-
     // This is a data structure with all the exams associated via school.
-    this.examSchoolList = getExamSchoolArrayBySchool();
+    this.examSchoolList = input.getExamSchoolArrayBySchool();
 
     // This is a data structure with all the exams associated via code
-    this.examTeamList = getExamTeamArrayByTeams();
+    this.examTeamList = input.getExamTeamArrayByTeams();
 
     double stdDev = this.analyseExams(exams);
     System.out.println(stdDev);
-  }
-
-  /*
-  Retrieve an array like so:
-  arr[0] = Alla tentor som associeras med BEST.
-  arr[1] = Alla tentor som associeras med Cefyrekon
-  arr[n] = Alla tentor som associeras med SCHOOLS[n]
-  */
-  private List<ExamSchool[]> getExamSchoolArrayBySchool()
-  {
-    List<ExamSchool[]> examSchools = new ArrayList<>();
-
-    for (String school : SCHOOLS)
-    {
-      ExamSchool[] loopArray = this.getExamSchoolsBySchool(school);
-      examSchools.add(loopArray);
-    }
-
-    return examSchools;
-  }
-
-  // Helper function to get the ExamSchool[] with all exams associated with input school.
-  private ExamSchool[] getExamSchoolsBySchool(String school)
-  {
-    int size = 0;
-    for (ExamSchool examSchool : this.examSchools)
-    {
-      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
-      {
-        size++;
-      }
-    }
-
-    ExamSchool[] examSchools = new ExamSchool[size];
-
-    int k = 0;
-    for (ExamSchool examSchool : this.examSchools)
-    {
-      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
-      {
-        examSchools[k++] = new ExamSchool(school.toLowerCase().trim(), examSchool);
-      }
-    }
-    return examSchools;
-  }
-
-  /*
-  Retrieve an array like so:
-  arr[0] = Alla tentor som associeras med 101
-  arr[1] = Alla tentor som associeras med 1103
-  arr[n] = Alla tentor som associeras med codes[n]
-  */
-  private List<ExamTeam[]> getExamTeamArrayByTeams()
-  {
-    List<ExamTeam[]> list = new ArrayList<>();
-
-    for (int i : this.CODES)
-    {
-      ExamTeam[] loopArray = this.getExamTeamsByTeam(i);
-      list.add(loopArray);
-    }
-
-    return list;
-  }
-
-  // Helper function to get the ExamTeams[] with all exams associated with input code.
-  private ExamTeam[] getExamTeamsByTeam(int code)
-  {
-    int size = 0;
-    for (ExamTeam examTeam : this.examTeams)
-    {
-      if (examTeam.getAnonymousCode() == code)
-      {
-        size++;
-      }
-    }
-
-    ExamTeam[] teams = new ExamTeam[size];
-
-    int k = 0;
-    for (ExamTeam e : this.examTeams)
-    {
-      if (e.getAnonymousCode() == code)
-      {
-        teams[k++] = new ExamTeam(e.getExam(), code);
-      }
-    }
-    return teams;
   }
 
   // Statistical Analysis
@@ -145,28 +50,28 @@ public class ExamAnalysis
   {
     double standardDeviation = 0, mean = 0, median = 0;
     int length = exams.length;
+    int totLength = exams[0].getSeparateScoresForAllQuestions().length * length;
     double sum = 0;
 
     for (int i = 0; i < length; i++)
     {
       for (int j = 0; j < 15; j++)
       {
-        System.out.println(exams[i].getAnonymousCode() + " " + Arrays.toString(exams[i].getSeparateScoresForAllQuestions()));
         sum += (double) exams[i].getSeparateScoresForAllQuestions()[j];
       }
     }
 
-    mean = sum / length;
+    mean = sum / (totLength * length);
 
     for (int i = 0; i < length; i++)
     {
-      for (int j = 4; j < 19; j++)
+      for (int j = 0; j < 15; j++)
       {
         standardDeviation += Math.pow((exams[i].getSeparateScoresForAllQuestions()[j] - mean), 2);
       }
     }
 
-    return Math.sqrt(standardDeviation / length);
+    return Math.sqrt(standardDeviation / (totLength * length));
   }
 
   // Exams for all schools.

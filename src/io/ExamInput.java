@@ -3,10 +3,12 @@ package io;
 import Exams.Exam;
 import Exams.ExamSchool;
 import Exams.ExamTeam;
+import analysis.ExamAnalysis;
 
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +19,7 @@ public class ExamInput
   private ExamSchool[] examSchools;
 
   private List<String[]> listOfRowsInData;
+  private int[] CODES;
 
   private static final int INDIVIDUAL_SCORES_START = 4;
   private static final int INDIVIDUAL_SCORES_END = 19;
@@ -32,6 +35,7 @@ public class ExamInput
       e.printStackTrace();
     }
 
+
     // Inits the lists.
     // First, the exams with no school associated.
     this.exams = this.getExamList();
@@ -39,6 +43,9 @@ public class ExamInput
     this.examSchools = this.getExamSchoolList();
     // Third, exam with team name.
     this.examTeams = this.getExamTeamList();
+
+    // All codes for the exams.
+    CODES = this.getExamCodes();
   }
 
   // This gets the subset array of examSchools with the school equal to input.
@@ -139,6 +146,94 @@ public class ExamInput
     return -1;
   }
 
+  /*
+Retrieve an array like so:
+arr[0] = Alla tentor som associeras med BEST.
+arr[1] = Alla tentor som associeras med Cefyrekon
+arr[n] = Alla tentor som associeras med SCHOOLS[n]
+*/
+  public List<ExamSchool[]> getExamSchoolArrayBySchool()
+  {
+    List<ExamSchool[]> examSchools = new ArrayList<>();
+
+    for (String school : ExamAnalysis.SCHOOLS)
+    {
+      ExamSchool[] loopArray = this.getExamSchoolsBySchool(school);
+      examSchools.add(loopArray);
+    }
+
+    return examSchools;
+  }
+
+  // Helper function to get the ExamSchool[] with all exams associated with input school.
+  private ExamSchool[] getExamSchoolsBySchool(String school)
+  {
+    int size = 0;
+    for (ExamSchool examSchool : this.examSchools)
+    {
+      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
+      {
+        size++;
+      }
+    }
+
+    ExamSchool[] examSchools = new ExamSchool[size];
+
+    int k = 0;
+    for (ExamSchool examSchool : this.examSchools)
+    {
+      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
+      {
+        examSchools[k++] = new ExamSchool(school.toLowerCase().trim(), examSchool);
+      }
+    }
+    return examSchools;
+  }
+
+  /*
+  Retrieve an array like so:
+  arr[0] = Alla tentor som associeras med 101
+  arr[1] = Alla tentor som associeras med 1103
+  arr[n] = Alla tentor som associeras med codes[n]
+  */
+  public List<ExamTeam[]> getExamTeamArrayByTeams()
+  {
+    List<ExamTeam[]> list = new ArrayList<>();
+
+    for (int i : CODES)
+    {
+      ExamTeam[] loopArray = this.getExamTeamsByTeam(i);
+      list.add(loopArray);
+    }
+
+    return list;
+  }
+
+  // Helper function to get the ExamTeams[] with all exams associated with input code.
+  private ExamTeam[] getExamTeamsByTeam(int code)
+  {
+    int size = 0;
+    for (ExamTeam examTeam : this.examTeams)
+    {
+      if (examTeam.getAnonymousCode() == code)
+      {
+        size++;
+      }
+    }
+
+    ExamTeam[] teams = new ExamTeam[size];
+
+    int k = 0;
+    for (ExamTeam e : this.examTeams)
+    {
+      if (e.getAnonymousCode() == code)
+      {
+        teams[k++] = new ExamTeam(e.getExam(), code);
+      }
+    }
+    return teams;
+  }
+
   private ExamTeam[] getExamTeamList()
   {
     ExamTeam[] examTeams;
@@ -229,7 +324,7 @@ public class ExamInput
   {
     int[] codes;
     int size = 0;
-    for (int i = 0; i < exams.length; i++)
+    for (int i = 0; i < this.exams.length; i++)
     {
       size++;
     }
