@@ -14,6 +14,8 @@ public class ExamAnalysis
       , "HHGS", "IMF", "Kalmar ESS", "KarlEkon", "Mälekon", "Novitas", "Safir", "Sesam", "SköEkon",
       "Sundekon", "SÖFRE", "VisEkon", "VästEko"};
 
+  public final static int AMOUNT_OF_QUESTIONS = 16;
+
   private ExamInput input;
   private ExamTeam[] examTeams;
   private ExamSchool[] examSchools;
@@ -38,19 +40,18 @@ public class ExamAnalysis
 
     // This is a data structure with all the exams associated via code
     this.examTeamList = input.getExamTeamArrayByTeams();
-
-    double stdDev = this.analyseExams(exams);
-    System.out.println(stdDev);
   }
 
   // Statistical Analysis
 
   // All the exams.
-  private double analyseExams(Exam[] exams)
+  // Loop through all the exams, and then loop through all the values of the the
+  // separate questions and add them up. Get stdDev.
+  protected static double analyseExams(Exam[] exams)
   {
     double standardDeviation = 0, mean = 0, median = 0;
     int length = exams.length;
-    int totLength = exams[0].getSeparateScoresForAllQuestions().length * length;
+    int totLength = AMOUNT_OF_QUESTIONS;
     double sum = 0;
 
     for (int i = 0; i < length; i++)
@@ -75,25 +76,30 @@ public class ExamAnalysis
   }
 
   // Exams for all schools.
-  private void analyseExams(ExamSchool[] exams)
+  // Loop through all "rows" of the list, then loop through all the exams, then all questions.
+  // Add into object StatsSchool, as a new List.
+  protected static void analyseExams(List<ExamSchool[]> exams)
   {
     int standardDeviation, mean, median;
+    int totLength = AMOUNT_OF_QUESTIONS;
+    double sum = 0;
+
   }
 
   // Exams for specific schools
-  private void analyseExams(String school, ExamSchool[] schools)
+  protected static void analyseExams(String school, ExamSchool[] schools)
   {
     int standardDeviation, mean, median;
   }
 
   // Exams for all the teams.
-  private void analyseExams(ExamTeam[] exams)
+  protected static void analyseExams(ExamTeam[] exams)
   {
     int standardDeviation, mean, median;
   }
 
   // Exams for specific team.
-  private void analyseExams(int team, ExamTeam[] teams)
+  protected static void analyseExams(int team, ExamTeam[] teams)
   {
     int standardDeviation, mean, median;
   }
