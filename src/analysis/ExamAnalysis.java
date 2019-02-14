@@ -31,7 +31,6 @@ public class ExamAnalysis
 
   private void init()
   {
-    this.exams = this.input.getExams();
     this.examSchools = this.input.getExamSchools();
     this.examTeams = input.getExamTeams();
 
@@ -43,37 +42,6 @@ public class ExamAnalysis
   }
 
   // Statistical Analysis
-
-  // All the exams.
-  // Loop through all the exams, and then loop through all the values of the the
-  // separate questions and add them up. Get stdDev.
-  protected static double analyseExams(Exam[] exams)
-  {
-    double standardDeviation = 0, mean = 0, median = 0;
-    int length = exams.length;
-    int totLength = AMOUNT_OF_QUESTIONS;
-    double sum = 0;
-
-    for (int i = 0; i < length; i++)
-    {
-      for (int j = 0; j < 15; j++)
-      {
-        sum += (double) exams[i].getSeparateScoresForAllQuestions()[j];
-      }
-    }
-
-    mean = sum / (totLength * length);
-
-    for (int i = 0; i < length; i++)
-    {
-      for (int j = 0; j < 15; j++)
-      {
-        standardDeviation += Math.pow((exams[i].getSeparateScoresForAllQuestions()[j] - mean), 2);
-      }
-    }
-
-    return Math.sqrt(standardDeviation / (totLength * length));
-  }
 
   // Exams for all schools.
   // Loop through all "rows" of the list, then loop through all the exams, then all questions.
