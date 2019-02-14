@@ -4,9 +4,9 @@ package Exams;
 public class ExamTeam extends Exam
 {
   private Exam exam;
-  private int team;
+  private String team;
 
-  public ExamTeam(Exam exam, int team)
+  public ExamTeam(Exam exam, String team)
   {
     super(exam.getScore(), exam.getSeparateScoresForAllQuestions(), exam.getDate(), exam.getAnonymousCode());
     this.exam = exam;
@@ -32,12 +32,12 @@ public class ExamTeam extends Exam
     this.exam = exam;
   }
 
-  public int getTeam()
+  public String getTeam()
   {
     return team;
   }
 
-  public void setTeam(int team)
+  public void setTeam(String team)
   {
     this.team = team;
   }

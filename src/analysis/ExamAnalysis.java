@@ -10,10 +10,6 @@ import java.util.List;
 
 public class ExamAnalysis
 {
-  public final static String[] SCHOOLS = {"BEST", "Cefyrekon", "EKEN", "Ekonomisektionen", "Esekon", "Eurekha", "Gavlecon"
-      , "HHGS", "IMF", "Kalmar ESS", "KarlEkon", "Mälekon", "Novitas", "Safir", "Sesam", "SköEkon",
-      "Sundekon", "SÖFRE", "VisEkon", "VästEko"};
-
   public final static int AMOUNT_OF_QUESTIONS = 16;
 
   private ExamInput input;
@@ -31,7 +27,7 @@ public class ExamAnalysis
 
   private void init()
   {
-    this.examSchools = this.input.getExamSchools();
+    this.examSchools = input.getExamSchools();
     this.examTeams = input.getExamTeams();
 
     // This is a data structure with all the exams associated via school.

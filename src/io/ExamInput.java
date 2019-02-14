@@ -3,13 +3,13 @@ package io;
 import Exams.Exam;
 import Exams.ExamSchool;
 import Exams.ExamTeam;
-import analysis.ExamAnalysis;
 
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 public class ExamInput
@@ -19,10 +19,15 @@ public class ExamInput
   private ExamSchool[] examSchools;
 
   private List<String[]> listOfRowsInData;
-  private int[] CODES;
+  private String[] teams;
 
-  private static final int INDIVIDUAL_SCORES_START = 4;
-  private static final int INDIVIDUAL_SCORES_END = 19;
+  public static String[] SCHOOLS;
+
+  private static final int INDIVIDUAL_SCORES_START = 5;
+  private static final int INDIVIDUAL_SCORES_END = 20;
+
+  private static final int GOOGLE_DATE = 0, GOOGLE_SCHOOL = 1,
+      GOOGLE_REAL_DATE = 2, GOOGLE_ANON_CODE = 3, GOOGLE_TEAM_NAME = 4;
 
   public ExamInput(String examDirectory)
   {
@@ -44,8 +49,27 @@ public class ExamInput
     // Third, exam with team name.
     this.examTeams = this.getExamTeamList();
 
-    // All codes for the exams.
-    CODES = this.getExamCodes();
+    // All teams for the exams.
+    teams = this.teams();
+    // Init the school names.
+    SCHOOLS = this.getSchools();
+  }
+
+  private String[] getSchools()
+  {
+    HashSet<String> schools = new HashSet<>();
+
+    for (int i = 0; i < listOfRowsInData.size(); i++)
+    {
+      String[] row = listOfRowsInData.get(i);
+      if (!row[0].equals("Skola"))
+      {
+        schools.add(row[0]);
+      }
+    }
+
+
+    return schools.toArray(new String[schools.size()]);
   }
 
   // This gets the subset array of examSchools with the school equal to input.
@@ -83,6 +107,27 @@ public class ExamInput
     }
 
     return schools;
+  }
+
+  private String[] teams()
+  {
+    String[] strings;
+    int size = 0;
+    for (String[] s : listOfRowsInData)
+    {
+      if (!s[0].equals("Skola")) size++;
+    }
+
+    strings = new String[size];
+
+    int k = 0;
+    for (String[] s : listOfRowsInData)
+    {
+      if (!s[0].equals("Skola"))
+        strings[k++] = s[0];
+    }
+
+    return strings;
   }
 
   // Helper function that sets the array examSchools to all the Exams + the school name.
@@ -156,7 +201,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
   {
     List<ExamSchool[]> examSchools = new ArrayList<>();
 
-    for (String school : ExamAnalysis.SCHOOLS)
+    for (String school : SCHOOLS)
     {
       ExamSchool[] loopArray = this.getExamSchoolsBySchool(school);
       examSchools.add(loopArray);
@@ -200,7 +245,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
   {
     List<ExamTeam[]> list = new ArrayList<>();
 
-    for (int i : CODES)
+    for (String i : this.teams)
     {
       ExamTeam[] loopArray = this.getExamTeamsByTeam(i);
       list.add(loopArray);
@@ -210,12 +255,12 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
   }
 
   // Helper function to get the ExamTeams[] with all exams associated with input code.
-  private ExamTeam[] getExamTeamsByTeam(int code)
+  private ExamTeam[] getExamTeamsByTeam(String team)
   {
     int size = 0;
     for (ExamTeam examTeam : this.examTeams)
     {
-      if (examTeam.getAnonymousCode() == code)
+      if (examTeam.getTeam().equals(team))
       {
         size++;
       }
@@ -226,9 +271,9 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
     int k = 0;
     for (ExamTeam e : this.examTeams)
     {
-      if (e.getAnonymousCode() == code)
+      if (e.getTeam().equals(team))
       {
-        teams[k++] = new ExamTeam(e.getExam(), code);
+        teams[k++] = new ExamTeam(e.getExam(), team);
       }
     }
     return teams;
@@ -250,7 +295,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
 
     for (int i = 0; i < examTeams.length; i++)
     {
-      examTeams[i] = new ExamTeam(this.exams[i], Integer.parseInt(listOfRowsInData.get(i + 2)[2]));
+      examTeams[i] = new ExamTeam(this.exams[i], (listOfRowsInData.get(i + 2)[3]));
     }
 
     return examTeams;
@@ -263,9 +308,8 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
 
     for (int i = 2; i < listOfRowsInData.size(); i++)
     {
-      int score = Integer.parseInt(listOfRowsInData.get(i)[3]);
-      int[] scores = getIndexedSetsFromString(listOfRowsInData.get(i)
-      );
+      int score = Integer.parseInt(listOfRowsInData.get(i)[4]);
+      int[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
 
       Date date = new Date();
       SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
