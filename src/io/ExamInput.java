@@ -7,10 +7,7 @@ import Exams.ExamTeam;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ExamInput
 {
@@ -21,7 +18,7 @@ public class ExamInput
   private List<String[]> listOfRowsInData;
   private String[] teams;
 
-  public static String[] SCHOOLS;
+  private static String[] SCHOOLS;
 
   private static final int INDIVIDUAL_SCORES_START = 5;
   private static final int INDIVIDUAL_SCORES_END = 20;
@@ -40,6 +37,10 @@ public class ExamInput
       e.printStackTrace();
     }
 
+    // All teams for the exams.
+    teams = this.teams();
+    // Init the school names.
+    SCHOOLS = this.getSchools();
 
     // Inits the lists.
     // First, the exams with no school associated.
@@ -48,86 +49,56 @@ public class ExamInput
     this.examSchools = this.getExamSchoolList();
     // Third, exam with team name.
     this.examTeams = this.getExamTeamList();
-
-    // All teams for the exams.
-    teams = this.teams();
-    // Init the school names.
-    SCHOOLS = this.getSchools();
   }
 
   private String[] getSchools()
   {
     HashSet<String> schools = new HashSet<>();
 
-    for (int i = 0; i < listOfRowsInData.size(); i++)
+    for (String[] row : listOfRowsInData)
     {
-      String[] row = listOfRowsInData.get(i);
       if (!row[0].equals("Skola"))
       {
         schools.add(row[0]);
       }
     }
 
+    for (String s : schools)
+    {
+      System.out.println(s);
+    }
 
-    return schools.toArray(new String[schools.size()]);
+    return schools.toArray(new String[0]);
   }
 
-  // This gets the subset array of examSchools with the school equal to input.
-  // TODO: fix this! Get schools and teams.
-  protected ExamSchool[] getExamSchoolList(String school)
+  public int getTotalScore(String school)
   {
-    // P1: Init an array with exactly the size of exams[] where the schools are the same.
-    // P2: Return the array with all those exams with school in common.
-
-    // P1
-    int sizeOfExamSchoolArray = 0;
-
-    for (int i = 2; i < listOfRowsInData.size(); i++)
+    int tot = 0;
+    for (ExamSchool examSchool : this.examSchools)
     {
-      if (listOfRowsInData.get(i)[0].toLowerCase().trim().equals(school.toLowerCase().trim()))
+      if (examSchool.getSchool().trim().toLowerCase().equals(school.trim().toLowerCase()))
       {
-        sizeOfExamSchoolArray++;
+        int[] sepScores = examSchool.getSeparateScoresForAllQuestions();
+        System.out.println(Arrays.toString(sepScores));
+        for (int i = 0; i < INDIVIDUAL_SCORES_END - INDIVIDUAL_SCORES_START; i++)
+        {
+          tot += sepScores[i];
+        }
       }
     }
 
-    // P2
-    ExamSchool[] schools = new ExamSchool[sizeOfExamSchoolArray];
-    int insert = 0;
-
-    for (String[] strings : listOfRowsInData)
-    {
-      String schoolInList = strings[0].toLowerCase().trim();
-      String schoolParamater = school.toLowerCase().trim();
-
-      if (schoolInList.equals(schoolParamater) && findExamByCode(Integer.parseInt(strings[2])) != -1)
-      {
-        int index = this.findExamByCode(Integer.parseInt(strings[2]));
-        schools[insert++] = new ExamSchool(school, this.exams[index]);
-      }
-    }
-
-    return schools;
+    return tot;
   }
 
   private String[] teams()
   {
-    String[] strings;
-    int size = 0;
+    HashSet<String> stringHashSet = new HashSet<>();
     for (String[] s : listOfRowsInData)
     {
-      if (!s[0].equals("Skola")) size++;
+      if (!s[0].equals("Skola")) stringHashSet.add(s[3]);
     }
 
-    strings = new String[size];
-
-    int k = 0;
-    for (String[] s : listOfRowsInData)
-    {
-      if (!s[0].equals("Skola"))
-        strings[k++] = s[0];
-    }
-
-    return strings;
+    return stringHashSet.toArray(new String[0]);
   }
 
   // Helper function that sets the array examSchools to all the Exams + the school name.
@@ -135,7 +106,7 @@ public class ExamInput
   {
     int sizeOfExamSchoolArray = 0;
 
-    for (int i = 2; i < listOfRowsInData.size(); i++)
+    for (int i = 1; i < listOfRowsInData.size(); i++)
     {
       sizeOfExamSchoolArray++;
     }
@@ -145,7 +116,7 @@ public class ExamInput
 
     for (int i = 0; i < schools.length; i++)
     {
-      int index = i + 2;
+      int index = i + 1;
       schools[i] = new ExamSchool(listOfRowsInData.get(index)[0], this.exams[i]);
     }
 
@@ -205,8 +176,8 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
     {
       ExamSchool[] loopArray = this.getExamSchoolsBySchool(school);
       examSchools.add(loopArray);
-    }
 
+    }
     return examSchools;
   }
 
@@ -304,9 +275,9 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
   private Exam[] getExamList()
   {
     // Format the data.
-    Exam[] exams = new Exam[listOfRowsInData.size() - 2];
+    Exam[] exams = new Exam[listOfRowsInData.size() - 1];
 
-    for (int i = 2; i < listOfRowsInData.size(); i++)
+    for (int i = 1; i < listOfRowsInData.size(); i++)
     {
       int score = Integer.parseInt(listOfRowsInData.get(i)[4]);
       int[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
@@ -324,7 +295,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
       int code = Integer.parseInt(listOfRowsInData.get(i)[2]);
 
       // TODO: change when Jonas Kågströms sends all info.
-      exams[i - 2] = insertExam(score, scores, date, code);
+      exams[i - 1] = insertExam(score, scores, date, code);
     }
 
     return exams;

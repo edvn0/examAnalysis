@@ -8,20 +8,20 @@ import java.util.Scanner;
 
 class FileInput
 {
-    private Scanner scanner;
+  private Scanner scanner;
 
-    FileInput(String dir) throws FileNotFoundException
-    {
-        scanner = new Scanner(new File(dir));
-    }
+  FileInput(String dir) throws FileNotFoundException
+  {
+    scanner = new Scanner(new File(dir));
+  }
 
-    List<String[]> fileInput()
+  List<String[]> fileInput()
+  {
+    List<String[]> values = new ArrayList<>();
+    while (scanner.hasNext())
     {
-        List<String[]> values = new ArrayList<>();
-        while (scanner.hasNext())
-        {
-            values.add(scanner.nextLine().split(","));
-        }
-        return values;
+      values.add(scanner.nextLine().split(","));
     }
+    return values;
+  }
 }

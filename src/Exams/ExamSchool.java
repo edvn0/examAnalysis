@@ -17,15 +17,11 @@ public class ExamSchool extends Exam
   public String toString()
   {
     return "ExamSchool{" +
-        "school=" + school.toUpperCase() +
-        ", exam='" + exam.toString() + '\'' +
+        "school = " + this.school +
+        ", exam = " + exam.toString() +
         '}';
   }
 
-  public int getScore()
-  {
-    return exam.getScore();
-  }
 
   public String getSchool()
   {

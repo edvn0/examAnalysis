@@ -19,10 +19,11 @@ public class ExamAnalysis
   private List<ExamTeam[]> examTeamList;
   private Exam[] exams;
 
+  private String dir;
+
   public ExamAnalysis(String dir)
   {
-    input = new ExamInput(dir);
-    init();
+    this.dir = dir;
   }
 
   private void init()
@@ -35,6 +36,12 @@ public class ExamAnalysis
 
     // This is a data structure with all the exams associated via code
     this.examTeamList = input.getExamTeamArrayByTeams();
+
+    for (ExamSchool es : examSchools)
+    {
+      String name = es.getSchool();
+      analyseExams(this.examSchoolList, name);
+    }
   }
 
   // Statistical Analysis
@@ -42,11 +49,31 @@ public class ExamAnalysis
   // Exams for all schools.
   // Loop through all "rows" of the list, then loop through all the exams, then all questions.
   // Add into object StatsSchool, as a new List.
-  protected static void analyseExams(List<ExamSchool[]> exams)
+  protected void analyseExams(List<ExamSchool[]> exams, String school)
   {
-    int standardDeviation, mean, median;
+    double standardDeviation, mean, median;
     int totLength = AMOUNT_OF_QUESTIONS;
+
+    System.out.println("Total score! " + input.getTotalScore(school));
+
     double sum = 0;
+    for (ExamSchool[] el : exams)
+    {
+      if (el[0].getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
+        sum += input.getTotalScore(school);
+    }
+
+    mean = sum / totLength;
+
+
+    double squaredSum = 0;
+    for (ExamSchool[] el : exams)
+    {
+      if (el[0].getSchool().toLowerCase().trim().equals(school.toLowerCase().trim()))
+        squaredSum += Math.pow(input.getTotalScore(school), 2);
+    }
+
+    double varianceSquared = (squaredSum / totLength) - Math.pow(mean, 2);
 
   }
 
@@ -130,5 +157,11 @@ public class ExamAnalysis
   public void setExamTeamList(List<ExamTeam[]> examTeamList)
   {
     this.examTeamList = examTeamList;
+  }
+
+  public void start()
+  {
+    input = new ExamInput(this.dir);
+    init();
   }
 }
