@@ -1,9 +1,8 @@
 package analysis;
 
-
-import Exams.Exam;
-import Exams.ExamSchool;
-import Exams.ExamTeam;
+import exams.Exam;
+import exams.ExamSchool;
+import exams.ExamTeam;
 import analysis.Stats.StatsSchool;
 import analysis.Stats.StatsTeam;
 import analysis.Stats.helperobjects.RoundOffStats;
@@ -51,7 +50,7 @@ public class ExamAnalysis
   }
 
   // Statistical Analysis
-  // Exams for a specific team.
+  // exams for a specific team.
   private StatsTeam analyseExams(@NotNull ExamTeam[] exams, @NotNull String name)
   {
     double standardDeviation, mean;
@@ -98,7 +97,7 @@ public class ExamAnalysis
     return new StatsTeam(name, totalScore, roundOffStats.getMean(), roundOffStats.getMedian(), roundOffStats.getStddev(), roundOffStats.getVariance());
   }
 
-  // Exams for a specific school.
+  // exams for a specific school.
   private StatsSchool analyseExams(@NotNull ExamSchool[] schools, String name)
   {
     double standardDeviation, mean, variance;
@@ -112,9 +111,9 @@ public class ExamAnalysis
     double[] average_scores = new double[totLength];
     double average_score = 0;
 
-    for (int i = 0; i < arrayLength; i++)
+    for (ExamSchool examSchool1 : schoolsWithSameName)
     {
-      average_score += schoolsWithSameName[i].getScore();
+      average_score += examSchool1.getScore();
     }
     average_score /= arrayLength;
 

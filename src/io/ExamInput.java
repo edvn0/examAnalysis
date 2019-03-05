@@ -1,8 +1,8 @@
 package io;
 
-import Exams.Exam;
-import Exams.ExamSchool;
-import Exams.ExamTeam;
+import exams.Exam;
+import exams.ExamSchool;
+import exams.ExamTeam;
 
 import java.io.FileNotFoundException;
 import java.text.ParseException;
@@ -97,7 +97,7 @@ public class ExamInput
     return stringHashSet.toArray(new String[0]);
   }
 
-  // Helper function that sets the array examSchools to all the Exams + the school name.
+  // Helper function that sets the array examSchools to all the exams + the school name.
   private ExamSchool[] setExamSchoolList()
   {
     int sizeOfExamSchoolArray = 0;
@@ -159,11 +159,11 @@ public class ExamInput
   }
 
   /*
-Retrieve an array like so:
-arr[0] = Alla tentor som associeras med BEST.
-arr[1] = Alla tentor som associeras med Cefyrekon
-arr[n] = Alla tentor som associeras med SCHOOLS[n]
-*/
+  Retrieve an array like so:
+  arr[0] = Alla tentor som associeras med BEST.
+  arr[1] = Alla tentor som associeras med Cefyrekon
+  arr[n] = Alla tentor som associeras med SCHOOLS[n]
+  */
   public List<ExamSchool[]> getExamSchoolArrayBySchool()
   {
     List<ExamSchool[]> examSchools = new ArrayList<>();

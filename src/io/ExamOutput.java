@@ -93,25 +93,6 @@ public class ExamOutput
     writer.write(stringBuilder.toString());
   }
 
-  public static void insertIntoDatabaseTeams(List<StatsTeam> teamList)
-  {
-    try
-    {
-      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:8889/stats_exams", "Edwin", "Edwin98");
-
-      for (StatsTeam team : teamList)
-      {
-        String sql = "insert into stats_exams.team_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
-        PreparedStatement statement = con.prepareStatement(sql);
-        setStatementWithPS(statement, team.getScore(), team.getMean(), team.getStddev(), team.getVariance(), team.getMedian(), team, null);
-      }
-    } catch (Exception e)
-    {
-      e.printStackTrace();
-    }
-
-  }
-
   private static void setStatementWithPS(PreparedStatement statement, double score, double mean, double stddev, double variance, double median, StatsTeam team, StatsSchool school) throws SQLException
   {
     if (school == null)
@@ -129,23 +110,46 @@ public class ExamOutput
     statement.execute();
   }
 
-  public static void insertIntoDatabaseSchools(List<StatsSchool> teamList)
+  public static void insertIntoDatabase(List<StatsTeam> teamList, List<StatsSchool> schoolList)
   {
     try
     {
-      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:8889/stats_exams", "Edwin", "Edwin98");
+      Connection con = DriverManager.getConnection(
+          "jdbc:mysql://localhost:8889/stats_exams",
+          "Edwin",
+          "Edwin98");
 
-      for (StatsSchool school : teamList)
+      if (teamList == null && schoolList != null)
       {
-        String sql = "insert into stats_exams.school_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
-        PreparedStatement statement = con.prepareStatement(sql);
-        setStatementWithPS(statement, school.getScore(), school.getMean(), school.getStddev(), school.getVariance(), school.getMedian(), null, school);
+        for (StatsSchool school : schoolList)
+        {
+          String sql = "insert into stats_exams.school_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+          PreparedStatement statement = con.prepareStatement(sql);
+          setStatementWithPS(statement, school.getScore(),
+              school.getMean(), school.getStddev(),
+              school.getVariance(), school.getMedian(), null, school);
+        }
+        con.close();
+      } else if (schoolList == null && teamList != null)
+      {
+        for (StatsTeam team : teamList)
+        {
+          String sql = "insert into stats_exams.team_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+          PreparedStatement statement = con.prepareStatement(sql);
+          setStatementWithPS(statement, team.getScore(),
+              team.getMean(), team.getStddev(),
+              team.getVariance(), team.getMedian(), team, null);
+        }
+        con.close();
+      } else
+      {
+        con.close();
+        System.err.println("Error! Input either schoolexams or teamexams.");
+        System.exit(-1);
       }
-    } catch (Exception e)
+    } catch (SQLException e)
     {
       e.printStackTrace();
     }
-
   }
-
 }

@@ -1,4 +1,4 @@
-package Exams;
+package exams;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -46,7 +46,7 @@ public class Exam
     this.score = score;
   }
 
-  public Date getDate()
+  Date getDate()
   {
     return date;
   }

@@ -1,4 +1,4 @@
-package Exams;
+package exams;
 
 // Kommer att representera poäng för varje lag.
 public class ExamTeam extends Exam
