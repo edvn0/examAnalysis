@@ -7,7 +7,10 @@ import Exams.ExamTeam;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 public class ExamInput
 {
@@ -21,10 +24,7 @@ public class ExamInput
   private static String[] SCHOOLS;
 
   private static final int INDIVIDUAL_SCORES_START = 5;
-  private static final int INDIVIDUAL_SCORES_END = 20;
-
-  private static final int GOOGLE_DATE = 0, GOOGLE_SCHOOL = 1,
-      GOOGLE_REAL_DATE = 2, GOOGLE_ANON_CODE = 3, GOOGLE_TEAM_NAME = 4;
+  private static final int INDIVIDUAL_SCORES_END = 21;
 
   public ExamInput(String examDirectory)
   {
@@ -63,11 +63,6 @@ public class ExamInput
       }
     }
 
-    for (String s : schools)
-    {
-      System.out.println(s);
-    }
-
     return schools.toArray(new String[0]);
   }
 
@@ -79,13 +74,14 @@ public class ExamInput
       if (examSchool.getSchool().trim().toLowerCase().equals(school.trim().toLowerCase()))
       {
         int[] sepScores = examSchool.getSeparateScoresForAllQuestions();
-        System.out.println(Arrays.toString(sepScores));
         for (int i = 0; i < INDIVIDUAL_SCORES_END - INDIVIDUAL_SCORES_START; i++)
         {
           tot += sepScores[i];
         }
       }
     }
+
+    System.out.println(tot);
 
     return tot;
   }
@@ -256,7 +252,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
 
     // P1: Init an array with exactly the size of exams[] where the team is the same.
     int sizeOfExamTeamSchool = 0;
-    for (int i = 2; i < listOfRowsInData.size(); i++)
+    for (int i = 1; i < listOfRowsInData.size(); i++)
     {
       sizeOfExamTeamSchool++;
     }
@@ -266,7 +262,7 @@ arr[n] = Alla tentor som associeras med SCHOOLS[n]
 
     for (int i = 0; i < examTeams.length; i++)
     {
-      examTeams[i] = new ExamTeam(this.exams[i], (listOfRowsInData.get(i + 2)[3]));
+      examTeams[i] = new ExamTeam(this.exams[i], (listOfRowsInData.get(i + 1)[3]));
     }
 
     return examTeams;

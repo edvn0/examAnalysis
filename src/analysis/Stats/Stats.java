@@ -2,23 +2,34 @@ package analysis.Stats;
 
 public class Stats
 {
-  double mean, median, stddev;
+  private double stddev, mean, median, variance;
 
-  Stats(double mean, double median, double stddev)
+  Stats(double stddev, double mean, double median, double variance)
   {
+    this.stddev = stddev;
     this.mean = mean;
     this.median = median;
-    this.stddev = stddev;
+    this.variance = variance;
   }
 
-  @Override
-  public String toString()
+  public double getVariance()
   {
-    return "Stats{" +
-        "mean=" + mean +
-        ", median=" + median +
-        ", stddev=" + stddev +
-        '}';
+    return variance;
+  }
+
+  public void setVariance(double variance)
+  {
+    this.variance = variance;
+  }
+
+  public double getStddev()
+  {
+    return stddev;
+  }
+
+  public void setStddev(double stddev)
+  {
+    this.stddev = stddev;
   }
 
   public double getMean()
@@ -39,15 +50,5 @@ public class Stats
   public void setMedian(double median)
   {
     this.median = median;
-  }
-
-  public double getStddev()
-  {
-    return stddev;
-  }
-
-  public void setStddev(double stddev)
-  {
-    this.stddev = stddev;
   }
 }
