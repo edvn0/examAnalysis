@@ -7,10 +7,7 @@ import exams.ExamTeam;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class ExamInput
 {
@@ -23,8 +20,8 @@ public class ExamInput
 
   private static String[] SCHOOLS;
 
-  private static final int INDIVIDUAL_SCORES_START = 5;
-  private static final int INDIVIDUAL_SCORES_END = 21;
+  private static final int INDIVIDUAL_SCORES_START = 4;
+  private static final int INDIVIDUAL_SCORES_END = 18;
 
   public ExamInput(String examDirectory)
   {
@@ -262,7 +259,7 @@ public class ExamInput
 
     for (int i = 0; i < examTeams.length; i++)
     {
-      examTeams[i] = new ExamTeam(this.exams[i], (listOfRowsInData.get(i + 1)[3]));
+      examTeams[i] = new ExamTeam(this.exams[i], (listOfRowsInData.get(i + 1)[2]));
     }
 
     return examTeams;
@@ -275,7 +272,7 @@ public class ExamInput
 
     for (int i = 1; i < listOfRowsInData.size(); i++)
     {
-      int score = Integer.parseInt(listOfRowsInData.get(i)[4]);
+      int score = Integer.parseInt(listOfRowsInData.get(i)[3]);
       int[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
 
       Date date = new Date();
@@ -288,9 +285,8 @@ public class ExamInput
         e.printStackTrace();
       }
 
-      int code = Integer.parseInt(listOfRowsInData.get(i)[2]);
+      int code = Objects.hash(listOfRowsInData.get(i)[2]);
 
-      // TODO: change when Jonas Kågströms sends all info.
       exams[i - 1] = insertExam(score, scores, date, code);
     }
 
@@ -308,8 +304,11 @@ public class ExamInput
   {
     int[] list = new int[ExamInput.INDIVIDUAL_SCORES_END - ExamInput.INDIVIDUAL_SCORES_START + 1];
 
-    for (int i = ExamInput.INDIVIDUAL_SCORES_START; i <= ExamInput.INDIVIDUAL_SCORES_END; i++)
+    System.out.println(input.length + " " + list.length);
+
+    for (int i = ExamInput.INDIVIDUAL_SCORES_START; i < ExamInput.INDIVIDUAL_SCORES_END; i++)
     {
+      System.out.println(input[i]);
       list[i - ExamInput.INDIVIDUAL_SCORES_START] = Integer.parseInt(input[i]);
     }
 

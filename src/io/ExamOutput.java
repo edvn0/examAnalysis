@@ -2,6 +2,7 @@ package io;
 
 import analysis.Stats.StatsSchool;
 import analysis.Stats.StatsTeam;
+import analysis.Stats.helperobjects.RoundOffStatsQuestion;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -93,24 +94,37 @@ public class ExamOutput
     writer.write(stringBuilder.toString());
   }
 
-  private static void setStatementWithPS(PreparedStatement statement, double score, double mean, double stddev, double variance, double median, StatsTeam team, StatsSchool school) throws SQLException
+  private static void setStatementWithPS(PreparedStatement statement, double score, double mean, double stddev, double variance, double median, StatsTeam team, StatsSchool school, String question) throws SQLException
   {
-    if (school == null)
+    if (question != null && school == null && team == null)
     {
-      statement.setString(1, team.getTeam());
+      statement.setDate(1, java.sql.Date.valueOf(java.time.LocalDate.now()));
+      statement.setString(2, question);
+      statement.setString(3, "" + mean);
+      statement.setString(4, "" + median);
+      statement.setString(5, "" + stddev);
+      statement.setString(6, "" + variance);
     } else if (team == null)
     {
       statement.setString(1, school.getSchool());
+      statement.setString(2, "" + score);
+      statement.setString(3, "" + mean);
+      statement.setString(4, "" + stddev);
+      statement.setString(5, "" + variance);
+      statement.setString(6, "" + median);
+    } else if (school == null)
+    {
+      statement.setString(1, team.getTeam());
+      statement.setString(2, "" + score);
+      statement.setString(3, "" + mean);
+      statement.setString(4, "" + stddev);
+      statement.setString(5, "" + variance);
+      statement.setString(6, "" + median);
     }
-    statement.setString(2, "" + score);
-    statement.setString(3, "" + mean);
-    statement.setString(4, "" + stddev);
-    statement.setString(5, "" + variance);
-    statement.setString(6, "" + median);
     statement.execute();
   }
 
-  public static void insertIntoDatabase(List<StatsTeam> teamList, List<StatsSchool> schoolList)
+  public static void insertIntoDatabase(List<StatsTeam> teamList, List<StatsSchool> schoolList, List<RoundOffStatsQuestion> rosqList)
   {
     try
     {
@@ -119,7 +133,7 @@ public class ExamOutput
           "Edwin",
           "Edwin98");
 
-      if (teamList == null && schoolList != null)
+      if (teamList == null && schoolList != null && rosqList == null)
       {
         for (StatsSchool school : schoolList)
         {
@@ -127,10 +141,10 @@ public class ExamOutput
           PreparedStatement statement = con.prepareStatement(sql);
           setStatementWithPS(statement, school.getScore(),
               school.getMean(), school.getStddev(),
-              school.getVariance(), school.getMedian(), null, school);
+              school.getVariance(), school.getMedian(), null, school, null);
         }
         con.close();
-      } else if (schoolList == null && teamList != null)
+      } else if (schoolList == null && teamList != null && rosqList == null)
       {
         for (StatsTeam team : teamList)
         {
@@ -138,7 +152,23 @@ public class ExamOutput
           PreparedStatement statement = con.prepareStatement(sql);
           setStatementWithPS(statement, team.getScore(),
               team.getMean(), team.getStddev(),
-              team.getVariance(), team.getMedian(), team, null);
+              team.getVariance(), team.getMedian(), team, null, null);
+        }
+        con.close();
+      } else if (schoolList == null && teamList == null && rosqList != null)
+      {
+        for (RoundOffStatsQuestion question : rosqList)
+        {
+          String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
+          String sQ = "q".concat(q);
+          String table = "stats_exams.".concat(sQ);
+          String sql = "insert into " + table + " (date, question, mean, median, stddev, variance) values (?,?,?,?,?,?)";
+
+          PreparedStatement statement = con.prepareStatement(sql);
+
+          setStatementWithPS(statement, 0,
+              question.getMean(), question.getStddev(),
+              question.getVariance(), question.getMedian(), null, null, sQ);
         }
         con.close();
       } else

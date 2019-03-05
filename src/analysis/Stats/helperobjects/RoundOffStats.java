@@ -36,4 +36,14 @@ public class RoundOffStats
   {
     return variance;
   }
+
+  @Override
+  public String toString()
+  {
+    return
+        "Mean: [" + getMean() + "]\n" +
+            "Median: [" + getMedian() + "]\n" +
+            "Standard: [" + getStddev() + "]\n" +
+            "Variance: [" + getVariance() + ']';
+  }
 }
