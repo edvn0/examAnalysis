@@ -22,6 +22,7 @@ public class ExamAnalysis
   private List<RoundOffStatsQuestion> questionsStats;
 
   private ExamTeam[] examTeams;
+  private ExamSchool[] examSchools;
 
   private final String dir;
 
@@ -38,7 +39,7 @@ public class ExamAnalysis
 
   private void init()
   {
-    ExamSchool[] examSchools = input.getExamSchools();
+    examSchools = input.getExamSchools();
     examTeams = input.getExamTeams();
 
     statsTeams = this.generateStatsTeams(examTeams);
@@ -46,7 +47,10 @@ public class ExamAnalysis
     questionsStats = this.generateQuestionsStats();
   }
 
-  // Statistical Analysis
+  //////////////////////////////
+  //// Statistical Analysis ////
+  //////////////////////////////
+
   // exams for a specific team.
   private StatsTeam analyseExams(@NotNull ExamTeam[] exams, @NotNull String name)
   {
@@ -79,7 +83,7 @@ public class ExamAnalysis
     variance = (squaredSum / (totLength));
 
     // STDDEV
-    standardDeviation = getStandardDeviation(mean, totLength, average_scores);
+    standardDeviation = generateStandardDeviation(mean, totLength, average_scores);
 
     // Median
     double median = generateMedian(average_scores);
@@ -106,12 +110,6 @@ public class ExamAnalysis
     double[] average_scores = new double[totLength];
     double average_score = 0;
 
-    for (ExamSchool examSchool1 : schoolsWithSameName)
-    {
-      average_score += examSchool1.getScore();
-    }
-    average_score /= arrayLength;
-
     // This makes an average score array from the full school, to do stats analysis on.
     for (ExamSchool examSchool : schoolsWithSameName)
     {
@@ -123,8 +121,10 @@ public class ExamAnalysis
     }
     for (int i = 0; i < average_scores.length; i++)
     {
+      average_score += average_scores[i];
       average_scores[i] = average_scores[i] / arrayLength;
     }
+    average_score = average_score / arrayLength;
 
     // MEAN
     for (int i = 0; i < totLength; i++)
@@ -134,16 +134,15 @@ public class ExamAnalysis
     mean = sum / totLength;
 
     // VARIANCE
-    variance = this.produceVariance(average_scores, mean, arrayLength);
+    variance = this.generateVariance(average_scores, mean, totLength);
 
     // Standard deviation
-    standardDeviation = getStandardDeviation(mean, totLength, average_scores);
+    standardDeviation = generateStandardDeviation(mean, totLength, average_scores);
 
     // Median
     double median = generateMedian(average_scores);
 
     RoundOffStats ros = new RoundOffStats(mean, median, standardDeviation, variance, 1000.00);
-    System.out.println("Mean for ros: " + ros.getMean());
 
     return new StatsSchool(name, average_score, ros.getMean(), ros.getMedian(), ros.getStddev(), ros.getVariance());
   }
@@ -246,8 +245,8 @@ public class ExamAnalysis
 
     double mean = generateMean(scoresForIndex, scoresForIndex.length);
     double median = generateMedian(scoresForIndex);
-    double stddev = getStandardDeviation(mean, scoresForIndex.length, scoresForIndex);
-    double variance = produceVariance(scoresForIndex, mean, scoresForIndex.length);
+    double stddev = generateStandardDeviation(mean, scoresForIndex.length, scoresForIndex);
+    double variance = generateVariance(scoresForIndex, mean, scoresForIndex.length);
 
     return getRoundOffQuestionsObject(String.valueOf(index), mean, median, stddev, variance);
   }
@@ -285,12 +284,12 @@ public class ExamAnalysis
     return array.length % 2 == 0 ? midpoint : midpoint_mid;
   }
 
-  private double produceVariance(double[] scores, double mean, int length)
+  private double generateVariance(double[] scores, double mean, int length)
   {
     return getXiSquared(mean, scores) / length;
   }
 
-  private double getStandardDeviation(double mean, int totLength, double[] average_scores)
+  private double generateStandardDeviation(double mean, int totLength, double[] average_scores)
   {
     double xi_xbar_sum = getXiSquared(mean, average_scores);
     return Math.sqrt(xi_xbar_sum / totLength);

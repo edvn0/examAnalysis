@@ -14,10 +14,10 @@ public class ExamMain
     ExamOutput.printToCSV_Schools(examAnalysis.getStatsSchools());
 
     System.out.println("First");
-    ExamOutput.insertIntoDatabase(examAnalysis.getStatsTeams(), null, null);
+    //ExamOutput.insertIntoDatabase(examAnalysis.getStatsTeams(), null, null);
     System.out.println("Second");
-    ExamOutput.insertIntoDatabase(null, examAnalysis.getStatsSchools(), null);
+    //ExamOutput.insertIntoDatabase(null, examAnalysis.getStatsSchools(), null);
     System.out.println("Third");
-    ExamOutput.insertIntoDatabase(null, null, examAnalysis.getQuestionsStats());
+    //ExamOutput.insertIntoDatabase(null, null, examAnalysis.getQuestionsStats());
   }
 }

@@ -11,17 +11,14 @@ import java.util.*;
 
 public class ExamInput
 {
+  private static String[] SCHOOLS;
   private Exam[] exams;
   private ExamTeam[] examTeams;
   private ExamSchool[] examSchools;
-
   private List<String[]> listOfRowsInData;
   private String[] teams;
-
-  private static String[] SCHOOLS;
-
-  private static final int INDIVIDUAL_SCORES_START = 4;
-  private static final int INDIVIDUAL_SCORES_END = 18;
+  private int INDIVIDUAL_SCORES_START;
+  private int INDIVIDUAL_SCORES_END;
 
   public ExamInput(String examDirectory)
   {
@@ -29,15 +26,19 @@ public class ExamInput
     {
       FileInput fileInput = new FileInput(examDirectory);
       listOfRowsInData = fileInput.fileInput();
+      INDIVIDUAL_SCORES_START = fileInput.getIndex(true, listOfRowsInData) != -1 ? fileInput.getIndex(true, listOfRowsInData) : 0;
+      INDIVIDUAL_SCORES_END = fileInput.getIndex(false, listOfRowsInData) != -1 ? fileInput.getIndex(false, listOfRowsInData) : 0;
     } catch (FileNotFoundException e)
     {
       e.printStackTrace();
     }
+    if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) System.exit(0);
 
     // All teams for the exams.
     teams = this.teams();
     // Init the school names.
     SCHOOLS = this.getSchools();
+
 
     // Inits the lists.
     // First, the exams with no school associated.
@@ -77,8 +78,6 @@ public class ExamInput
         }
       }
     }
-
-    System.out.println(tot);
 
     return tot;
   }
@@ -302,14 +301,12 @@ public class ExamInput
   // Gets the individual scores
   private int[] getIndexedSetsFromString(String[] input)
   {
-    int[] list = new int[ExamInput.INDIVIDUAL_SCORES_END - ExamInput.INDIVIDUAL_SCORES_START + 1];
+    int[] list = new int[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START + 1];
 
-    System.out.println(input.length + " " + list.length);
 
-    for (int i = ExamInput.INDIVIDUAL_SCORES_START; i < ExamInput.INDIVIDUAL_SCORES_END; i++)
+    for (int i = this.INDIVIDUAL_SCORES_START; i < this.INDIVIDUAL_SCORES_END; i++)
     {
-      System.out.println(input[i]);
-      list[i - ExamInput.INDIVIDUAL_SCORES_START] = Integer.parseInt(input[i]);
+      list[i - this.INDIVIDUAL_SCORES_START] = Integer.parseInt(input[i]);
     }
 
     return list;

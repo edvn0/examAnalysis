@@ -7,7 +7,6 @@ public class RoundOffStatsQuestion extends RoundOffStats
   public RoundOffStatsQuestion(double mean, double median, double stddev, double variance, double numOfDec, String question)
   {
     super(mean, median, stddev, variance, numOfDec);
-    System.out.println(mean + " " + median + " " + stddev + " " + variance);
     this.question = question;
   }
 
