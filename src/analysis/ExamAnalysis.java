@@ -147,22 +147,74 @@ public class ExamAnalysis
     return new StatsSchool(name, average_score, ros.getMean(), ros.getMedian(), ros.getStddev(), ros.getVariance());
   }
 
-  // Helper function which gets an array with all the teams sharing a name.
-  private ExamTeam getExamTeamFromName(ExamTeam[] exams, String name)
+  // Uses analyseExams to analyse ALL teams.
+  private List<StatsTeam> generateStatsTeams(ExamTeam[] teams)
   {
-    if (name != null)
+    Set<StatsTeam> teamSet = new HashSet<>();
+    for (ExamTeam team : teams)
     {
-      ExamTeam teamsWithSameName = null;
-      for (ExamTeam et : exams)
-      {
-        if (et.getTeam().toLowerCase().trim().equals(name.toLowerCase().trim()))
-          teamsWithSameName = new ExamTeam(et.getExam(), et.getTeam());
-      }
-      return teamsWithSameName;
-    } else
-    {
-      return null;
+      StatsTeam statsTeam = analyseExams(teams, team.getTeam());
+      teamSet.add(statsTeam);
     }
+
+    return new ArrayList<>(teamSet);
+  }
+
+  // Uses analyseExams to analyse ALL schools.
+  private List<StatsSchool> generateStatsSchools(ExamSchool[] schools)
+  {
+    Set<StatsSchool> teamSet = new HashSet<>();
+    for (ExamSchool school : schools)
+    {
+      StatsSchool statsSchool = analyseExams(schools, school.getSchool());
+      teamSet.add(statsSchool);
+    }
+
+    return new ArrayList<>(teamSet);
+  }
+
+  //////////////////////////////////
+  //// End Statistical Analysis ////
+  //////////////////////////////////
+
+  // Helper object
+  private RoundOffStats getRoundOffObject(double mean, double median, double stddev, double variance)
+  {
+    return new RoundOffStats(mean, median, stddev, variance, 1000.0);
+  }
+
+  private RoundOffStatsQuestion getRoundOffQuestionsObject(String question, double mean, double median, double stddev, double variance)
+  {
+    return new RoundOffStatsQuestion(mean, median, stddev, variance, 1000.00, question);
+  }
+
+  private List<RoundOffStatsQuestion> generateQuestionsStats()
+  {
+    List<RoundOffStatsQuestion> stats = new ArrayList<>();
+
+    for (int i = 0; i < AMOUNT_OF_QUESTIONS; i++)
+    {
+      RoundOffStatsQuestion question = this.generateRoundOffStats(i);
+      stats.add(question);
+    }
+
+    return stats;
+  }
+
+  private RoundOffStatsQuestion generateRoundOffStats(int index)
+  {
+    double[] scoresForIndex = new double[examTeams.length];
+    for (int i = 0; i < scoresForIndex.length; i++)
+    {
+      scoresForIndex[i] = examTeams[i].getSeparateScoresForAllQuestions()[index];
+    }
+
+    double mean = generateMean(scoresForIndex, scoresForIndex.length);
+    double median = generateMedian(scoresForIndex);
+    double stddev = generateStandardDeviation(mean, scoresForIndex.length, scoresForIndex);
+    double variance = generateVariance(scoresForIndex, mean, scoresForIndex.length);
+
+    return getRoundOffQuestionsObject(String.valueOf(index), mean, median, stddev, variance);
   }
 
   // Helper function which gets an array with all the schools sharing a name.
@@ -196,72 +248,22 @@ public class ExamAnalysis
     }
   }
 
-  // Uses analyseExams to analyse ALL teams.
-  private List<StatsTeam> generateStatsTeams(ExamTeam[] teams)
+  // Helper function which gets an array with all the teams sharing a name.
+  private ExamTeam getExamTeamFromName(ExamTeam[] exams, String name)
   {
-    Set<StatsTeam> teamSet = new HashSet<>();
-    for (ExamTeam team : teams)
+    if (name != null)
     {
-      StatsTeam statsTeam = analyseExams(teams, team.getTeam());
-      teamSet.add(statsTeam);
-    }
-
-    return new ArrayList<>(teamSet);
-  }
-
-  // Uses analyseExams to analyse ALL schools.
-  private List<StatsSchool> generateStatsSchools(ExamSchool[] schools)
-  {
-    Set<StatsSchool> teamSet = new HashSet<>();
-    for (ExamSchool school : schools)
+      ExamTeam teamsWithSameName = null;
+      for (ExamTeam et : exams)
+      {
+        if (et.getTeam().toLowerCase().trim().equals(name.toLowerCase().trim()))
+          teamsWithSameName = new ExamTeam(et.getExam(), et.getTeam());
+      }
+      return teamsWithSameName;
+    } else
     {
-      StatsSchool statsSchool = analyseExams(schools, school.getSchool());
-      teamSet.add(statsSchool);
+      return null;
     }
-
-    return new ArrayList<>(teamSet);
-  }
-
-  private List<RoundOffStatsQuestion> generateQuestionsStats()
-  {
-    List<RoundOffStatsQuestion> stats = new ArrayList<>();
-
-    for (int i = 0; i < AMOUNT_OF_QUESTIONS; i++)
-    {
-      RoundOffStatsQuestion question = this.generateRoundOffStats(i);
-      stats.add(question);
-    }
-
-    return stats;
-  }
-
-  private RoundOffStatsQuestion generateRoundOffStats(int index)
-  {
-    double[] scoresForIndex = new double[examTeams.length];
-    for (int i = 0; i < scoresForIndex.length; i++)
-    {
-      scoresForIndex[i] = examTeams[i].getSeparateScoresForAllQuestions()[index];
-    }
-
-    double mean = generateMean(scoresForIndex, scoresForIndex.length);
-    double median = generateMedian(scoresForIndex);
-    double stddev = generateStandardDeviation(mean, scoresForIndex.length, scoresForIndex);
-    double variance = generateVariance(scoresForIndex, mean, scoresForIndex.length);
-
-    return getRoundOffQuestionsObject(String.valueOf(index), mean, median, stddev, variance);
-  }
-
-  // End statistical Analysis
-
-  // Helper object
-  private RoundOffStats getRoundOffObject(double mean, double median, double stddev, double variance)
-  {
-    return new RoundOffStats(mean, median, stddev, variance, 1000.0);
-  }
-
-  private RoundOffStatsQuestion getRoundOffQuestionsObject(String question, double mean, double median, double stddev, double variance)
-  {
-    return new RoundOffStatsQuestion(mean, median, stddev, variance, 1000.00, question);
   }
   // End helper object
 
@@ -327,7 +329,6 @@ public class ExamAnalysis
   {
     return examSchools;
   }
-
   // End getters
 
 }

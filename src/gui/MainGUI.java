@@ -30,8 +30,9 @@ public class MainGUI
   {
     questionsToDatabaseButton.addActionListener(e ->
     {
+      System.out.println("Inserting...");
       ExamOutput.insertIntoDatabase(null, null, questionsStats);
-      System.out.println("QuestionsToDatabase");
+      System.out.println("Inserted...");
     });
     teamsToDatabaseButton.addActionListener(e ->
     {
@@ -43,7 +44,10 @@ public class MainGUI
       ExamOutput.insertIntoDatabase(null, statsSchools, null);
       System.out.println("schoolsToDatabase");
     });
-    exitButton.addActionListener(e -> System.exit(0));
+    exitButton.addActionListener(e ->
+    {
+      System.exit(0);
+    });
     oneToFourteenCSVButton.addActionListener(e ->
     {
       ExamOutput.printQuestionsToCSV(examSchools);

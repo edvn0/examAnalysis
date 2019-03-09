@@ -260,10 +260,10 @@ public class ExamOutput
         con.close();
       } else if (schoolList == null && teamList == null && rosqList != null)
       {
-        // Inserts the questions 1-14 into stats_exams.questions.
+        // Inserts the questions 1-14 into stats_exams.questions if the questions already do not exist.
         boolean doesQuestionsExist = checkDatabaseForQuestions(con, rosqList);
 
-        if (doesQuestionsExist)
+        if (!doesQuestionsExist)
         {
           for (RoundOffStatsQuestion question : rosqList)
           {
@@ -314,11 +314,11 @@ public class ExamOutput
       while (rs.next())
       {
         String question = rs.getString(2);
-        double mean = Double.parseDouble(rs.getString(3));
-        double median = Double.parseDouble(rs.getString(4));
-        double stddev = Double.parseDouble(rs.getString(5));
-        double variance = Double.parseDouble(rs.getString(6));
-        double maxscore = Double.parseDouble(rs.getString(7));
+        double mean = Double.parseDouble(rs.getString(4));
+        double median = Double.parseDouble(rs.getString(5));
+        double stddev = Double.parseDouble(rs.getString(6));
+        double variance = Double.parseDouble(rs.getString(7));
+        double maxscore = Double.parseDouble(rs.getString(8));
         String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
         String sQ = "q".concat(q);
         if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0)
