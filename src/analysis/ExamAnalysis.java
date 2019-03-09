@@ -9,7 +9,11 @@ import exams.ExamTeam;
 import io.ExamInput;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ExamAnalysis
 {
@@ -89,7 +93,7 @@ public class ExamAnalysis
     double median = generateMedian(average_scores);
 
     // TOTAL SCORE
-    int totalScore = teamSameName.getScore();
+    double totalScore = teamSameName.getScore();
 
     // Round off all values into an object for refactoring.
     RoundOffStats roundOffStats = this.getRoundOffObject(mean, median, standardDeviation, variance);
@@ -115,8 +119,8 @@ public class ExamAnalysis
     {
       for (int j = 0; j < totLength; j++)
       {
-        int[] sepscores = examSchool.getSeparateScoresForAllQuestions();
-        average_scores[j] += (double) sepscores[j];
+        double[] sepscores = examSchool.getSeparateScoresForAllQuestions();
+        average_scores[j] += sepscores[j];
       }
     }
     for (int i = 0; i < average_scores.length; i++)
@@ -240,7 +244,7 @@ public class ExamAnalysis
     double[] scoresForIndex = new double[examTeams.length];
     for (int i = 0; i < scoresForIndex.length; i++)
     {
-      scoresForIndex[i] = (double) examTeams[i].getSeparateScoresForAllQuestions()[index];
+      scoresForIndex[i] = examTeams[i].getSeparateScoresForAllQuestions()[index];
     }
 
     double mean = generateMean(scoresForIndex, scoresForIndex.length);

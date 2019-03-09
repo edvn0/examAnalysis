@@ -5,9 +5,9 @@ import java.util.Objects;
 public class StatsTeam extends Stats
 {
   private String team;
-  private int score;
+  private double score;
 
-  public StatsTeam(String team, int score, double mean, double median, double stddev, double variance)
+  public StatsTeam(String team, double score, double mean, double median, double stddev, double variance)
   {
     super(stddev, mean, median, variance);
     this.team = team;
@@ -56,7 +56,7 @@ public class StatsTeam extends Stats
     return team;
   }
 
-  public int getScore()
+  public double getScore()
   {
     return score;
   }

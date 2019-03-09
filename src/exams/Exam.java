@@ -1,5 +1,7 @@
 package exams;
 
+import analysis.Stats.helperobjects.RoundOffStatsQuestion;
+
 import java.util.Arrays;
 import java.util.Date;
 
@@ -7,20 +9,16 @@ import java.util.Date;
 public class Exam
 {
   private int anonymousCode;
-  private int score;
+  private double score;
   private Date date;
-  private int[] separateScoresForAllQuestions;
+  private double[] separateScoresForAllQuestions;
 
-  public Exam(int score, int[] scores, Date date, int anonymousCode)
+  public Exam(double score, double[] scores, Date date, int anonymousCode)
   {
     this.anonymousCode = anonymousCode;
     this.separateScoresForAllQuestions = scores;
     this.score = score;
     this.date = date;
-  }
-
-  public Exam()
-  {
   }
 
   @Override
@@ -36,12 +34,12 @@ public class Exam
 
   // Mutators!
 
-  public int getScore()
+  public double getScore()
   {
     return score;
   }
 
-  public void setScore(int score)
+  public void setScore(double score)
   {
     this.score = score;
   }
@@ -56,12 +54,12 @@ public class Exam
     this.date = date;
   }
 
-  public int[] getSeparateScoresForAllQuestions()
+  public double[] getSeparateScoresForAllQuestions()
   {
     return separateScoresForAllQuestions;
   }
 
-  public void setSeparateScoresForAllQuestions(int[] separateScoresForAllQuestions)
+  public void setSeparateScoresForAllQuestions(double[] separateScoresForAllQuestions)
   {
     this.separateScoresForAllQuestions = separateScoresForAllQuestions;
   }

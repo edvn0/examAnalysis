@@ -49,6 +49,45 @@ public class ExamInput
     this.examTeams = this.getExamTeamList();
   }
 
+  private enum Scores
+  {
+    qOne(10, 1),
+    qTwo(2, 2),
+    qThree(4, 3),
+    qFour(4, 4),
+    qFive(10, 5),
+    qSix(10, 6),
+    qSeven(5, 7),
+    qEight(5, 8),
+    qNine(5, 9),
+    qTen(5, 10),
+    qEleven(5, 11),
+    qTwelve(5, 12),
+    qThirteen(5, 13),
+    qFourteen(5, 14);
+
+    private int max;
+    private int index;
+
+    Scores(int max, int index)
+    {
+      this.max = max;
+      this.index = index;
+    }
+  }
+
+  static int getMaxScore(String question)
+  {
+    for (Scores scores : Scores.values())
+    {
+      if (Integer.parseInt(question) == scores.index)
+      {
+        return scores.max;
+      }
+    }
+    return -1;
+  }
+
   private String[] getSchools()
   {
     HashSet<String> schools = new HashSet<>();
@@ -64,14 +103,14 @@ public class ExamInput
     return schools.toArray(new String[0]);
   }
 
-  public int getTotalScore(String school)
+  public double getTotalScore(String school)
   {
-    int tot = 0;
+    double tot = 0;
     for (ExamSchool examSchool : this.examSchools)
     {
       if (examSchool.getSchool().trim().toLowerCase().equals(school.trim().toLowerCase()))
       {
-        int[] sepScores = examSchool.getSeparateScoresForAllQuestions();
+        double[] sepScores = examSchool.getSeparateScoresForAllQuestions();
         for (int i = 0; i < INDIVIDUAL_SCORES_END - INDIVIDUAL_SCORES_START; i++)
         {
           tot += sepScores[i];
@@ -271,8 +310,8 @@ public class ExamInput
 
     for (int i = 1; i < listOfRowsInData.size(); i++)
     {
-      int score = Integer.parseInt(listOfRowsInData.get(i)[3]);
-      int[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
+      double score = Double.parseDouble(listOfRowsInData.get(i)[3]);
+      double[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
 
       Date date = new Date();
       SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -292,21 +331,21 @@ public class ExamInput
     return exams;
   }
 
-  private Exam insertExam(int score, int[] scores, Date date, int anonymousCode)
+  private Exam insertExam(double score, double[] scores, Date date, int anonymousCode)
   {
     return new Exam(score,
         scores, date, anonymousCode);
   }
 
   // Gets the individual scores
-  private int[] getIndexedSetsFromString(String[] input)
+  private double[] getIndexedSetsFromString(String[] input)
   {
-    int[] list = new int[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START + 1];
+    double[] list = new double[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START + 1];
 
 
     for (int i = this.INDIVIDUAL_SCORES_START; i < this.INDIVIDUAL_SCORES_END; i++)
     {
-      list[i - this.INDIVIDUAL_SCORES_START] = Integer.parseInt(input[i]);
+      list[i - this.INDIVIDUAL_SCORES_START] = Double.parseDouble(input[i]);
     }
 
     return list;
