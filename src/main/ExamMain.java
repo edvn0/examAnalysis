@@ -1,7 +1,9 @@
 package main;
 
 import analysis.ExamAnalysis;
-import io.ExamOutput;
+import gui.MainGUI;
+
+import javax.swing.*;
 
 public class ExamMain
 {
@@ -10,15 +12,12 @@ public class ExamMain
     ExamAnalysis examAnalysis = new ExamAnalysis("/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/data/Deltävlingstentamen-2.csv");
     examAnalysis.start();
 
-    ExamOutput.printToCSV_Teams(examAnalysis.getStatsTeams());
-    ExamOutput.printToCSV_Schools(examAnalysis.getStatsSchools());
-    ExamOutput.printToCSV_Questions(examAnalysis.getQuestionsStats());
-
-    System.out.println("First");
-    //ExamOutput.insertIntoDatabase(examAnalysis.getStatsTeams(), null, null);
-    System.out.println("Second");
-    //ExamOutput.insertIntoDatabase(null, examAnalysis.getStatsSchools(), null);
-    System.out.println("Third");
-    //ExamOutput.insertIntoDatabase(null, null, examAnalysis.getQuestionsStats());
+    MainGUI gui = new MainGUI(examAnalysis.getExamSchools(), examAnalysis.getQuestionsStats(), examAnalysis.getStatsSchools(), examAnalysis.getStatsTeams());
+    JFrame frame = new JFrame("MainGUI");
+    frame.setContentPane(gui.panel1);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.pack();
+    frame.setVisible(true);
+    frame.setLocationRelativeTo(null);
   }
 }

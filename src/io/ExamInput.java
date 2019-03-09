@@ -340,8 +340,7 @@ public class ExamInput
   // Gets the individual scores
   private double[] getIndexedSetsFromString(String[] input)
   {
-    double[] list = new double[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START + 1];
-
+    double[] list = new double[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START];
 
     for (int i = this.INDIVIDUAL_SCORES_START; i < this.INDIVIDUAL_SCORES_END; i++)
     {

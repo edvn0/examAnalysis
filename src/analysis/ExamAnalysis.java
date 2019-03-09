@@ -9,11 +9,7 @@ import exams.ExamTeam;
 import io.ExamInput;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ExamAnalysis
 {
@@ -326,6 +322,12 @@ public class ExamAnalysis
   {
     return questionsStats;
   }
+
+  public ExamSchool[] getExamSchools()
+  {
+    return examSchools;
+  }
+
   // End getters
 
 }

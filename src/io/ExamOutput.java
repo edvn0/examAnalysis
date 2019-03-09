@@ -3,6 +3,7 @@ package io;
 import analysis.Stats.StatsSchool;
 import analysis.Stats.StatsTeam;
 import analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import exams.ExamSchool;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -88,6 +89,45 @@ public class ExamOutput
     {
       e.printStackTrace();
     }
+  }
+
+  public static void printQuestionsToCSV(ExamSchool[] statsSchools)
+  {
+    // Headers:
+    /*
+     * school:
+     * questions = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
+     */
+    try (PrintWriter writer = new PrintWriter(directory + "/output_onetofourteenandschools.csv"))
+    {
+      writer.write("School,");
+      for (int i = 1; i <= 14; i++)
+      {
+        if (i < 14)
+          writer.write("q" + i + ",");
+        else
+          writer.write("q" + i);
+      }
+      writer.write("\n");
+
+      for (ExamSchool schools : statsSchools)
+      {
+        double[] scores = schools.getSeparateScoresForAllQuestions();
+        writer.write(schools.getSchool() + ",");
+        for (int i = 0; i < scores.length; i++)
+        {
+          writer.write("" + scores[i]);
+          if (i != 13) writer.write(",");
+        }
+        writer.write("\n");
+      }
+
+    } catch (FileNotFoundException e)
+    {
+      e.printStackTrace();
+    }
+
+
   }
 
   private static void writeHeaderWithPrintWriter(PrintWriter writer, boolean questions)
