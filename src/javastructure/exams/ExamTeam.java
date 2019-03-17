@@ -1,4 +1,4 @@
-package exams;
+package javastructure.exams;
 
 // Kommer att representera poäng för varje lag.
 public class ExamTeam extends Exam

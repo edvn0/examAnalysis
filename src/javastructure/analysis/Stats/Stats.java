@@ -1,4 +1,4 @@
-package analysis.Stats;
+package javastructure.analysis.Stats;
 
 public class Stats
 {

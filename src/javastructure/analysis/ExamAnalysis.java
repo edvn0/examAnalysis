@@ -1,12 +1,12 @@
-package analysis;
+package javastructure.analysis;
 
-import analysis.Stats.StatsSchool;
-import analysis.Stats.StatsTeam;
-import analysis.Stats.helperobjects.RoundOffStats;
-import analysis.Stats.helperobjects.RoundOffStatsQuestion;
-import exams.ExamSchool;
-import exams.ExamTeam;
-import io.ExamInput;
+import javastructure.analysis.Stats.StatsSchool;
+import javastructure.analysis.Stats.StatsTeam;
+import javastructure.analysis.Stats.helperobjects.RoundOffStats;
+import javastructure.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import javastructure.exams.ExamSchool;
+import javastructure.exams.ExamTeam;
+import javastructure.io.ExamInput;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -51,7 +51,7 @@ public class ExamAnalysis
   //// Statistical Analysis ////
   //////////////////////////////
 
-  // exams for a specific team.
+  // java.exams for a specific team.
   private StatsTeam analyseExams(@NotNull ExamTeam[] exams, @NotNull String name)
   {
     double standardDeviation, mean;
@@ -97,7 +97,7 @@ public class ExamAnalysis
     return new StatsTeam(name, totalScore, roundOffStats.getMean(), roundOffStats.getMedian(), roundOffStats.getStddev(), roundOffStats.getVariance());
   }
 
-  // exams for a specific school.
+  // java.exams for a specific school.
   private StatsSchool analyseExams(@NotNull ExamSchool[] schools, String name)
   {
     double standardDeviation, mean, variance;
@@ -110,7 +110,7 @@ public class ExamAnalysis
     double[] average_scores = new double[totLength];
     double average_score = 0;
 
-    // This makes an average score array from the full school, to do stats analysis on.
+    // This makes an average score array from the full school, to do stats java.analysis on.
     for (ExamSchool examSchool : schoolsWithSameName)
     {
       for (int j = 0; j < totLength; j++)

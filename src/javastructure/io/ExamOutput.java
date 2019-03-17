@@ -1,9 +1,9 @@
-package io;
+package javastructure.io;
 
-import analysis.Stats.StatsSchool;
-import analysis.Stats.StatsTeam;
-import analysis.Stats.helperobjects.RoundOffStatsQuestion;
-import exams.ExamSchool;
+import javastructure.analysis.Stats.StatsSchool;
+import javastructure.analysis.Stats.StatsTeam;
+import javastructure.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import javastructure.exams.ExamSchool;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class ExamOutput
 {
-  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/data/output";
+  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/java.data/output";
 
   public static void printToCSV_Teams(List<StatsTeam> teamList)
   {

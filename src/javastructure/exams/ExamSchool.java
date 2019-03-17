@@ -1,4 +1,4 @@
-package exams;
+package javastructure.exams;
 
 // Kommer representera poäng i varje skola.
 public class ExamSchool extends Exam

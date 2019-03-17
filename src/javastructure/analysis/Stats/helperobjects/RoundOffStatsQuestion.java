@@ -1,4 +1,4 @@
-package analysis.Stats.helperobjects;
+package javastructure.analysis.Stats.helperobjects;
 
 public class RoundOffStatsQuestion extends RoundOffStats
 {

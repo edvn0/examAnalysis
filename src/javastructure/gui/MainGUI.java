@@ -1,12 +1,12 @@
-package gui;
+package javastructure.gui;
 
-import analysis.Stats.StatsSchool;
-import analysis.Stats.StatsTeam;
-import analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import exams.ExamSchool;
-import io.ExamOutput;
+import javastructure.analysis.Stats.StatsSchool;
+import javastructure.analysis.Stats.StatsTeam;
+import javastructure.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import javastructure.exams.ExamSchool;
+import javastructure.io.ExamOutput;
 
 import javax.swing.*;
 import java.awt.*;

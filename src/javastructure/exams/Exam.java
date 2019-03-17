@@ -1,6 +1,4 @@
-package exams;
-
-import analysis.Stats.helperobjects.RoundOffStatsQuestion;
+package javastructure.exams;
 
 import java.util.Arrays;
 import java.util.Date;

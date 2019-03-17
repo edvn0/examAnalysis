@@ -1,4 +1,4 @@
-package io;
+package javastructure.io;
 
 import java.io.File;
 import java.io.FileNotFoundException;

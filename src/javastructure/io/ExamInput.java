@@ -1,8 +1,8 @@
-package io;
+package javastructure.io;
 
-import exams.Exam;
-import exams.ExamSchool;
-import exams.ExamTeam;
+import javastructure.exams.Exam;
+import javastructure.exams.ExamSchool;
+import javastructure.exams.ExamTeam;
 
 import java.io.FileNotFoundException;
 import java.text.ParseException;
@@ -34,14 +34,14 @@ public class ExamInput
     }
     if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) System.exit(0);
 
-    // All teams for the exams.
+    // All teams for the java.exams.
     teams = this.teams();
     // Init the school names.
     SCHOOLS = this.getSchools();
 
 
     // Inits the lists.
-    // First, the exams with no school associated.
+    // First, the java.exams with no school associated.
     this.exams = this.getExamList();
     // Second, exam with the school, sorted lexicographically with the schools.
     this.examSchools = this.getExamSchoolList();
@@ -132,7 +132,7 @@ public class ExamInput
     return stringHashSet.toArray(new String[0]);
   }
 
-  // Helper function that sets the array examSchools to all the exams + the school name.
+  // Helper function that sets the array examSchools to all the java.exams + the school name.
   private ExamSchool[] setExamSchoolList()
   {
     int sizeOfExamSchoolArray = 0;
@@ -180,7 +180,7 @@ public class ExamInput
     return examSchools;
   }
 
-  // Helper function to find an Exam in this.exams with the anon code.
+  // Helper function to find an Exam in this.java.exams with the anon code.
   private int findExamByCode(int code)
   {
     for (int i = 0; i < this.exams.length; i++)
@@ -212,7 +212,7 @@ public class ExamInput
     return examSchools;
   }
 
-  // Helper function to get the ExamSchool[] with all exams associated with input school.
+  // Helper function to get the ExamSchool[] with all java.exams associated with input school.
   private ExamSchool[] getExamSchoolsBySchool(String school)
   {
     int size = 0;
@@ -256,7 +256,7 @@ public class ExamInput
     return list;
   }
 
-  // Helper function to get the ExamTeams[] with all exams associated with input code.
+  // Helper function to get the ExamTeams[] with all java.exams associated with input code.
   private ExamTeam[] getExamTeamsByTeam(String team)
   {
     int size = 0;
@@ -285,7 +285,7 @@ public class ExamInput
   {
     ExamTeam[] examTeams;
 
-    // P1: Init an array with exactly the size of exams[] where the team is the same.
+    // P1: Init an array with exactly the size of java.exams[] where the team is the same.
     int sizeOfExamTeamSchool = 0;
     for (int i = 1; i < listOfRowsInData.size(); i++)
     {
@@ -293,7 +293,7 @@ public class ExamInput
     }
 
     examTeams = new ExamTeam[sizeOfExamTeamSchool];
-    // P2: Return the array with all those exams with teams in common.
+    // P2: Return the array with all those java.exams with teams in common.
 
     for (int i = 0; i < examTeams.length; i++)
     {
@@ -305,13 +305,13 @@ public class ExamInput
 
   private Exam[] getExamList()
   {
-    // Format the data.
+    // Format the java.data.
     Exam[] exams = new Exam[listOfRowsInData.size() - 1];
 
     for (int i = 1; i < listOfRowsInData.size(); i++)
     {
       double score = Double.parseDouble(listOfRowsInData.get(i)[3]);
-      double[] scores = getIndexedSetsFromString(listOfRowsInData.get(i));
+      double[] scores = getScoresFromRowData(listOfRowsInData.get(i));
 
       Date date = new Date();
       SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -338,7 +338,7 @@ public class ExamInput
   }
 
   // Gets the individual scores
-  private double[] getIndexedSetsFromString(String[] input)
+  private double[] getScoresFromRowData(String[] input)
   {
     double[] list = new double[this.INDIVIDUAL_SCORES_END - this.INDIVIDUAL_SCORES_START];
 
