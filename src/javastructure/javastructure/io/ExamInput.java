@@ -17,6 +17,7 @@ public class ExamInput
   private ExamSchool[] examSchools;
   private List<String[]> listOfRowsInData;
   private String[] teams;
+
   private int INDIVIDUAL_SCORES_START;
   private int INDIVIDUAL_SCORES_END;
 
@@ -350,11 +351,6 @@ public class ExamInput
     return list;
   }
 
-  public Exam[] getExams()
-  {
-    return this.exams;
-  }
-
   public ExamTeam[] getExamTeams()
   {
     return this.examTeams;
@@ -363,23 +359,5 @@ public class ExamInput
   public ExamSchool[] getExamSchools()
   {
     return examSchools;
-  }
-
-  public int[] getExamCodes()
-  {
-    int[] codes;
-    int size = 0;
-    for (int i = 0; i < this.exams.length; i++)
-    {
-      size++;
-    }
-
-    codes = new int[size];
-
-    for (int i = 0; i < codes.length; i++)
-    {
-      codes[i] = exams[i].getAnonymousCode();
-    }
-    return codes;
   }
 }

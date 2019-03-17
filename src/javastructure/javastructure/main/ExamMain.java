@@ -7,9 +7,12 @@ import javax.swing.*;
 
 public class ExamMain
 {
-  public static void main(String... args)
+  public static void main(final String... args)
   {
-    ExamAnalysis examAnalysis = new ExamAnalysis("/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/javastructure/data/Deltävlingstentamen.csv");
+    ExamAnalysis examAnalysis = new ExamAnalysis(
+        "/Users/edwincarlsson/Documents/Programmering" +
+            "/Java-programmering/src/javastructure/data/Deltävlingstentamen.csv");
+
     examAnalysis.start();
 
     MainGUI gui = new MainGUI(examAnalysis.getExamSchools(), examAnalysis.getQuestionsStats(), examAnalysis.getStatsSchools(), examAnalysis.getStatsTeams());

@@ -1,5 +1,6 @@
 package javastructure.io;
 
+import javastructure.analysis.ExamAnalysis;
 import javastructure.analysis.Stats.StatsSchool;
 import javastructure.analysis.Stats.StatsTeam;
 import javastructure.analysis.Stats.helperobjects.RoundOffStatsQuestion;
@@ -7,7 +8,6 @@ import javastructure.exams.ExamSchool;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -197,21 +197,22 @@ public class ExamOutput
     } else if (team == null)
     {
       statement.setString(1, school.getSchool());
-      statement.setString(2, "" + score);
-      statement.setString(3, "" + mean);
-      statement.setString(4, "" + stddev);
-      statement.setString(5, "" + variance);
-      statement.setString(6, "" + median);
+      writeStringToStatement(statement, score, mean, stddev, variance, median);
     } else if (school == null)
     {
       statement.setString(1, team.getTeam());
-      statement.setString(2, "" + score);
-      statement.setString(3, "" + mean);
-      statement.setString(4, "" + stddev);
-      statement.setString(5, "" + variance);
-      statement.setString(6, "" + median);
+      writeStringToStatement(statement, score, mean, stddev, variance, median);
     }
     statement.execute();
+  }
+
+  private static void writeStringToStatement(PreparedStatement statement, double score, double mean, double stddev, double variance, double median) throws SQLException
+  {
+    statement.setString(2, "" + score);
+    statement.setString(3, "" + mean);
+    statement.setString(4, "" + stddev);
+    statement.setString(5, "" + variance);
+    statement.setString(6, "" + median);
   }
 
   public static void insertIntoDatabase(List<StatsTeam> teamList, List<StatsSchool> schoolList, List<RoundOffStatsQuestion> rosqList)
@@ -286,9 +287,6 @@ public class ExamOutput
               throw new SQLException("Max Score was not found.");
             }
           }
-        } else
-        {
-          // TODO: fix this. INSERT INTO ... ON DUPLICATE KEY UPDATE
         }
         con.close();
       } else
@@ -305,7 +303,6 @@ public class ExamOutput
 
   private static boolean checkDatabaseForQuestions(Connection con, List<RoundOffStatsQuestion> rosqList)
   {
-    System.out.println("ExamOutput.checkDatabaseForQuestions");
     int equalQuestions = 0;
     try
     {
@@ -326,36 +323,11 @@ public class ExamOutput
           equalQuestions++;
         }
       }
-      return equalQuestions == 14;
+      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
     } catch (SQLException e)
     {
       System.out.println(e.getSQLState());
     }
     return false;
-  }
-
-  public static void deleteAllTablesFromDatabase()
-  {
-    try (PrintWriter writer = new PrintWriter(directory + "/sql_cheat.csv"))
-    {
-      StringBuilder builder = new StringBuilder();
-      for (int i = 1; i <= 16; i++)
-      {
-        if (i <= 14)
-          builder.append("DELETE").append(" ").append("FROM").append(" ").append("stats_exams.q").append(i).append(";\n");
-        else if (i == 15)
-          builder.append("DELETE").append(" ").append("FROM").append(" ").append("stats_exams.school_statistics").append(";\n");
-        else
-        {
-          builder.append("DELETE").append(" ").append("FROM").append(" ").append("stats_exams.team_statistics").append(";\n");
-        }
-      }
-      String sql = builder.toString();
-
-      writer.write(sql);
-    } catch (IOException e)
-    {
-      e.printStackTrace();
-    }
   }
 }

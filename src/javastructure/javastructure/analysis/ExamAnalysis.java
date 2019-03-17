@@ -13,7 +13,7 @@ import java.util.*;
 
 public class ExamAnalysis
 {
-  private final static int AMOUNT_OF_QUESTIONS = 14;
+  public final static int AMOUNT_OF_QUESTIONS = 14;
 
   private ExamInput input;
 
@@ -63,30 +63,30 @@ public class ExamAnalysis
 
     // Every examteam[i] has an array with scores[j]. Average scores is a combined array with averages of every
     // question for every team. This is easier to work with and to analyse.
-    double[] average_scores = new double[totLength];
+    double[] averageScores = new double[totLength];
     for (int i = 1; i < teamSameName.getSeparateScoresForAllQuestions().length; i++)
     {
       int index = i - 1;
-      average_scores[index] = teamSameName.getSeparateScoresForAllQuestions()[i];
+      averageScores[index] = teamSameName.getSeparateScoresForAllQuestions()[i];
     }
 
     // MEAN
-    sum = Arrays.stream(average_scores).sum();
+    sum = Arrays.stream(averageScores).sum();
     mean = sum / totLength;
 
     // Variance
-    for (double average_score1 : average_scores)
+    for (double averageScore : averageScores)
     {
-      double xi_xbar = average_score1 - mean;
-      squaredSum += xi_xbar * xi_xbar;
+      double xiXbar = averageScore - mean;
+      squaredSum += xiXbar * xiXbar;
     }
     variance = (squaredSum / (totLength));
 
     // STDDEV
-    standardDeviation = generateStandardDeviation(mean, totLength, average_scores);
+    standardDeviation = generateStandardDeviation(mean, totLength, averageScores);
 
     // Median
-    double median = generateMedian(average_scores);
+    double median = generateMedian(averageScores);
 
     // TOTAL SCORE
     double totalScore = teamSameName.getScore();
@@ -107,8 +107,8 @@ public class ExamAnalysis
     ExamSchool[] schoolsWithSameName = this.getExamSchoolArrayFromName(schools, name);
     final int arrayLength = schoolsWithSameName.length;
 
-    double[] average_scores = new double[totLength];
-    double average_score = 0;
+    double[] averageScores = new double[totLength];
+    double averageScore = 0;
 
     // This makes an average score array from the full school, to do stats java.analysis on.
     for (ExamSchool examSchool : schoolsWithSameName)
@@ -116,35 +116,35 @@ public class ExamAnalysis
       for (int j = 0; j < totLength; j++)
       {
         double[] sepscores = examSchool.getSeparateScoresForAllQuestions();
-        average_scores[j] += sepscores[j];
+        averageScores[j] += sepscores[j];
       }
     }
-    for (int i = 0; i < average_scores.length; i++)
+    for (int i = 0; i < averageScores.length; i++)
     {
-      average_score += average_scores[i];
-      average_scores[i] = average_scores[i] / arrayLength;
+      averageScore += averageScores[i];
+      averageScores[i] = averageScores[i] / arrayLength;
     }
-    average_score = average_score / arrayLength;
+    averageScore = averageScore / arrayLength;
 
     // MEAN
     for (int i = 0; i < totLength; i++)
     {
-      sum += average_scores[i];
+      sum += averageScores[i];
     }
     mean = sum / totLength;
 
     // VARIANCE
-    variance = this.generateVariance(average_scores, mean, totLength);
+    variance = this.generateVariance(averageScores, mean, totLength);
 
     // Standard deviation
-    standardDeviation = generateStandardDeviation(mean, totLength, average_scores);
+    standardDeviation = generateStandardDeviation(mean, totLength, averageScores);
 
     // Median
-    double median = generateMedian(average_scores);
+    double median = generateMedian(averageScores);
 
     RoundOffStats ros = new RoundOffStats(mean, median, standardDeviation, variance, 1000.00);
 
-    return new StatsSchool(name, average_score, ros.getMean(), ros.getMedian(), ros.getStddev(), ros.getVariance());
+    return new StatsSchool(name, averageScore, ros.getMean(), ros.getMedian(), ros.getStddev(), ros.getVariance());
   }
 
   // Uses analyseExams to analyse ALL teams.
@@ -299,13 +299,13 @@ public class ExamAnalysis
 
   private double getXiSquared(double mean, double[] average_scores)
   {
-    double xi_xbar_sum = 0;
+    double xiXbarSum = 0;
     for (double xi : average_scores)
     {
       double xi_xbar = xi - mean;
-      xi_xbar_sum += xi_xbar * xi_xbar;
+      xiXbarSum += xi_xbar * xi_xbar;
     }
-    return xi_xbar_sum;
+    return xiXbarSum;
   }
   // End help math
 
