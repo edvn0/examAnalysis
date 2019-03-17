@@ -2,7 +2,7 @@ package javastructure.analysis.Stats;
 
 import java.util.Objects;
 
-public class StatsSchool extends Stats
+public class StatsSchool extends javastructure.analysis.Stats.Stats
 {
   private String school;
   private double score;
