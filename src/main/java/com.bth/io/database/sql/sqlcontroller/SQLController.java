@@ -9,7 +9,10 @@ import com.bth.io.ExamInput;
 import com.bth.io.database.sql.sqlconnector.SQLConnector;
 
 import java.math.BigDecimal;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 public class SQLController
@@ -17,12 +20,6 @@ public class SQLController
   public static void setDatabaseLoginUser(DatabaseLoginUser databaseLoginUser)
   {
     SQLConnector.databaseLoginUser = databaseLoginUser;
-  }
-
-  public static boolean validateConnection(DatabaseLoginUser user) throws SQLException
-  {
-    Connection connection = DriverManager.getConnection(user.getDatabase(), user.getUser(), user.getPassword());
-    return connection.getMetaData() == null;
   }
 
   /***
@@ -33,7 +30,9 @@ public class SQLController
    * @param rosqList List of questions
    * @throws SQLException Because SQL sucks
    */
-  public static void insertIntoDatabase(Connection con, List<StatsTeam> teamList, List<StatsSchool> schoolList, List<RoundOffStatsQuestion> rosqList) throws SQLException
+  public static void insertIntoDatabase(Connection con, List<StatsTeam> teamList,
+                                        List<StatsSchool> schoolList,
+                                        List<RoundOffStatsQuestion> rosqList) throws SQLException
   {
     if (teamList == null && schoolList != null && rosqList == null)
     {
@@ -139,7 +138,10 @@ public class SQLController
     return false;
   }
 
-  private static void setStatementWithPS(PreparedStatement statement, double score, double mean, double stddev, double variance, double median, StatsTeam team, StatsSchool school, String question, int maxscore) throws SQLException
+  private static void setStatementWithPS(PreparedStatement statement, double score,
+                                         double mean, double stddev, double variance,
+                                         double median, StatsTeam team, StatsSchool school,
+                                         String question, int maxscore) throws SQLException
   {
     if (question != null && school == null && team == null)
     {
@@ -166,7 +168,9 @@ public class SQLController
     statement.execute();
   }
 
-  private static void writeStringToStatement(PreparedStatement statement, double score, double mean, double stddev, double variance, double median) throws SQLException
+  private static void writeStringToStatement(PreparedStatement statement, double score,
+                                             double mean, double stddev, double variance,
+                                             double median) throws SQLException
   {
     statement.setString(2, "" + score);
     statement.setString(3, "" + mean);

@@ -1,10 +1,15 @@
 package com.bth.gui.login;
 
 import com.bth.gui.controller.DatabaseLoginUser;
+import com.bth.gui.controller.GUIController;
+import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnector;
+import com.bth.io.database.mongodb.mongodbcontroller.MongoDBController;
 import com.bth.io.database.sql.sqlconnector.SQLConnector;
 import com.bth.io.database.sql.sqlcontroller.SQLController;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,11 +29,13 @@ public class LoginDatabase
   public JComboBox DBTypeComboBox;
   public JPasswordField Password;
   public JTextField collectionNameTextField;
+  public JTextField mongoDatabaseNameTextField;
   public JFrame frame;
 
   private DatabaseLoginUser user;
 
   private Connection connection;
+  private MongoCollection<BasicDBObject> objectsInDb;
 
   public LoginDatabase()
   {
@@ -39,10 +46,33 @@ public class LoginDatabase
     frame.setVisible(false);
     frame.setLocationRelativeTo(null);
 
+    // DEV purpose.
+    test(false);
+
     user = null;
     connection = null;
+    objectsInDb = null;
 
     confirmButton.addActionListener(new ConfirmButtonListener());
+  }
+
+  private void test(boolean sqlormongo)
+  {
+    if (!sqlormongo)
+    {
+      this.collectionNameTextField.setText("SchoolStatistics");
+      this.databaseName.setText("mongodb+srv://edwin-carlsson:Frostdruid98199819@examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true");
+      this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
+      this.UserName.setText("edwin-carlsson");
+      this.Password.setText("Edwin98");
+    } else
+    {
+      this.collectionNameTextField.setText("none");
+      this.databaseName.setText("jdbc:mysql://localhost:8889/stats_exams");
+      this.mongoDatabaseNameTextField.setText("none");
+      this.UserName.setText("Edwin");
+      this.Password.setText("Edwin98");
+    }
   }
 
   // Local class for getting DBObject
@@ -56,23 +86,27 @@ public class LoginDatabase
       char[] password = Password.getPassword();
       String collection = collectionNameTextField.getText();
       String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
+      String mongo = mongoDatabaseNameTextField.getText();
 
       System.out.println(choice);
-
-      if (choice.equals("MySQL"))
+      try
       {
-        try
+        user = new DatabaseLoginUser(mongo, choice, database, userName, password, collection);
+        if (choice.equals("MySQL"))
         {
-          user = new DatabaseLoginUser(choice, database, userName, password, collection);
           SQLController.setDatabaseLoginUser(user);
           connection = SQLConnector.connectToDatabase();
-        } catch (SQLException e1)
+          GUIController.dbChoice = true;
+        } else
         {
-          e1.printStackTrace();
+          // TODO: fix MongoDB integration.
+          MongoDBController.setDatabaseLoginUser(user);
+          objectsInDb = MongoDBConnector.connectToMongoDB(user);
+          GUIController.dbChoice = false;
         }
-      } else
+      } catch (SQLException e1)
       {
-
+        e1.printStackTrace();
       }
       frame.dispose();
     }
@@ -81,6 +115,11 @@ public class LoginDatabase
   public Connection getConnection()
   {
     return connection;
+  }
+
+  public MongoCollection<BasicDBObject> getObjectsInDb()
+  {
+    return objectsInDb;
   }
 
   public JButton getConfirmButton()
@@ -116,26 +155,29 @@ public class LoginDatabase
     confirmButton.setText("Confirm");
     exitConfirmPanel.add(confirmButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     final JPanel panel1 = new JPanel();
-    panel1.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
+    panel1.setLayout(new GridLayoutManager(4, 3, new Insets(0, 0, 0, 0), -1, -1));
     primaryPanel.add(panel1, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     databaseName = new JTextField();
-    databaseName.setText("Database Name");
+    databaseName.setText("jdbc:mysql://<localhost:port>/<db_name>");
     panel1.add(databaseName, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     UserName = new JTextField();
     UserName.setText("Username for DB");
-    panel1.add(UserName, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+    panel1.add(UserName, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     DBTypeComboBox = new JComboBox();
     final DefaultComboBoxModel defaultComboBoxModel1 = new DefaultComboBoxModel();
     defaultComboBoxModel1.addElement("MongoDB");
     defaultComboBoxModel1.addElement("MySQL");
     DBTypeComboBox.setModel(defaultComboBoxModel1);
-    panel1.add(DBTypeComboBox, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    panel1.add(DBTypeComboBox, new GridConstraints(0, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     Password = new JPasswordField();
     Password.setText("Password");
-    panel1.add(Password, new GridConstraints(3, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+    panel1.add(Password, new GridConstraints(3, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
     collectionNameTextField = new JTextField();
     collectionNameTextField.setText("Collection Name");
-    panel1.add(collectionNameTextField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+    panel1.add(collectionNameTextField, new GridConstraints(1, 2, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+    mongoDatabaseNameTextField = new JTextField();
+    mongoDatabaseNameTextField.setText("Mongo Database Name");
+    panel1.add(mongoDatabaseNameTextField, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
   }
 
   /**

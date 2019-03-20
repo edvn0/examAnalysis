@@ -4,10 +4,11 @@ import java.sql.SQLException;
 
 public class DatabaseLoginUser
 {
-  private String database, user, password, collection, typeDatabase;
+  private String database, user, password, collection, typeDatabase, mongoDatabase;
 
-  public DatabaseLoginUser(String typeDatabase, String database, String user, char[] pass, String collection) throws SQLException
+  public DatabaseLoginUser(String mongoDatabase, String typeDatabase, String database, String user, char[] pass, String collection) throws SQLException
   {
+    this.mongoDatabase = mongoDatabase;
     this.database = validateDatabase(database);
     this.collection = collection;
     this.typeDatabase = typeDatabase;
@@ -80,5 +81,10 @@ public class DatabaseLoginUser
   public String getTypeDatabase()
   {
     return typeDatabase;
+  }
+
+  public String getMongoDatabase()
+  {
+    return mongoDatabase;
   }
 }

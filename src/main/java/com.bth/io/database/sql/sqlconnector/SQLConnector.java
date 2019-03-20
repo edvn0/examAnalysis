@@ -21,14 +21,11 @@ public class SQLConnector
     String user = SQLDBInformation.user == null ? databaseLoginUser.getUser() : SQLDBInformation.user;
     String pass = SQLDBInformation.pass == null ? databaseLoginUser.getPassword() : SQLDBInformation.pass;
 
-    try (Connection connection1 = DriverManager.getConnection(url, user, pass))
+    try
     {
-      System.out.println(url + " " + user + " " + pass);
-
-      connection = connection1;
+      connection = DriverManager.getConnection(url, user, pass);
 
       System.out.println(String.format("You are now connected to the database [ %s ] as user %s, at %s", url.split("/")[2], user, LocalDate.now().toString()));
-      System.out.println(connection.isClosed());
     } catch (SQLException e)
     {
       e.printStackTrace();

@@ -6,10 +6,14 @@ import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.GUIController;
 import com.bth.gui.login.LoginDatabase;
-import com.bth.io.ExamOutput;
+import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnector;
+import com.bth.io.database.mongodb.mongodbcontroller.MongoDBController;
+import com.bth.io.database.sql.sqlconnector.SQLConnector;
 import com.bth.io.database.sql.sqlcontroller.SQLController;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.MongoCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,9 +44,18 @@ public class MainGUI
   private GUIController controller;
   private LoginDatabase database;
   private Connection connection;
+  private MongoCollection<BasicDBObject> collection;
+
+  private List<RoundOffStatsQuestion> questionsStats;
+  private List<StatsSchool> statsSchools;
+  private List<StatsTeam> statsTeams;
 
   public MainGUI(ExamSchool[] examSchools, List<RoundOffStatsQuestion> questionsStats, List<StatsSchool> statsSchools, List<StatsTeam> statsTeams)
   {
+    this.questionsStats = questionsStats;
+    this.statsSchools = statsSchools;
+    this.statsTeams = statsTeams;
+
     controller = new GUIController();
     database = new LoginDatabase();
 
@@ -56,24 +69,10 @@ public class MainGUI
 
     database.confirmButton.addActionListener(new DatabaseButtonListener());
 
-    teamsToCSVButton.addActionListener(e ->
-    {
-      try
-      {
-        connection = database.getConnection();
-        System.out.println(connection.isClosed());
-        if (connection != null)
-        {
-          SQLController.insertIntoDatabase(connection, statsTeams, null, null);
-        } else
-        {
-          System.out.println("Connection is null.");
-        }
-      } catch (SQLException exc)
-      {
-        exc.printStackTrace();
-      }
-    });
+    // TODO: 2019-03-20 THIS IS WIP CHANGE THIS!
+    teamsToCSVButton.addActionListener(new DatabaseIntegrationListener());
+
+    exitButton.addActionListener(e -> System.exit(1));
   }
 
   private ArrayList<JComponent> addAllToList()
@@ -97,6 +96,43 @@ public class MainGUI
     public void actionPerformed(ActionEvent e)
     {
       String input = e.getActionCommand();
+    }
+  }
+
+  // Inner class for Database integration
+  class DatabaseIntegrationListener implements ActionListener
+  {
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+      try
+      {
+        if (GUIController.dbChoice) // SQL insertion
+        {
+          connection = database.getConnection();
+          System.out.println(connection.isClosed());
+          if (connection != null)
+          {
+            System.out.println("Inserting StatsTeams into " + SQLConnector.databaseLoginUser.getTypeDatabase() + " database...");
+            SQLController.insertIntoDatabase(connection, statsTeams, null, null);
+            System.out.println("Inserted!");
+          } else
+          {
+            System.out.println("Connection is null.");
+          }
+        } else // MongoDB insertion
+        {
+          // TODO: 2019-03-20 Insert mongodb.
+          System.out.println("Inserting StatsSchools into " + MongoDBConnector.user.getTypeDatabase() + " database...");
+          collection = database.getObjectsInDb();
+
+          MongoDBController.insertIntoMongoDatabase(collection, statsSchools);
+          System.out.println("Inserted!");
+        }
+      } catch (SQLException exc)
+      {
+        exc.printStackTrace();
+      }
     }
   }
 

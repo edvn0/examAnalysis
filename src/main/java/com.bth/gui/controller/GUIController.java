@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class GUIController
 {
   private boolean isLoggedIn;
+  public static boolean dbChoice = false; // SQL if TRUE.
 
   public GUIController()
   {
