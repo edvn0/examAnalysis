@@ -38,10 +38,7 @@ public class MainGUI
   {
     controller = new GUIController();
     setEnabledForAll(false);
-    loginDatabaseButton.addActionListener(e ->
-    {
-      database = new LoginDatabase();
-    });
+    loginDatabaseButton.addActionListener(this::actionPerformed);
   }
 
   public void setEnabledForAll(boolean loggedIn)
@@ -53,6 +50,11 @@ public class MainGUI
     this.teamsToCSVButton.setEnabled(loggedIn);
     this.schoolsToCSVButton.setEnabled(loggedIn);
     this.oneToFourteenCSVButton.setEnabled(loggedIn);
+  }
+
+  private void actionPerformed(ActionEvent e)
+  {
+    database = new LoginDatabase();
   }
 
   // Inner class for Database integration

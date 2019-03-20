@@ -12,6 +12,5 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'org.mongodb:mongo-java-driver:3.9.0'
-    compile 'forms_rt', version: '13.1.1'
+    compile 'com.intellij:forms_rt:7.0.3'
 }
