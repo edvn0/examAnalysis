@@ -45,6 +45,17 @@ public class DatabaseLoginUser
     return false;
   }
 
+  @Override
+  public String toString()
+  {
+    return "User{" +
+        "database='" + database + '\'' +
+        ", user='" + user + '\'' +
+        ", password='" + password + '\'' +
+        ", collection='" + collection + '\'' +
+        ", typeDatabase='" + typeDatabase + '\'' +
+        '}';
+  }
 
   public String getDatabase()
   {

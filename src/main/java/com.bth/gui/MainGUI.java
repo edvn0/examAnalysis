@@ -5,7 +5,9 @@ import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.GUIController;
-import com.bth.gui.controller.LoginDatabase;
+import com.bth.gui.login.LoginDatabase;
+import com.bth.io.ExamOutput;
+import com.bth.io.database.sql.sqlcontroller.SQLController;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
@@ -13,7 +15,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class MainGUI
 {
@@ -33,28 +39,54 @@ public class MainGUI
 
   private GUIController controller;
   private LoginDatabase database;
+  private Connection connection;
 
   public MainGUI(ExamSchool[] examSchools, List<RoundOffStatsQuestion> questionsStats, List<StatsSchool> statsSchools, List<StatsTeam> statsTeams)
   {
     controller = new GUIController();
-    setEnabledForAll(false);
-    loginDatabaseButton.addActionListener(this::actionPerformed);
-  }
-
-  public void setEnabledForAll(boolean loggedIn)
-  {
-    this.questionsToDatabaseButton.setEnabled(loggedIn);
-    this.teamsToDatabaseButton.setEnabled(loggedIn);
-    this.schoolsToDatabaseButton.setEnabled(loggedIn);
-    this.questionsToCSVButton.setEnabled(loggedIn);
-    this.teamsToCSVButton.setEnabled(loggedIn);
-    this.schoolsToCSVButton.setEnabled(loggedIn);
-    this.oneToFourteenCSVButton.setEnabled(loggedIn);
-  }
-
-  private void actionPerformed(ActionEvent e)
-  {
     database = new LoginDatabase();
+
+    ArrayList<JComponent> list = addAllToList();
+    controller.setEnabledForAll(list, false);
+
+    loginDatabaseButton.addActionListener(e1 ->
+    {
+      database.frame.setVisible(true);
+    });
+
+    database.confirmButton.addActionListener(new DatabaseButtonListener());
+
+    teamsToCSVButton.addActionListener(e ->
+    {
+      try
+      {
+        connection = database.getConnection();
+        System.out.println(connection.isClosed());
+        if (connection != null)
+        {
+          SQLController.insertIntoDatabase(connection, statsTeams, null, null);
+        } else
+        {
+          System.out.println("Connection is null.");
+        }
+      } catch (SQLException exc)
+      {
+        exc.printStackTrace();
+      }
+    });
+  }
+
+  private ArrayList<JComponent> addAllToList()
+  {
+    ArrayList<JComponent> temp = new ArrayList<>();
+    temp.add(questionsToCSVButton);
+    temp.add(teamsToCSVButton);
+    temp.add(schoolsToCSVButton);
+    temp.add(oneToFourteenCSVButton);
+    temp.add(schoolsToDatabaseButton);
+    temp.add(teamsToDatabaseButton);
+    temp.add(questionsToDatabaseButton);
+    return temp;
   }
 
   // Inner class for Database integration
@@ -74,7 +106,8 @@ public class MainGUI
     @Override
     public void actionPerformed(ActionEvent e)
     {
-
+      controller.setEnabledForAll(addAllToList(), true);
+      CSVInputFileButton.setEnabled(false);
     }
   }
 

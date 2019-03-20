@@ -77,7 +77,7 @@ public class ExamInput
     }
   }
 
-  static int getMaxScore(String question)
+  public static int getMaxScore(String question)
   {
     for (Scores scores : Scores.values())
     {
@@ -331,7 +331,6 @@ public class ExamInput
       int code = Objects.hash(listOfRowsInData.get(i)[2 + timeStampDependentIndex]);
 
       exams[i - 1] = insertExam(score, scores, date, code);
-      System.out.println(exams[i - 1]);
     }
 
     return exams;
@@ -339,7 +338,6 @@ public class ExamInput
 
   private int isFirstRowTimeStamp()
   {
-    System.out.println(listOfRowsInData.get(0)[0].equals("Tidstämpel") ? 1 : 0);
     return listOfRowsInData.get(0)[0].equals("Tidstämpel") ? 1 : 0;
   }
 

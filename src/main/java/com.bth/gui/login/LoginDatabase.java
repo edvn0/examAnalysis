@@ -1,5 +1,8 @@
-package com.bth.gui.controller;
+package com.bth.gui.login;
 
+import com.bth.gui.controller.DatabaseLoginUser;
+import com.bth.io.database.sql.sqlconnector.SQLConnector;
+import com.bth.io.database.sql.sqlcontroller.SQLController;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
@@ -7,6 +10,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.Connection;
 import java.sql.SQLException;
 
 public class LoginDatabase
@@ -20,25 +24,29 @@ public class LoginDatabase
   public JComboBox DBTypeComboBox;
   public JPasswordField Password;
   public JTextField collectionNameTextField;
+  public JFrame frame;
 
   private DatabaseLoginUser user;
 
+  private Connection connection;
+
   public LoginDatabase()
   {
-    JFrame frame = new JFrame("Login to Database");
+    frame = new JFrame("Login to Database");
     frame.setContentPane(this.primaryPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
-    frame.setVisible(true);
+    frame.setVisible(false);
     frame.setLocationRelativeTo(null);
 
     user = null;
+    connection = null;
 
-    confirmButton.addActionListener(new ConfirmButton());
+    confirmButton.addActionListener(new ConfirmButtonListener());
   }
 
   // Local class for getting DBObject
-  class ConfirmButton implements ActionListener
+  class ConfirmButtonListener implements ActionListener
   {
     @Override
     public void actionPerformed(ActionEvent e)
@@ -46,22 +54,38 @@ public class LoginDatabase
       String userName = UserName.getText();
       String database = databaseName.getText();
       char[] password = Password.getPassword();
-      String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
       String collection = collectionNameTextField.getText();
+      String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
 
-      try
+      System.out.println(choice);
+
+      if (choice.equals("MySQL"))
       {
-        user = new DatabaseLoginUser(choice, database, userName, password, collection);
-      } catch (SQLException e1)
+        try
+        {
+          user = new DatabaseLoginUser(choice, database, userName, password, collection);
+          SQLController.setDatabaseLoginUser(user);
+          connection = SQLConnector.connectToDatabase();
+        } catch (SQLException e1)
+        {
+          e1.printStackTrace();
+        }
+      } else
       {
-        e1.printStackTrace();
+
       }
+      frame.dispose();
     }
   }
 
-  public DatabaseLoginUser getUser()
+  public Connection getConnection()
   {
-    return user;
+    return connection;
+  }
+
+  public JButton getConfirmButton()
+  {
+    return confirmButton;
   }
 
   {
@@ -122,4 +146,48 @@ public class LoginDatabase
     return primaryPanel;
   }
 
+  public JPanel getPrimaryPanel()
+  {
+    return primaryPanel;
+  }
+
+  public JButton getExitButton()
+  {
+    return exitButton;
+  }
+
+  public JPanel getExitConfirmPanel()
+  {
+    return exitConfirmPanel;
+  }
+
+  public JTextField getDatabaseName()
+  {
+    return databaseName;
+  }
+
+  public JTextField getUserName()
+  {
+    return UserName;
+  }
+
+  public JComboBox getDBTypeComboBox()
+  {
+    return DBTypeComboBox;
+  }
+
+  public JPasswordField getPassword()
+  {
+    return Password;
+  }
+
+  public JTextField getCollectionNameTextField()
+  {
+    return collectionNameTextField;
+  }
+
+  public JFrame getFrame()
+  {
+    return frame;
+  }
 }

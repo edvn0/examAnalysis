@@ -41,9 +41,6 @@ public class ExamAnalysis
     examSchools = input.getExamSchools();
     examTeams = input.getExamTeams();
 
-    System.out.println(Arrays.toString(examSchools));
-    System.out.println(Arrays.toString(examTeams));
-
     statsTeams = this.generateStatsTeams(examTeams);
     statsSchools = this.generateStatsSchools(examSchools);
     questionsStats = this.generateQuestionsStats();
