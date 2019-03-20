@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MainGUI
-{
+public class MainGUI {
   public JPanel panel1;
   public JLabel DATABASELabel;
   public JLabel CSVLabel;
@@ -50,8 +49,7 @@ public class MainGUI
   private List<StatsSchool> statsSchools;
   private List<StatsTeam> statsTeams;
 
-  public MainGUI(ExamSchool[] examSchools, List<RoundOffStatsQuestion> questionsStats, List<StatsSchool> statsSchools, List<StatsTeam> statsTeams)
-  {
+  public MainGUI(ExamSchool[] examSchools, List<RoundOffStatsQuestion> questionsStats, List<StatsSchool> statsSchools, List<StatsTeam> statsTeams) {
     this.questionsStats = questionsStats;
     this.statsSchools = statsSchools;
     this.statsTeams = statsTeams;
@@ -75,8 +73,7 @@ public class MainGUI
     exitButton.addActionListener(e -> System.exit(1));
   }
 
-  private ArrayList<JComponent> addAllToList()
-  {
+  private ArrayList<JComponent> addAllToList() {
     ArrayList<JComponent> temp = new ArrayList<>();
     temp.add(questionsToCSVButton);
     temp.add(teamsToCSVButton);
@@ -89,36 +86,26 @@ public class MainGUI
   }
 
   // Inner class for Database integration
-  class CSVButtonListener implements ActionListener
-  {
+  class CSVButtonListener implements ActionListener {
 
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
       String input = e.getActionCommand();
     }
   }
 
   // Inner class for Database integration
-  class DatabaseIntegrationListener implements ActionListener
-  {
+  class DatabaseIntegrationListener implements ActionListener {
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
-      try
-      {
+    public void actionPerformed(ActionEvent e) {
+      try {
         if (GUIController.dbChoice) // SQL insertion
         {
           connection = database.getConnection();
-          System.out.println(connection.isClosed());
-          if (connection != null)
-          {
+          if (connection != null) {
             System.out.println("Inserting StatsTeams into " + SQLConnector.databaseLoginUser.getTypeDatabase() + " database...");
             SQLController.insertIntoDatabase(connection, statsTeams, null, null);
             System.out.println("Inserted!");
-          } else
-          {
-            System.out.println("Connection is null.");
           }
         } else // MongoDB insertion
         {
@@ -129,19 +116,16 @@ public class MainGUI
           MongoDBController.insertIntoMongoDatabase(collection, statsSchools);
           System.out.println("Inserted!");
         }
-      } catch (SQLException exc)
-      {
+      } catch (SQLException exc) {
         exc.printStackTrace();
       }
     }
   }
 
   // Inner class for Database login
-  class DatabaseButtonListener implements ActionListener
-  {
+  class DatabaseButtonListener implements ActionListener {
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
       controller.setEnabledForAll(addAllToList(), true);
       CSVInputFileButton.setEnabled(false);
     }
@@ -162,8 +146,7 @@ public class MainGUI
    *
    * @noinspection ALL
    */
-  private void $$$setupUI$$$()
-  {
+  private void $$$setupUI$$$() {
     panel1 = new JPanel();
     panel1.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
     panel1.setBackground(new Color(-12828863));
@@ -236,8 +219,7 @@ public class MainGUI
   /**
    * @noinspection ALL
    */
-  public JComponent $$$getRootComponent$$$()
-  {
+  public JComponent $$$getRootComponent$$$() {
     return panel1;
   }
 

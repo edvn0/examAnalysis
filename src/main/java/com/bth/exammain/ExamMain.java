@@ -5,12 +5,10 @@ import com.bth.gui.MainGUI;
 
 import javax.swing.*;
 
-public class ExamMain
-{
-  public static void main(final String... args)
-  {
+public class ExamMain {
+  public static void main(final String... args) {
     ExamAnalysis examAnalysis = new ExamAnalysis(
-        "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/java/com.bth/data/csvfiles/Deltävlingstentamen_2019_03_20.csv");
+        "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/java/com/bth/data/csvfiles/Deltävlingstentamen_2019_03_20.csv");
 
     examAnalysis.start();
 

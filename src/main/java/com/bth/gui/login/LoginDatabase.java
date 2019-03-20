@@ -16,10 +16,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
-import java.sql.SQLException;
 
-public class LoginDatabase
-{
+public class LoginDatabase {
   public JPanel primaryPanel;
   public JButton exitButton;
   public JButton confirmButton;
@@ -37,8 +35,7 @@ public class LoginDatabase
   private Connection connection;
   private MongoCollection<BasicDBObject> objectsInDb;
 
-  public LoginDatabase()
-  {
+  public LoginDatabase() {
     frame = new JFrame("Login to Database");
     frame.setContentPane(this.primaryPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +44,7 @@ public class LoginDatabase
     frame.setLocationRelativeTo(null);
 
     // DEV purpose.
-    test(false);
+    test(true);
 
     user = null;
     connection = null;
@@ -56,17 +53,14 @@ public class LoginDatabase
     confirmButton.addActionListener(new ConfirmButtonListener());
   }
 
-  private void test(boolean sqlormongo)
-  {
-    if (!sqlormongo)
-    {
+  private void test(boolean sqlormongo) {
+    if (!sqlormongo) {
       this.collectionNameTextField.setText("SchoolStatistics");
       this.databaseName.setText("mongodb+srv://edwin-carlsson:Frostdruid98199819@examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true");
       this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
       this.UserName.setText("edwin-carlsson");
       this.Password.setText("Edwin98");
-    } else
-    {
+    } else {
       this.collectionNameTextField.setText("none");
       this.databaseName.setText("jdbc:mysql://localhost:8889/stats_exams");
       this.mongoDatabaseNameTextField.setText("none");
@@ -76,11 +70,9 @@ public class LoginDatabase
   }
 
   // Local class for getting DBObject
-  class ConfirmButtonListener implements ActionListener
-  {
+  class ConfirmButtonListener implements ActionListener {
     @Override
-    public void actionPerformed(ActionEvent e)
-    {
+    public void actionPerformed(ActionEvent e) {
       String userName = UserName.getText();
       String database = databaseName.getText();
       char[] password = Password.getPassword();
@@ -88,42 +80,34 @@ public class LoginDatabase
       String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
       String mongo = mongoDatabaseNameTextField.getText();
 
-      System.out.println(choice);
-      try
-      {
+      try {
         user = new DatabaseLoginUser(mongo, choice, database, userName, password, collection);
-        if (choice.equals("MySQL"))
-        {
+        if (choice.equals("MySQL")) {
           SQLController.setDatabaseLoginUser(user);
           connection = SQLConnector.connectToDatabase();
           GUIController.dbChoice = true;
-        } else
-        {
+        } else {
           // TODO: fix MongoDB integration.
           MongoDBController.setDatabaseLoginUser(user);
           objectsInDb = MongoDBConnector.connectToMongoDB(user);
           GUIController.dbChoice = false;
         }
-      } catch (SQLException e1)
-      {
+      } catch (Exception e1) {
         e1.printStackTrace();
       }
       frame.dispose();
     }
   }
 
-  public Connection getConnection()
-  {
+  public Connection getConnection() {
     return connection;
   }
 
-  public MongoCollection<BasicDBObject> getObjectsInDb()
-  {
+  public MongoCollection<BasicDBObject> getObjectsInDb() {
     return objectsInDb;
   }
 
-  public JButton getConfirmButton()
-  {
+  public JButton getConfirmButton() {
     return confirmButton;
   }
 
@@ -141,8 +125,7 @@ public class LoginDatabase
    *
    * @noinspection ALL
    */
-  private void $$$setupUI$$$()
-  {
+  private void $$$setupUI$$$() {
     primaryPanel = new JPanel();
     primaryPanel.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1));
     exitConfirmPanel = new JPanel();
@@ -183,53 +166,43 @@ public class LoginDatabase
   /**
    * @noinspection ALL
    */
-  public JComponent $$$getRootComponent$$$()
-  {
+  public JComponent $$$getRootComponent$$$() {
     return primaryPanel;
   }
 
-  public JPanel getPrimaryPanel()
-  {
+  public JPanel getPrimaryPanel() {
     return primaryPanel;
   }
 
-  public JButton getExitButton()
-  {
+  public JButton getExitButton() {
     return exitButton;
   }
 
-  public JPanel getExitConfirmPanel()
-  {
+  public JPanel getExitConfirmPanel() {
     return exitConfirmPanel;
   }
 
-  public JTextField getDatabaseName()
-  {
+  public JTextField getDatabaseName() {
     return databaseName;
   }
 
-  public JTextField getUserName()
-  {
+  public JTextField getUserName() {
     return UserName;
   }
 
-  public JComboBox getDBTypeComboBox()
-  {
+  public JComboBox getDBTypeComboBox() {
     return DBTypeComboBox;
   }
 
-  public JPasswordField getPassword()
-  {
+  public JPasswordField getPassword() {
     return Password;
   }
 
-  public JTextField getCollectionNameTextField()
-  {
+  public JTextField getCollectionNameTextField() {
     return collectionNameTextField;
   }
 
-  public JFrame getFrame()
-  {
+  public JFrame getFrame() {
     return frame;
   }
 }
