@@ -109,14 +109,6 @@ public class MainGUI {
   }
 
   // Inner class for Database integration
-  private class CSVButtonListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      String input = e.getActionCommand();
-    }
-  }
-
-  // Inner class for Database integration
   class OutputIntegrationListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
