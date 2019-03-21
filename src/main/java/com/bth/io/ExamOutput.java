@@ -11,8 +11,9 @@ import java.io.PrintWriter;
 import java.util.Comparator;
 import java.util.List;
 
-class ExamOutput {
-  private static final String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/java/com.bth/data/output";
+public class ExamOutput {
+  // This will be dynamically changed by the CSV input file.
+  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/java/com.bth/data/output";
 
   public static void printToCSV_Teams(List<StatsTeam> teamList) {
     teamList.sort(Comparator.comparing(StatsTeam::getScore));
@@ -117,7 +118,7 @@ class ExamOutput {
     }
   }
 
-  public static void printQuestionsToCSV(ExamSchool[] statsSchools) {
+  public static void printQuestionsToCSV(ExamSchool[] exams) {
     // Headers:
     /*
      * school:
@@ -125,6 +126,7 @@ class ExamOutput {
      */
     try (PrintWriter writer = new PrintWriter(directory + "/output_onetofourteenandschools.csv")) {
       writer.write("School,");
+      writer.write("Exam Anon Code,");
       for (int i = 1; i <= 14; i++) {
         if (i < 14)
           writer.write("q" + i + ",");
@@ -133,9 +135,10 @@ class ExamOutput {
       }
       writer.write("\n");
 
-      for (ExamSchool schools : statsSchools) {
+      for (ExamSchool schools : exams) {
         double[] scores = schools.getSeparateScoresForAllQuestions();
         writer.write(schools.getSchool() + ",");
+        writer.write(schools.getExam().getAnonymousCode() + ",");
         for (int i = 0; i < scores.length; i++) {
           writer.write("" + scores[i]);
           if (i != 13) writer.write(",");
@@ -148,5 +151,13 @@ class ExamOutput {
     }
 
 
+  }
+
+  public static void setDirectory(String directory) {
+    ExamOutput.directory = directory;
+  }
+
+  public static String getDirectory() {
+    return directory;
   }
 }

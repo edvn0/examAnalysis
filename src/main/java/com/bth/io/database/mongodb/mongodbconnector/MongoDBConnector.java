@@ -19,12 +19,16 @@ public class MongoDBConnector {
     database = null;
   }
 
-  public static MongoCollection<BasicDBObject> connectToMongoDB(DatabaseLoginUser user) {
-    uri = new MongoClientURI(user.getDatabase());
+  public static void connectToMongoDB() {
+
+    uri = new MongoClientURI(user.getMongoConnectorName());
     client = new MongoClient(uri);
-    database = client.getDatabase(user.getMongoDatabase());
-    return database.getCollection(user.getCollection(),
-        BasicDBObject.class);
+    database = client.getDatabase(user.getMongoDatabaseName());
+  }
+
+  public static MongoCollection<BasicDBObject> getCollectionFromInputCollection(String inputCollection) {
+    connectToMongoDB();
+    return database.getCollection(inputCollection, BasicDBObject.class);
   }
 
   public static void disconnect() {

@@ -20,8 +20,8 @@ public class SQLConnector {
     Connection connection = null;
     System.out.println("We are here trying to connect to the database.");
 
-    String url = SQLDBInformation.url == null ? databaseLoginUser.getDatabase() : SQLDBInformation.url;
-    String user = SQLDBInformation.user == null ? databaseLoginUser.getUser() : SQLDBInformation.user;
+    String url = SQLDBInformation.url == null ? databaseLoginUser.getSqlConnectorName() : SQLDBInformation.url;
+    String user = SQLDBInformation.user == null ? databaseLoginUser.getUserName() : SQLDBInformation.user;
     String pass = SQLDBInformation.pass == null ? databaseLoginUser.getPassword() : SQLDBInformation.pass;
 
     try {
