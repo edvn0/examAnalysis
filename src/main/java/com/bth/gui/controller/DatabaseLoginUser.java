@@ -1,7 +1,12 @@
 package com.bth.gui.controller;
 
 public class DatabaseLoginUser {
-  private String database, user, password, collection, typeDatabase, mongoDatabase;
+  private final String mongoDatabase;
+  private String database;
+  private String user;
+  private String password;
+  private String collection;
+  private String typeDatabase;
 
   /***
    * Represents the data from the GUI Login.

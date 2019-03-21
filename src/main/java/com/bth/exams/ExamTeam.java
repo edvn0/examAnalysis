@@ -23,15 +23,8 @@ public class ExamTeam extends Exam {
     return exam;
   }
 
-  public void setExam(Exam exam) {
-    this.exam = exam;
-  }
-
   public String getTeam() {
     return team;
   }
 
-  public void setTeam(String team) {
-    this.team = team;
-  }
 }

@@ -12,17 +12,13 @@ import java.util.*;
 
 public class ExamAnalysis {
   public final static int AMOUNT_OF_QUESTIONS = 14;
-
+  private final String dir;
   private ExamInput input;
-
   private List<StatsTeam> statsTeams;
   private List<StatsSchool> statsSchools;
   private List<RoundOffStatsQuestion> questionsStats;
-
   private ExamTeam[] examTeams;
   private ExamSchool[] examSchools;
-
-  private final String dir;
 
   public ExamAnalysis(String dir) {
     this.dir = dir;

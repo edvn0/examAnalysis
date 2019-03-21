@@ -92,31 +92,6 @@ public class SQLController {
     }
   }
 
-  private static boolean checkDatabaseForQuestions(Connection con, List<RoundOffStatsQuestion> rosqList) {
-    int equalQuestions = 0;
-    try {
-      ResultSet rs = con.prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
-      int k = 0;
-      while (rs.next()) {
-        String question = rs.getString(2);
-        double mean = Double.parseDouble(rs.getString(4));
-        double median = Double.parseDouble(rs.getString(5));
-        double stddev = Double.parseDouble(rs.getString(6));
-        double variance = Double.parseDouble(rs.getString(7));
-        double maxscore = Double.parseDouble(rs.getString(8));
-        String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
-        String sQ = "q".concat(q);
-        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0) {
-          equalQuestions++;
-        }
-      }
-      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
-    } catch (SQLException e) {
-      System.out.println(e.getSQLState());
-    }
-    return false;
-  }
-
   private static void setStatementWithPS(PreparedStatement statement, double score,
                                          double mean, double stddev, double variance,
                                          double median, StatsTeam team, StatsSchool school,
@@ -141,6 +116,31 @@ public class SQLController {
       writeStringToStatement(statement, score, mean, stddev, variance, median);
     }
     statement.execute();
+  }
+
+  private static boolean checkDatabaseForQuestions(Connection con, List<RoundOffStatsQuestion> rosqList) {
+    int equalQuestions = 0;
+    try {
+      ResultSet rs = con.prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
+      int k = 0;
+      while (rs.next()) {
+        String question = rs.getString(2);
+        double mean = Double.parseDouble(rs.getString(4));
+        double median = Double.parseDouble(rs.getString(5));
+        double stddev = Double.parseDouble(rs.getString(6));
+        double variance = Double.parseDouble(rs.getString(7));
+        double maxscore = Double.parseDouble(rs.getString(8));
+        String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
+        String sQ = "q".concat(q);
+        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0) {
+          equalQuestions++;
+        }
+      }
+      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
+    } catch (SQLException e) {
+      System.out.println(e.getSQLState());
+    }
+    return false;
   }
 
   private static void writeStringToStatement(PreparedStatement statement, double score,

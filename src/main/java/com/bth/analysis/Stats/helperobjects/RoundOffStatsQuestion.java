@@ -1,23 +1,19 @@
 package com.bth.analysis.Stats.helperobjects;
 
-public class RoundOffStatsQuestion extends RoundOffStats
-{
-  private String question;
+public class RoundOffStatsQuestion extends RoundOffStats {
+  private final String question;
 
-  public RoundOffStatsQuestion(double mean, double median, double stddev, double variance, double numOfDec, String question)
-  {
+  public RoundOffStatsQuestion(double mean, double median, double stddev, double variance, double numOfDec, String question) {
     super(mean, median, stddev, variance, numOfDec);
     this.question = question;
   }
 
-  public String getQuestion()
-  {
+  public String getQuestion() {
     return question;
   }
 
   @Override
-  public String toString()
-  {
+  public String toString() {
     return
         "Question: " + question + "\n" +
             "Mean: [" + getMean() + "]\n" +
