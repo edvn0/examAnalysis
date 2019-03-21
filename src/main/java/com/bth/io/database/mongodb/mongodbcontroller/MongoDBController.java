@@ -10,20 +10,16 @@ import com.mongodb.client.MongoCollection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MongoDBController
-{
-  public static void setDatabaseLoginUser(DatabaseLoginUser user)
-  {
+public class MongoDBController {
+  public static void setDatabaseLoginUser(DatabaseLoginUser user) {
     MongoDBConnector.user = user;
   }
 
   // TODO: Here is the problem for multithreaded access to the MongoDB database.
-  public static void insertIntoMongoDatabase(MongoCollection<BasicDBObject> collection, List<StatsSchool> schoolList)
-  {
+  public static void insertIntoMongoDatabase(MongoCollection<BasicDBObject> collection, List<StatsSchool> schoolList) {
     List<BasicDBObject> objects = new ArrayList<>();
 
-    for (StatsSchool school : schoolList)
-    {
+    for (StatsSchool school : schoolList) {
       objects.add(ExamMongoDBObject.toDBObject(school));
     }
 

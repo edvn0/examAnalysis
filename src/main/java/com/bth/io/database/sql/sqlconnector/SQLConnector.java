@@ -8,12 +8,15 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
-public class SQLConnector
-{
+public class SQLConnector {
   public static DatabaseLoginUser databaseLoginUser;
+  public static Connection connection;
 
-  public static Connection connectToDatabase()
-  {
+  SQLConnector() {
+    connection = null;
+  }
+
+  public static Connection connectToDatabase() {
     Connection connection = null;
     System.out.println("We are here trying to connect to the database.");
 
@@ -21,17 +24,42 @@ public class SQLConnector
     String user = SQLDBInformation.user == null ? databaseLoginUser.getUser() : SQLDBInformation.user;
     String pass = SQLDBInformation.pass == null ? databaseLoginUser.getPassword() : SQLDBInformation.pass;
 
-    try
-    {
+    try {
       connection = DriverManager.getConnection(url, user, pass);
 
       System.out.println(String.format("You are now connected to the database [ %s ] as user %s, at %s", url.split("/")[2], user, LocalDate.now().toString()));
-    } catch (SQLException e)
-    {
+    } catch (SQLException e) {
       e.printStackTrace();
+      System.out.println(e.getSQLState());
+    } finally {
+      if (connection != null) {
+        try {
+          connection.close();
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+      }
     }
     return connection;
   }
 
+  public static boolean isConnected() {
+    try {
+      return (connection != null && !connection.isClosed());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
 
+  public static void disconnect() {
+    if (connection != null) {
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }
+

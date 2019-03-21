@@ -7,17 +7,31 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class MongoDBConnector
-{
+public class MongoDBConnector {
   public static DatabaseLoginUser user;
+  private static MongoClientURI uri;
+  private static MongoClient client;
+  private static MongoDatabase database;
 
-  public static MongoCollection<BasicDBObject> connectToMongoDB(DatabaseLoginUser user)
-  {
-    MongoClientURI uri = new MongoClientURI(user.getDatabase());
-    MongoClient client = new MongoClient(uri);
-    MongoDatabase database = client.getDatabase(user.getMongoDatabase());
-    MongoCollection<BasicDBObject> collection = database.getCollection(user.getCollection(),
+  MongoDBConnector() {
+    uri = null;
+    client = null;
+    database = null;
+  }
+
+  public static MongoCollection<BasicDBObject> connectToMongoDB(DatabaseLoginUser user) {
+    uri = new MongoClientURI(user.getDatabase());
+    client = new MongoClient(uri);
+    database = client.getDatabase(user.getMongoDatabase());
+    return database.getCollection(user.getCollection(),
         BasicDBObject.class);
-    return collection;
+  }
+
+  public static void disconnect() {
+    if (client != null) client.close();
+  }
+
+  public static boolean isConnected() {
+    return (client != null);
   }
 }

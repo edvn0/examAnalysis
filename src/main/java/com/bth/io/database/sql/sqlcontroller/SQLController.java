@@ -15,10 +15,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class SQLController
-{
-  public static void setDatabaseLoginUser(DatabaseLoginUser databaseLoginUser)
-  {
+public class SQLController {
+  public static void setDatabaseLoginUser(DatabaseLoginUser databaseLoginUser) {
     SQLConnector.databaseLoginUser = databaseLoginUser;
   }
 
@@ -32,12 +30,9 @@ public class SQLController
    */
   public static void insertIntoDatabase(Connection con, List<StatsTeam> teamList,
                                         List<StatsSchool> schoolList,
-                                        List<RoundOffStatsQuestion> rosqList) throws SQLException
-  {
-    if (teamList == null && schoolList != null && rosqList == null)
-    {
-      for (StatsSchool school : schoolList)
-      {
+                                        List<RoundOffStatsQuestion> rosqList) throws SQLException {
+    if (teamList == null && schoolList != null && rosqList == null) {
+      for (StatsSchool school : schoolList) {
         String sql = "insert into stats_exams.school_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = con.prepareStatement(sql);
         setStatementWithPS(statement,
@@ -51,11 +46,8 @@ public class SQLController
             null,
             0);
       }
-      con.close();
-    } else if (schoolList == null && teamList != null && rosqList == null)
-    {
-      for (StatsTeam team : teamList)
-      {
+    } else if (schoolList == null && teamList != null && rosqList == null) {
+      for (StatsTeam team : teamList) {
         String sql = "insert into stats_exams.team_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = con.prepareStatement(sql);
         setStatementWithPS(statement,
@@ -69,16 +61,12 @@ public class SQLController
             null,
             0);
       }
-      con.close();
-    } else if (schoolList == null && teamList == null && rosqList != null)
-    {
+    } else if (schoolList == null && teamList == null && rosqList != null) {
       // Inserts the questions 1-14 into stats_exams.questions if the questions already do not exist.
       boolean doesQuestionsExist = checkDatabaseForQuestions(con, rosqList);
 
-      if (!doesQuestionsExist)
-      {
-        for (RoundOffStatsQuestion question : rosqList)
-        {
+      if (!doesQuestionsExist) {
+        for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
           String sql = "insert into " +
@@ -87,64 +75,28 @@ public class SQLController
               "values (?,?,?,?,?,?,?)";
 
           int maxScore = ExamInput.getMaxScore(q);
-          if (maxScore != -1)
-          {
+          if (maxScore != -1) {
             PreparedStatement statement = con.prepareStatement(sql);
             setStatementWithPS(statement, 0,
                 question.getMean(), question.getStddev(),
                 question.getVariance(), question.getMedian(), null, null, sQ, maxScore);
-          } else
-          {
+          } else {
             throw new SQLException("Max Score was not found.");
           }
         }
       }
-      con.close();
-    } else
-    {
+    } else {
       con.close();
       System.err.println("Error! Input either schoolexams or teamexams.");
       System.exit(-1);
     }
   }
 
-  private static boolean checkDatabaseForQuestions(Connection con, List<RoundOffStatsQuestion> rosqList)
-  {
-    int equalQuestions = 0;
-    try
-    {
-      ResultSet rs = con.prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
-      int k = 0;
-      while (rs.next())
-      {
-        String question = rs.getString(2);
-        double mean = Double.parseDouble(rs.getString(4));
-        double median = Double.parseDouble(rs.getString(5));
-        double stddev = Double.parseDouble(rs.getString(6));
-        double variance = Double.parseDouble(rs.getString(7));
-        double maxscore = Double.parseDouble(rs.getString(8));
-        String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
-        String sQ = "q".concat(q);
-        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0)
-        {
-          equalQuestions++;
-        }
-      }
-      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
-    } catch (SQLException e)
-    {
-      System.out.println(e.getSQLState());
-    }
-    return false;
-  }
-
   private static void setStatementWithPS(PreparedStatement statement, double score,
                                          double mean, double stddev, double variance,
                                          double median, StatsTeam team, StatsSchool school,
-                                         String question, int maxscore) throws SQLException
-  {
-    if (question != null && school == null && team == null)
-    {
+                                         String question, int maxscore) throws SQLException {
+    if (question != null && school == null && team == null) {
       BigDecimal bdMean = new BigDecimal(mean);
       BigDecimal bdMedian = new BigDecimal(median);
       BigDecimal bdStddev = new BigDecimal(stddev);
@@ -156,22 +108,44 @@ public class SQLController
       statement.setBigDecimal(5, bdStddev);
       statement.setBigDecimal(6, bdVariance);
       statement.setInt(7, maxscore);
-    } else if (team == null)
-    {
+    } else if (team == null) {
       statement.setString(1, school.getSchool());
       writeStringToStatement(statement, score, mean, stddev, variance, median);
-    } else if (school == null)
-    {
+    } else if (school == null) {
       statement.setString(1, team.getTeam());
       writeStringToStatement(statement, score, mean, stddev, variance, median);
     }
     statement.execute();
   }
 
+  private static boolean checkDatabaseForQuestions(Connection con, List<RoundOffStatsQuestion> rosqList) {
+    int equalQuestions = 0;
+    try {
+      ResultSet rs = con.prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
+      int k = 0;
+      while (rs.next()) {
+        String question = rs.getString(2);
+        double mean = Double.parseDouble(rs.getString(4));
+        double median = Double.parseDouble(rs.getString(5));
+        double stddev = Double.parseDouble(rs.getString(6));
+        double variance = Double.parseDouble(rs.getString(7));
+        double maxscore = Double.parseDouble(rs.getString(8));
+        String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
+        String sQ = "q".concat(q);
+        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0) {
+          equalQuestions++;
+        }
+      }
+      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
+    } catch (SQLException e) {
+      System.out.println(e.getSQLState());
+    }
+    return false;
+  }
+
   private static void writeStringToStatement(PreparedStatement statement, double score,
                                              double mean, double stddev, double variance,
-                                             double median) throws SQLException
-  {
+                                             double median) throws SQLException {
     statement.setString(2, "" + score);
     statement.setString(3, "" + mean);
     statement.setString(4, "" + stddev);
