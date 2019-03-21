@@ -28,7 +28,7 @@ public class CsvDirectoryChoice {
 
     frame = new JFrame("In which directory should CSV be outputted?");
     frame.setContentPane(this.primaryPanel);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     frame.pack();
     frame.setVisible(false);
     frame.setLocationRelativeTo(null);

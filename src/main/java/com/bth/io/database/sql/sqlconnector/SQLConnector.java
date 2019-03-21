@@ -1,7 +1,6 @@
 package com.bth.io.database.sql.sqlconnector;
 
 import com.bth.gui.controller.DatabaseLoginUser;
-import com.bth.io.database.sql.information.SQLDBInformation;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -20,9 +19,9 @@ public class SQLConnector {
     Connection connection = null;
     System.out.println("We are here trying to connect to the database.");
 
-    String url = SQLDBInformation.url == null ? databaseLoginUser.getSqlConnectorName() : SQLDBInformation.url;
-    String user = SQLDBInformation.user == null ? databaseLoginUser.getUserName() : SQLDBInformation.user;
-    String pass = SQLDBInformation.pass == null ? databaseLoginUser.getPassword() : SQLDBInformation.pass;
+    String url = databaseLoginUser.getSqlConnectorName();
+    String user = databaseLoginUser.getUserName();
+    String pass = databaseLoginUser.getPassword();
 
     try {
       connection = DriverManager.getConnection(url, user, pass);

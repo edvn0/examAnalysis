@@ -66,7 +66,7 @@ public class LoginDatabase {
     frame.setResizable(false);
 
     // DEV purpose.
-    test(false);
+    test();
 
     user = null;
     connection = null;
@@ -78,21 +78,20 @@ public class LoginDatabase {
     });
   }
 
-  @SuppressWarnings("SameParameterValue")
-  private void test(boolean sqlormongo) {
-    if (!sqlormongo) {
-      this.mdbschoolCollectionNameTextField.setText("SchoolStatistics");
-      this.mongoDbConnectStringTextField.setText("mongodb+srv://edwin-carlsson:Edwin98@examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true");
-      this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
-      this.UserName.setText("edwin-carlsson");
-      this.Password.setText("Edwin98");
-    } else {
-      this.mdbschoolCollectionNameTextField.setText("none");
-      this.sqlconnectorStringTextField.setText("jdbc:mysql://localhost:8889/stats_exams");
-      this.mongoDatabaseNameTextField.setText("none");
-      this.UserName.setText("Edwin");
-      this.Password.setText("Edwin98");
-    }
+  private void test() {
+    this.mdbschoolCollectionNameTextField.setText("SchoolStatistics");
+    this.mdbteamsCollectionNameTextField.setText("TeamStatistics");
+    this.mdbquestionsNameTextField.setText("QuestionStatistics");
+    this.mongoDbConnectStringTextField.setText("mongodb+srv://edwin-carlsson:Edwin98@examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true");
+    this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
+    this.UserName.setText("edwin-carlsson");
+    this.Password.setText("Edwin98");
+
+    this.sqlconnectorStringTextField.setText("jdbc:mysql://localhost:8889/stats_exams");
+    this.mySQLDatabaseNameTextField.setText("stats_exams");
+    this.sqlschoolsTableNameTextField.setText("school_statistics");
+    this.sqlteamsTableNameTextField.setText("team_statistics");
+    this.sqlquestionsTableNameTextField.setText("questions");
   }
 
   public Connection getConnection() {
@@ -101,6 +100,51 @@ public class LoginDatabase {
 
   public MongoCollection<BasicDBObject> getObjectsInDb() {
     return objectsInDb;
+  }
+
+
+  // Local class for getting DBObject
+  class ConfirmButtonListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      String userName = UserName.getText();
+      char[] password = Password.getPassword();
+
+      String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
+
+      // MYSQL INFO
+      // Connector Connection Name, Database name, schooltable, teamtable, questiontable.
+      String sqlConnectorName = sqlconnectorStringTextField.getText();
+      String sqlDatabaseName = mySQLDatabaseNameTextField.getText();
+      String schoolTable = sqlschoolsTableNameTextField.getText();
+      String teamTable = sqlteamsTableNameTextField.getText();
+      String questionTable = sqlquestionsTableNameTextField.getText();
+
+      // MONGODB INFO
+      // Connector MongoConnector Name, Database name, schoolCollection, teamCollection, questionCollection
+      String mongoConnectorName = mongoDbConnectStringTextField.getText();
+      String mongoDatabaseName = mongoDatabaseNameTextField.getText();
+      String schoolCollection = mdbschoolCollectionNameTextField.getText();
+      String teamCollection = mdbteamsCollectionNameTextField.getText();
+      String questionCollection = mdbquestionsNameTextField.getText();
+
+      try {
+        user = new DatabaseLoginUser(userName, password, choice, sqlConnectorName, sqlDatabaseName, schoolTable, teamTable, questionTable, mongoConnectorName, mongoDatabaseName, schoolCollection, teamCollection, questionCollection);
+        //user = new DatabaseLoginUser(mongo, choice, sqlConnectorName, userName, password);
+        if (choice.equals("MySQL")) {
+          SQLController.setDatabaseLoginUser(user);
+          connection = SQLConnector.connectToDatabase();
+          GUIController.dbChoice = true;
+        } else {
+          MongoDBController.setDatabaseLoginUser(user);
+          MongoDBConnector.connectToMongoDB();
+          GUIController.dbChoice = false;
+        }
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
+      frame.dispose();
+    }
   }
 
   {
@@ -316,49 +360,5 @@ public class LoginDatabase {
    */
   public JComponent $$$getRootComponent$$$() {
     return primaryPanel;
-  }
-
-  // Local class for getting DBObject
-  class ConfirmButtonListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      String userName = UserName.getText();
-      char[] password = Password.getPassword();
-
-      String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
-
-      // MYSQL INFO
-      // Connector Connection Name, Database name, schooltable, teamtable, questiontable.
-      String sqlConnectorName = sqlconnectorStringTextField.getText();
-      String sqlDatabaseName = mySQLDatabaseNameTextField.getText();
-      String schoolTable = sqlschoolsTableNameTextField.getText();
-      String teamTable = sqlteamsTableNameTextField.getText();
-      String questionTable = sqlquestionsTableNameTextField.getText();
-
-      // MONGODB INFO
-      //
-      String mongoConnectorName = mongoDbConnectStringTextField.getText();
-      String mongoDatabaseName = mongoDatabaseNameTextField.getText();
-      String schoolCollection = mdbschoolCollectionNameTextField.getText();
-      String teamCollection = mdbteamsCollectionNameTextField.getText();
-      String questionCollection = mdbquestionsNameTextField.getText();
-
-      try {
-        user = new DatabaseLoginUser(userName, password, choice, sqlConnectorName, sqlDatabaseName, schoolTable, teamTable, questionTable, mongoConnectorName, mongoDatabaseName, schoolCollection, teamCollection, questionCollection);
-        //user = new DatabaseLoginUser(mongo, choice, sqlConnectorName, userName, password);
-        if (choice.equals("MySQL")) {
-          SQLController.setDatabaseLoginUser(user);
-          connection = SQLConnector.connectToDatabase();
-          GUIController.dbChoice = true;
-        } else {
-          MongoDBController.setDatabaseLoginUser(user);
-          MongoDBConnector.connectToMongoDB();
-          GUIController.dbChoice = false;
-        }
-      } catch (Exception e1) {
-        e1.printStackTrace();
-      }
-      frame.dispose();
-    }
   }
 }
