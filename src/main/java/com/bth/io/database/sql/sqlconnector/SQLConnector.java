@@ -10,6 +10,11 @@ import java.time.LocalDate;
 
 public class SQLConnector {
   public static DatabaseLoginUser databaseLoginUser;
+  public static Connection connection;
+
+  SQLConnector() {
+    connection = null;
+  }
 
   public static Connection connectToDatabase() {
     Connection connection = null;
@@ -36,6 +41,25 @@ public class SQLConnector {
       }
     }
     return connection;
+  }
+
+  public static boolean isConnected() {
+    try {
+      return (connection != null && !connection.isClosed());
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public static void disconnect() {
+    if (connection != null) {
+      try {
+        connection.close();
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
+    }
   }
 }
 

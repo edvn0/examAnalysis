@@ -71,7 +71,11 @@ public class MainGUI {
     // TODO: 2019-03-20 THIS IS WIP CHANGE THIS!
     teamsToCSVButton.addActionListener(new DatabaseIntegrationListener());
 
-    exitButton.addActionListener(e -> System.exit(1));
+    exitButton.addActionListener(e -> {
+      if (SQLConnector.isConnected()) SQLConnector.disconnect();
+      if (MongoDBConnector.isConnected()) MongoDBConnector.disconnect();
+      System.exit(1);
+    });
 
     CSVInputFileButton.addActionListener(e -> {
       csvDirectoryChoice.frame.setVisible(true);
@@ -226,7 +230,7 @@ public class MainGUI {
     @Override
     public void actionPerformed(ActionEvent e) {
       controller.setEnabledForAll(addAllToList(), true);
-      CSVInputFileButton.setEnabled(false);
+      CSVInputFileButton.setEnabled(true);
     }
   }
 
