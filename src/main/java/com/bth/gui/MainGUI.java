@@ -64,6 +64,10 @@ public class MainGUI {
     database = new LoginDatabase();
     csvDirectoryChoice = new CsvDirectoryChoice();
 
+    setup();
+  }
+
+  private void setup() {
     ArrayList<JComponent> list = addAllToList();
     controller.setEnabledForAll(list, false);
 
@@ -121,10 +125,8 @@ public class MainGUI {
       String directory = ExamOutput.getDirectory();
       DatabaseLoginUser sqlormdb = SQLConnector.databaseLoginUser == null ? MongoDBConnector.user : null;
       String[] tableName;
-      String[] collNames;
       if (sqlormdb != null) {
         tableName = sqlormdb.getTableNames();
-        collNames = sqlormdb.getCollectionNames();
 
         switch (e.getActionCommand().toLowerCase().trim()) {
           case ("teams to csv"):
