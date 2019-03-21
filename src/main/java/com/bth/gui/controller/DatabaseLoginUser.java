@@ -1,36 +1,38 @@
 package com.bth.gui.controller;
 
+import java.util.Arrays;
+
 public class DatabaseLoginUser {
-  private final String mongoDatabase;
-  private String database;
-  private String user;
+  private String schoolCollection;
+  private String userName;
   private String password;
-  private String collection;
-  private String typeDatabase;
+  private String choice;
+  private String sqlConnectorName;
+  private String sqlDatabaseName;
+  private String teamCollection;
+  private String questionCollection;
+  private String schoolTable;
+  private String teamTable;
+  private String questionTable;
+  private String mongoConnectorName;
+  private String mongoDatabaseName;
 
-  /***
-   * Represents the data from the GUI Login.
-   * @param mongoDatabase the Database in the MongoDB system
-   * @param typeDatabase what type of Database is used? MySQL/MongoDB
-   * @param database MySQL database URI
-   * @param user name of database user
-   * @param pass password of database user
-   * @param collection Mongodb collection
-   * @throws Exception throws Exception if user cannot be validated.
-   */
-  public DatabaseLoginUser(String mongoDatabase, String typeDatabase, String database, String user, char[] pass, String collection) throws Exception {
-    this.mongoDatabase = mongoDatabase;
-    this.database = validateDatabase(database);
-    this.collection = collection;
-    this.typeDatabase = typeDatabase;
+  public DatabaseLoginUser(String userName, char[] password, String choice, String sqlConnectorName, String sqlDatabaseName, String schoolTable, String teamTable, String questionTable, String mongoConnectorName, String mongoDatabaseName, String schoolCollection, String teamCollection, String questionCollection) {
+    this.userName = userName;
+    this.password = String.copyValueOf(password);
+    this.choice = choice;
 
-    if (validateUser(String.copyValueOf(pass), user)) {
-      this.password = String.copyValueOf(pass);
-      this.user = user;
-    } else {
-      this.password = null;
-      this.user = null;
-    }
+    this.sqlConnectorName = sqlConnectorName;
+    this.sqlDatabaseName = sqlDatabaseName;
+    this.schoolTable = schoolTable;
+    this.teamTable = teamTable;
+    this.questionTable = questionTable;
+
+    this.mongoConnectorName = mongoConnectorName;
+    this.mongoDatabaseName = mongoDatabaseName;
+    this.teamCollection = teamCollection;
+    this.questionCollection = questionCollection;
+    this.schoolCollection = schoolCollection;
   }
 
   // TODO: Validate database names according to MySQL or MongoDB
@@ -54,36 +56,84 @@ public class DatabaseLoginUser {
 
   @Override
   public String toString() {
-    return "User{" +
-        "database='" + database + '\'' +
-        ", user='" + user + '\'' +
-        ", password='" + password + '\'' +
-        ", collection='" + collection + '\'' +
-        ", typeDatabase='" + typeDatabase + '\'' +
-        '}';
-  }
-
-  public String getDatabase() {
-    return database;
-  }
-
-  public String getUser() {
-    return user;
+    final StringBuilder sb = new StringBuilder("DatabaseLoginUser{");
+    sb.append("choice='").append(choice).append('\'');
+    sb.append(", collectionNames=").append(Arrays.toString(getCollectionNames()));
+    sb.append(", mongoConnectorName='").append(mongoConnectorName).append('\'');
+    sb.append(", mongoDatabaseName='").append(mongoDatabaseName).append('\'');
+    sb.append(", password='").append(password).append('\'');
+    sb.append(", questionCollection='").append(questionCollection).append('\'');
+    sb.append(", questionTable='").append(questionTable).append('\'');
+    sb.append(", schoolCollection='").append(schoolCollection).append('\'');
+    sb.append(", schoolTable='").append(schoolTable).append('\'');
+    sb.append(", sqlConnectorName='").append(sqlConnectorName).append('\'');
+    sb.append(", sqlDatabaseName='").append(sqlDatabaseName).append('\'');
+    sb.append(", tableNames=").append(Arrays.toString(getTableNames()));
+    sb.append(", teamCollection='").append(teamCollection).append('\'');
+    sb.append(", teamTable='").append(teamTable).append('\'');
+    sb.append(", userName='").append(userName).append('\'');
+    sb.append('}');
+    return sb.toString();
   }
 
   public String getPassword() {
     return password;
   }
 
-  public String getCollection() {
-    return collection;
+
+  public String getSchoolTable() {
+    return schoolTable;
   }
 
-  public String getTypeDatabase() {
-    return typeDatabase;
+  public String getTeamTable() {
+    return teamTable;
   }
 
-  public String getMongoDatabase() {
-    return mongoDatabase;
+  public String getQuestionTable() {
+    return questionTable;
+  }
+
+  public String getSchoolCollection() {
+    return schoolCollection;
+  }
+
+  public String getUserName() {
+    return userName;
+  }
+
+  public String getChoice() {
+    return choice;
+  }
+
+  public String getSqlConnectorName() {
+    return sqlConnectorName;
+  }
+
+  public String getSqlDatabaseName() {
+    return sqlDatabaseName;
+  }
+
+  public String getTeamCollection() {
+    return teamCollection;
+  }
+
+  public String getQuestionCollection() {
+    return questionCollection;
+  }
+
+  public String getMongoConnectorName() {
+    return mongoConnectorName;
+  }
+
+  public String getMongoDatabaseName() {
+    return mongoDatabaseName;
+  }
+
+  public String[] getTableNames() {
+    return new String[]{schoolTable, teamTable, questionTable};
+  }
+
+  public String[] getCollectionNames() {
+    return new String[]{schoolCollection, teamCollection, questionCollection};
   }
 }

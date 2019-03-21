@@ -18,10 +18,4 @@ public class GUIController {
       c.setEnabled(value);
     }
   }
-
-  public void connectToDatabase(DatabaseLoginUser user) {
-    SQLController.setDatabaseLoginUser(user);
-    SQLConnector.connectToDatabase();
-  }
-
 }

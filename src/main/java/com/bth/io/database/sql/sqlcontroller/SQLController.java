@@ -30,10 +30,10 @@ public class SQLController {
    */
   public static void insertIntoDatabase(Connection con, List<StatsTeam> teamList,
                                         List<StatsSchool> schoolList,
-                                        List<RoundOffStatsQuestion> rosqList) throws SQLException {
+                                        List<RoundOffStatsQuestion> rosqList, String database, String table) throws SQLException {
     if (teamList == null && schoolList != null && rosqList == null) {
       for (StatsSchool school : schoolList) {
-        String sql = "insert into stats_exams.school_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+        String sql = "insert into " + database + "." + table + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = con.prepareStatement(sql);
         setStatementWithPS(statement,
             school.getScore(),
@@ -48,7 +48,7 @@ public class SQLController {
       }
     } else if (schoolList == null && teamList != null && rosqList == null) {
       for (StatsTeam team : teamList) {
-        String sql = "insert into stats_exams.team_statistics (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+        String sql = "insert into " + database + "." + table + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = con.prepareStatement(sql);
         setStatementWithPS(statement,
             team.getScore(),
@@ -70,8 +70,8 @@ public class SQLController {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
           String sql = "insert into " +
-              "stats_exams.questions " +
-              "(question, date, mean, median, stddev, variance, max_score) " +
+              database + "." + table +
+              " (question, date, mean, median, stddev, variance, max_score) " +
               "values (?,?,?,?,?,?,?)";
 
           int maxScore = ExamInput.getMaxScore(q);

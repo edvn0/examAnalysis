@@ -1,13 +1,12 @@
 package com.bth.gui.csvchooser;
 
+import com.bth.io.ExamOutput;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 public class CsvDirectoryChoice {
   public JFileChooser fileChooser1;
@@ -17,16 +16,17 @@ public class CsvDirectoryChoice {
   public JPanel labelPanel;
   public JPanel filePanel;
   public JPanel buttonPanel;
+  public JLabel dirLabel;
   public JFrame frame;
 
   private File directory;
-  private URL url;
+  private File url;
 
   public CsvDirectoryChoice() {
     directory = null;
     url = null;
 
-    frame = new JFrame("Login to Database");
+    frame = new JFrame("In which directory should CSV be outputted?");
     frame.setContentPane(this.primaryPanel);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.pack();
@@ -34,13 +34,16 @@ public class CsvDirectoryChoice {
     frame.setLocationRelativeTo(null);
     frame.setResizable(false);
 
+    fileChooser1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
     confirmButton.addActionListener(e -> {
-      directory = fileChooser1.getCurrentDirectory();
-      try {
-        url = new URL(directory.getAbsolutePath());
-      } catch (MalformedURLException e1) {
-        e1.printStackTrace();
-      }
+      directory = fileChooser1.getSelectedFile();
+      ExamOutput.setDirectory(directory.getAbsolutePath());
+      frame.dispose();
+    });
+
+    exitButton.addActionListener(e -> {
+      frame.dispose();
     });
   }
 
@@ -72,11 +75,11 @@ public class CsvDirectoryChoice {
     labelPanel = new JPanel();
     labelPanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
     primaryPanel.add(labelPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-    final JLabel label1 = new JLabel();
-    Font label1Font = this.$$$getFont$$$("Monaco", Font.BOLD, 26, label1.getFont());
-    if (label1Font != null) label1.setFont(label1Font);
-    label1.setText("Choose local directory for CSV");
-    labelPanel.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+    dirLabel = new JLabel();
+    Font dirLabelFont = this.$$$getFont$$$("Monaco", Font.BOLD, 26, dirLabel.getFont());
+    if (dirLabelFont != null) dirLabel.setFont(dirLabelFont);
+    dirLabel.setText("Choose local directory for CSV");
+    labelPanel.add(dirLabel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     buttonPanel = new JPanel();
     buttonPanel.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
     primaryPanel.add(buttonPanel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -90,6 +93,7 @@ public class CsvDirectoryChoice {
     filePanel.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
     primaryPanel.add(filePanel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
     fileChooser1 = new JFileChooser();
+    fileChooser1.setAcceptAllFileFilterUsed(true);
     filePanel.add(fileChooser1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
   }
 
@@ -118,4 +122,5 @@ public class CsvDirectoryChoice {
   public JComponent $$$getRootComponent$$$() {
     return primaryPanel;
   }
+
 }
