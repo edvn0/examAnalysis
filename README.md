@@ -1,5 +1,5 @@
-Tänker såhär:
-Kommer en batch med tentafiler - beroende på hur de är formatterade etc så läser jag in datan i ExamInput. Den hanterar alltså all input. Hur når jag denna?
-<br>
-Exam representerar objektet Tenta, alltså varje fil i mappen med alla tentor. Här krävs total poäng, poäng på varje uppgift mappat som exempelvis (1,3) för att representera uppgift 1 där man fick 3 poäng. Vi behöver också löpnummer för att associera tenta med specifik grupp.
-<br>
+The Swedish Championship in Economics is this year being held the 18th of May in Gothenburg, hosted by HHGS and Ekonomiföreningen - student unions of Handelshögskolan i Göteborg.
+
+This project takes in a CSV file and returns four output files in a given directory, where information regarding statistical analysis is presented.
+
+Furthermore, it inputs all of the analysis into a MySQL database and a MongoDB database.

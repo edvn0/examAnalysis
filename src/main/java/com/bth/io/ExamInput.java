@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -108,20 +110,8 @@ public class ExamInput {
   // and inits the examSchoolsarray..
   private ExamSchool[] getExamSchoolList() {
     this.examSchools = setExamSchoolList(this.isFirstRowTimeStamp());
-    int length = examSchools.length;
 
-    for (int i = 0; i < length; i++) {
-      for (int j = 1; j < length - i; j++) {
-        // Compare
-        boolean swap = examSchools[j].getSchool().compareTo(examSchools[j - 1].getSchool()) < 0;
-
-        if (swap) {
-          ExamSchool temp = examSchools[j - 1];
-          examSchools[j - 1] = examSchools[j];
-          examSchools[j] = temp;
-        }
-      }
-    }
+    Arrays.sort(examSchools, Comparator.comparing(ExamSchool::getSchool));
 
     return examSchools;
   }
