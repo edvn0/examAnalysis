@@ -3,10 +3,12 @@ package com.bth.analysis.Stats;
 import java.util.Objects;
 
 public class StatsTeam extends Stats {
+
   private final String team;
   private final double score;
 
-  public StatsTeam(String team, double score, double mean, double median, double stddev, double variance) {
+  public StatsTeam(String team, double score, double mean, double median, double stddev,
+      double variance) {
     super(stddev, mean, median, variance);
     this.team = team;
     this.score = score;
@@ -31,7 +33,9 @@ public class StatsTeam extends Stats {
 
   @Override
   public boolean equals(final Object o) {
-    if (this.getClass() != o.getClass()) return false;
+    if (this.getClass() != o.getClass()) {
+      return false;
+    }
     StatsTeam temp = (StatsTeam) o;
     return (team.equals(temp.getTeam()) && score == temp.getScore() &&
         getMean() == temp.getMean() &&

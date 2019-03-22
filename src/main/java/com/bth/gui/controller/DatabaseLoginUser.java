@@ -3,6 +3,7 @@ package com.bth.gui.controller;
 import java.util.Arrays;
 
 public class DatabaseLoginUser {
+
   private String schoolCollection;
   private String userName;
   private String password;
@@ -17,11 +18,28 @@ public class DatabaseLoginUser {
   private String mongoConnectorName;
   private String mongoDatabaseName;
 
+  /***
+   * <p>The user who wants to log into the databases.
+   * Might be able to reduce this someday...</p>
+   * @param userName {String} User Name
+   * @param password {char[]} password
+   * @param choice choice of database, mysql or mongo
+   * @param sqlConnectorName sql connector string
+   * @param sqlDatabaseName sql db name
+   * @param schoolTable table for school stats in sqldb
+   * @param teamTable table for team stats in sqldb
+   * @param questionTable table for question statbs in sqldb
+   * @param mongoConnectorName mongodb connector string
+   * @param mongoDatabaseName mongodb db name
+   * @param schoolCollection mongodb school collection for stats
+   * @param teamCollection mongodb team collection for stats
+   * @param questionCollection mongodb question collection for stats
+   */
   public DatabaseLoginUser(String userName, char[] password, String choice,
-                           String sqlConnectorName, String sqlDatabaseName, String schoolTable,
-                           String teamTable, String questionTable, String mongoConnectorName,
-                           String mongoDatabaseName, String schoolCollection,
-                           String teamCollection, String questionCollection) {
+      String sqlConnectorName, String sqlDatabaseName, String schoolTable,
+      String teamTable, String questionTable, String mongoConnectorName,
+      String mongoDatabaseName, String schoolCollection,
+      String teamCollection, String questionCollection) {
 
     boolean validatedUser = false;
     try {
@@ -51,7 +69,6 @@ public class DatabaseLoginUser {
     this.teamTable = teamTable;
     this.questionTable = questionTable;
 
-
     this.teamCollection = teamCollection;
     this.questionCollection = questionCollection;
     this.schoolCollection = schoolCollection;
@@ -70,31 +87,24 @@ public class DatabaseLoginUser {
 
   private boolean validateUser(String password, char[] user) throws InstantiationException {
     if (password != null && user != null) {
-      if (password.length() > 0 && password.length() < 16 && user.length > 0 && user.length < 16)
+      if (password.length() > 0 && password.length() < 16 && user.length > 0 && user.length < 16) {
         return true;
+      }
     }
     throw new InstantiationException("Cannot validate user.");
   }
 
   @Override
   public String toString() {
-    String sb = "DatabaseLoginUser{" + "choice='" + choice + '\'' +
-        ", collectionNames=" + Arrays.toString(getCollectionNames()) +
-        ", mongoConnectorName='" + mongoConnectorName + '\'' +
-        ", mongoDatabaseName='" + mongoDatabaseName + '\'' +
-        ", password='" + password + '\'' +
-        ", questionCollection='" + questionCollection + '\'' +
-        ", questionTable='" + questionTable + '\'' +
-        ", schoolCollection='" + schoolCollection + '\'' +
-        ", schoolTable='" + schoolTable + '\'' +
-        ", sqlConnectorName='" + sqlConnectorName + '\'' +
-        ", sqlDatabaseName='" + sqlDatabaseName + '\'' +
-        ", tableNames=" + Arrays.toString(getTableNames()) +
-        ", teamCollection='" + teamCollection + '\'' +
-        ", teamTable='" + teamTable + '\'' +
-        ", userName='" + userName + '\'' +
-        '}';
-    return sb;
+    return "DatabaseLoginUser{" + "choice='" + choice + ", collectionNames=" + '\'' + Arrays
+        .toString(getCollectionNames()) + ", mongoConnectorName='" + mongoConnectorName + '\''
+        + ", mongoDatabaseName='" + mongoDatabaseName + '\'' + ", password='" + password + '\''
+        + ", questionCollection='" + questionCollection + '\'' + ", questionTable='" + questionTable
+        + '\'' + ", schoolCollection='" + schoolCollection + '\'' + ", schoolTable='" + schoolTable
+        + '\'' + ", sqlConnectorName='" + sqlConnectorName + '\'' + ", sqlDatabaseName='"
+        + sqlDatabaseName + '\'' + ", tableNames=" + Arrays.toString(getTableNames())
+        + ", teamCollection='" + teamCollection + '\'' + ", teamTable='" + teamTable + '\''
+        + ", userName='" + userName + '\'' + '}';
   }
 
   public String getPassword() {

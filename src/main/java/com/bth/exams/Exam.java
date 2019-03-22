@@ -5,6 +5,7 @@ import java.util.Date;
 
 // Main object, ska representera tentorna, med vilken kod de skrevs, alla separata poäng, datum.
 public class Exam {
+
   private int anonymousCode;
   private double score;
   private Date date;

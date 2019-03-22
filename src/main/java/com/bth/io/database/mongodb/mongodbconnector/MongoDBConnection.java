@@ -1,25 +1,30 @@
 package com.bth.io.database.mongodb.mongodbconnector;
 
 import com.bth.gui.controller.DatabaseLoginUser;
+import com.bth.io.database.DatabaseConnection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
-
+import java.sql.Connection;
 import java.time.LocalDate;
 
-public class MongoDBConnection {
-  private final MongoClientURI uri;
-  private final MongoClient client;
-  private final MongoDatabase database;
-  private final DatabaseLoginUser user;
+public class MongoDBConnection extends DatabaseConnection {
+
+  private MongoClient client;
+  private MongoDatabase database;
+  private DatabaseLoginUser user;
 
   public MongoDBConnection(DatabaseLoginUser user) {
-    this.user = user;
-    uri = new MongoClientURI(user.getMongoConnectorName());
-    client = new MongoClient(uri);
-    database = client.getDatabase(user.getMongoDatabaseName());
+    database = connectToMongo(user);
+  }
 
-    System.out.println("You were connected to MongoDB. Database: " + database.getName() + " at : " + LocalDate.now().toString());
+  @Override
+  public String toString() {
+    return "You were connected to a MongoDB Database. " +
+        "Info:\nDatabase:"
+        + user.getMongoDatabaseName() +
+        "\nAs User:" + user.getUserName() +
+        "\nAt time:" + LocalDate.now().toString();
   }
 
   public void disconnect() {
@@ -40,5 +45,22 @@ public class MongoDBConnection {
 
   public boolean isConnected() {
     return client != null && database != null;
+  }
+
+  @Override
+  protected Connection connectToSql(DatabaseLoginUser user) {
+    return null;
+  }
+
+  @Override
+  protected MongoDatabase connectToMongo(DatabaseLoginUser user) {
+    this.user = user;
+    MongoClientURI uri = new MongoClientURI(user.getMongoConnectorName());
+    client = new MongoClient(uri);
+    database = client.getDatabase(user.getMongoDatabaseName());
+
+    System.out.println(this.toString());
+
+    return database;
   }
 }

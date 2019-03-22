@@ -1,6 +1,7 @@
 package com.bth.analysis.Stats;
 
 public class Stats {
+
   private double stddev, mean, median, variance;
 
   Stats(double stddev, double mean, double median, double variance) {
