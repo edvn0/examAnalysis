@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Scanner;
 
 class FileInput {
+
   private Scanner scanner;
 
   FileInput(String dir) throws FileNotFoundException {
@@ -22,7 +23,8 @@ class FileInput {
   }
 
   int getIndex(boolean startorend, List<String[]> data) {
-    String question = startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();
+    String question =
+        startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();
     int length = data.get(0).length;
 
     for (int j = 0; j < length; j++) {

@@ -4,7 +4,6 @@ import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -13,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ExamOutput {
+
   // This will be dynamically changed by the CSV input file.
   private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/resources/data/output";
 
@@ -57,7 +57,9 @@ public class ExamOutput {
     writer.write("\n");
   }
 
-  private static void getStringRepresentation(PrintWriter writer, StringBuilder stringBuilder, double score2, double stddev2, double mean2, double median2, double variance2, StatsSchool statsSchool, StatsTeam statsTeam) {
+  private static void getStringRepresentation(PrintWriter writer, StringBuilder stringBuilder,
+      double score2, double stddev2, double mean2, double median2, double variance2,
+      StatsSchool statsSchool, StatsTeam statsTeam) {
     String name = "";
     if (statsSchool == null) {
       name += statsTeam.getTeam();
@@ -112,7 +114,9 @@ public class ExamOutput {
 
       for (StatsSchool statsSchool : statsSchools) {
         StringBuilder stringBuilder = new StringBuilder();
-        getStringRepresentation(writer, stringBuilder, statsSchool.getScore(), statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(), statsSchool.getVariance(), statsSchool, null);
+        getStringRepresentation(writer, stringBuilder, statsSchool.getScore(),
+            statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
+            statsSchool.getVariance(), statsSchool, null);
       }
     } catch (FileNotFoundException e) {
       e.printStackTrace();
@@ -129,10 +133,11 @@ public class ExamOutput {
       writer.write("School,");
       writer.write("Exam Anon Code,");
       for (int i = 1; i <= 14; i++) {
-        if (i < 14)
+        if (i < 14) {
           writer.write("q" + i + ",");
-        else
+        } else {
           writer.write("q" + i);
+        }
       }
       writer.write("\n");
 
@@ -142,7 +147,9 @@ public class ExamOutput {
         writer.write(schools.getExam().getAnonymousCode() + ",");
         for (int i = 0; i < scores.length; i++) {
           writer.write("" + scores[i]);
-          if (i != 13) writer.write(",");
+          if (i != 13) {
+            writer.write(",");
+          }
         }
         writer.write("\n");
       }

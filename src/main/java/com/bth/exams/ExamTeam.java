@@ -2,11 +2,13 @@ package com.bth.exams;
 
 // Kommer att representera poäng för varje lag.
 public class ExamTeam extends Exam {
+
   private Exam exam;
   private String team;
 
   public ExamTeam(Exam exam, String team) {
-    super(exam.getScore(), exam.getSeparateScoresForAllQuestions(), exam.getDate(), exam.getAnonymousCode());
+    super(exam.getScore(), exam.getSeparateScoresForAllQuestions(), exam.getDate(),
+        exam.getAnonymousCode());
     this.exam = exam;
     this.team = team;
   }

@@ -3,13 +3,17 @@ package com.bth.io;
 import com.bth.exams.Exam;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
-
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 
 public class ExamInput {
+
   private static String[] SCHOOLS;
   private final Exam[] exams;
   private final ExamTeam[] examTeams;
@@ -23,18 +27,21 @@ public class ExamInput {
     try {
       FileInput fileInput = new FileInput(examDirectory);
       listOfRowsInData = fileInput.fileInput();
-      INDIVIDUAL_SCORES_START = fileInput.getIndex(true, listOfRowsInData) != -1 ? fileInput.getIndex(true, listOfRowsInData) : 0;
-      INDIVIDUAL_SCORES_END = fileInput.getIndex(false, listOfRowsInData) != -1 ? fileInput.getIndex(false, listOfRowsInData) : 0;
+      INDIVIDUAL_SCORES_START = fileInput.getIndex(true, listOfRowsInData) != -1 ? fileInput
+          .getIndex(true, listOfRowsInData) : 0;
+      INDIVIDUAL_SCORES_END = fileInput.getIndex(false, listOfRowsInData) != -1 ? fileInput
+          .getIndex(false, listOfRowsInData) : 0;
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
-    if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) System.exit(0);
+    if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) {
+      System.exit(0);
+    }
 
     // All teams for the java.exams.
     teams = this.teams(this.isFirstRowTimeStamp());
     // Init the school names.
     SCHOOLS = this.getSchools(this.isFirstRowTimeStamp());
-
 
     // Inits the lists.
     // First, the java.exams with no school associated.
@@ -48,7 +55,9 @@ public class ExamInput {
   private String[] teams(int isTimeStampDependent) {
     HashSet<String> stringHashSet = new HashSet<>();
     for (String[] s : listOfRowsInData) {
-      if (!s[isTimeStampDependent].equals("Skola")) stringHashSet.add(s[3]);
+      if (!s[isTimeStampDependent].equals("Skola")) {
+        stringHashSet.add(s[3]);
+      }
     }
 
     return stringHashSet.toArray(new String[0]);
@@ -74,7 +83,6 @@ public class ExamInput {
     // Format the java.data.
     Exam[] exams = new Exam[listOfRowsInData.size() - 1];
     int timeStampDependentIndex = isFirstRowTimeStamp();
-
 
     for (int i = 1; i < listOfRowsInData.size(); i++) {
       double score = Double.parseDouble(listOfRowsInData.get(i)[3 + timeStampDependentIndex]);
@@ -133,7 +141,8 @@ public class ExamInput {
 
     for (int i = 0; i < examTeams.length; i++) {
       int index = i + 1;
-      examTeams[index - 1] = new ExamTeam(this.exams[index - 1], (listOfRowsInData.get(index)[2 + isTimeStampDependent]));
+      examTeams[index - 1] = new ExamTeam(this.exams[index - 1],
+          (listOfRowsInData.get(index)[2 + isTimeStampDependent]));
     }
 
     return examTeams;

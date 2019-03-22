@@ -1,6 +1,5 @@
 package com.bth.gui.controller;
 
-import com.bth.analysis.ExamAnalysis;
 import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
@@ -11,16 +10,16 @@ import com.bth.io.database.mongodb.mongodbconnector.ExamMongoDBObject;
 import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnection;
 import com.bth.io.database.sql.sqlconnector.MySqlConnection;
 import com.mongodb.BasicDBObject;
-
-import javax.swing.*;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JComponent;
 
 public class GUIController {
+
   public static boolean dbChoice = false; // SQL if TRUE.
 
   private static MongoDBConnection connection;
@@ -71,15 +70,18 @@ public class GUIController {
   }
 
   public void insertIntoMongoDatabase(List<StatsSchool> schoolList,
-                                      List<StatsTeam> teamList,
-                                      List<RoundOffStatsQuestion> questionList,
-                                      String sColl, String tColl, String qColl) {
+      List<StatsTeam> teamList,
+      List<RoundOffStatsQuestion> questionList,
+      String sColl, String tColl, String qColl) {
     boolean schoolListNull = schoolList == null;
     boolean teamListNull = teamList == null;
     boolean questionListNull = questionList == null;
-    boolean schoolTeamListNull = schoolListNull && teamListNull && !questionListNull; // => we will insert questions
-    boolean schoolQuestionListNull = schoolListNull && questionListNull && !teamListNull; // => we will insert teams
-    boolean teamQuestionNull = teamListNull && questionListNull && !schoolListNull; // => we will insert schools
+    boolean schoolTeamListNull =
+        schoolListNull && teamListNull && !questionListNull; // => we will insert questions
+    boolean schoolQuestionListNull =
+        schoolListNull && questionListNull && !teamListNull; // => we will insert teams
+    boolean teamQuestionNull =
+        teamListNull && questionListNull && !schoolListNull; // => we will insert schools
 
     List<BasicDBObject> objects = new ArrayList<>();
 
@@ -112,8 +114,8 @@ public class GUIController {
    * @throws SQLException if NoInputFound
    */
   public void insertIntoMySQLDatabase(List<StatsTeam> teamList,
-                                      List<StatsSchool> schoolList,
-                                      List<RoundOffStatsQuestion> rosqList, String table) throws SQLException {
+      List<StatsSchool> schoolList,
+      List<RoundOffStatsQuestion> rosqList, String table) throws SQLException {
     if (teamList == null && schoolList != null && rosqList == null) {
       for (StatsSchool school : schoolList) {
         String sql = "insert into " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
@@ -180,9 +182,9 @@ public class GUIController {
   }
 
   private void setStatementWithPS(PreparedStatement statement, double score,
-                                  double mean, double stddev, double variance,
-                                  double median, StatsTeam team, StatsSchool school,
-                                  String question, int maxscore) throws SQLException {
+      double mean, double stddev, double variance,
+      double median, StatsTeam team, StatsSchool school,
+      String question, int maxscore) throws SQLException {
     if (question != null && school == null && team == null) {
       BigDecimal bdMean = new BigDecimal(mean);
       BigDecimal bdMedian = new BigDecimal(median);
@@ -208,7 +210,8 @@ public class GUIController {
   private boolean checkDatabaseForQuestions(List<RoundOffStatsQuestion> rosqList) {
     int equalQuestions = 0;
     try {
-      ResultSet rs = mySqlConnection.getConnection().prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
+      ResultSet rs = mySqlConnection.getConnection()
+          .prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
       int k = 0;
       while (rs.next()) {
         String question = rs.getString(2);
@@ -219,11 +222,13 @@ public class GUIController {
         double maxscore = Double.parseDouble(rs.getString(8));
         String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
         String sQ = "q".concat(q);
-        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0 && maxscore >= 0) {
+        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0
+            && maxscore >= 0) {
           equalQuestions++;
         }
       }
-      return equalQuestions == ExamAnalysis.AMOUNT_OF_QUESTIONS;
+      // TODO: fix hard coded 14 here, might change in future.
+      return equalQuestions == 14;
     } catch (SQLException e) {
       System.out.println(e.getSQLState());
     }
@@ -231,8 +236,8 @@ public class GUIController {
   }
 
   private void writeStringToStatement(PreparedStatement statement, double score,
-                                      double mean, double stddev, double variance,
-                                      double median) throws SQLException {
+      double mean, double stddev, double variance,
+      double median) throws SQLException {
     statement.setString(2, "" + score);
     statement.setString(3, "" + mean);
     statement.setString(4, "" + stddev);
