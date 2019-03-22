@@ -225,6 +225,4 @@ public class MainGUI {
       CSVInputFileButton.setEnabled(true);
     }
   }
-
-
 }

@@ -177,6 +177,4 @@ public class LoginDatabase {
         mdbquestionsNameTextField.getText(),
     };
   }
-
-
 }

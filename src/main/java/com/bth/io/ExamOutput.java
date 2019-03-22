@@ -7,8 +7,11 @@ import com.bth.exams.ExamSchool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class ExamOutput {
@@ -153,7 +156,13 @@ public class ExamOutput {
         }
         writer.write("\n");
       }
-      writer.write("Latest Update: " + LocalDate.now().toString() + " by Edwin Carlsson, S.E.R.O.");
+      DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+      Date date = new Date();
+      String sdate = format.format(date);
+      System.out.println(sdate);
+      writer.write(
+          "Latest Update: " + LocalDate.now().toString() + " "
+              + "by Edwin Carlsson, S.E.R.O. at clock: " + sdate);
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
