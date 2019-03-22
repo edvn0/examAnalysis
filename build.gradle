@@ -22,4 +22,5 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     compile 'com.intellij:forms_rt:7.0.3'
     compile 'org.mongodb:mongo-java-driver:3.9.0'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.15'
 }

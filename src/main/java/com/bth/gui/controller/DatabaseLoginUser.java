@@ -17,25 +17,46 @@ public class DatabaseLoginUser {
   private String mongoConnectorName;
   private String mongoDatabaseName;
 
-  public DatabaseLoginUser(String userName, char[] password, String choice, String sqlConnectorName, String sqlDatabaseName, String schoolTable, String teamTable, String questionTable, String mongoConnectorName, String mongoDatabaseName, String schoolCollection, String teamCollection, String questionCollection) {
-    this.userName = userName;
-    this.password = String.copyValueOf(password);
+  public DatabaseLoginUser(String userName, char[] password, String choice,
+                           String sqlConnectorName, String sqlDatabaseName, String schoolTable,
+                           String teamTable, String questionTable, String mongoConnectorName,
+                           String mongoDatabaseName, String schoolCollection,
+                           String teamCollection, String questionCollection) {
+
+    boolean validatedUser = false;
+    try {
+      validatedUser = validateUser(userName, password);
+    } catch (InstantiationException e) {
+      e.printStackTrace();
+    }
+
+    if (validatedUser) {
+      this.userName = userName;
+      this.password = String.copyValueOf(password);
+    }
+
     this.choice = choice;
 
-    this.sqlConnectorName = sqlConnectorName;
+    try {
+      this.sqlConnectorName = validateDatabase(sqlConnectorName);
+      this.mongoConnectorName = validateDatabase(mongoConnectorName);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
     this.sqlDatabaseName = sqlDatabaseName;
+    this.mongoDatabaseName = mongoDatabaseName;
+
     this.schoolTable = schoolTable;
     this.teamTable = teamTable;
     this.questionTable = questionTable;
 
-    this.mongoConnectorName = mongoConnectorName;
-    this.mongoDatabaseName = mongoDatabaseName;
+
     this.teamCollection = teamCollection;
     this.questionCollection = questionCollection;
     this.schoolCollection = schoolCollection;
   }
 
-  // TODO: Validate database names according to MySQL or MongoDB
   private String validateDatabase(String db) throws Exception {
     boolean startsWithMySql = db.startsWith("jdbc:mysql://");
     boolean startsWithMongoDb = db.startsWith("mongodb+srv://");
@@ -47,39 +68,38 @@ public class DatabaseLoginUser {
     return db;
   }
 
-  private boolean validateUser(String password, String user) {
+  private boolean validateUser(String password, char[] user) throws InstantiationException {
     if (password != null && user != null) {
-      return password.length() > 0 && password.length() < 16 && user.length() > 0 && user.length() < 16;
+      if (password.length() > 0 && password.length() < 16 && user.length > 0 && user.length < 16)
+        return true;
     }
-    return false;
+    throw new InstantiationException("Cannot validate user.");
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("DatabaseLoginUser{");
-    sb.append("choice='").append(choice).append('\'');
-    sb.append(", collectionNames=").append(Arrays.toString(getCollectionNames()));
-    sb.append(", mongoConnectorName='").append(mongoConnectorName).append('\'');
-    sb.append(", mongoDatabaseName='").append(mongoDatabaseName).append('\'');
-    sb.append(", password='").append(password).append('\'');
-    sb.append(", questionCollection='").append(questionCollection).append('\'');
-    sb.append(", questionTable='").append(questionTable).append('\'');
-    sb.append(", schoolCollection='").append(schoolCollection).append('\'');
-    sb.append(", schoolTable='").append(schoolTable).append('\'');
-    sb.append(", sqlConnectorName='").append(sqlConnectorName).append('\'');
-    sb.append(", sqlDatabaseName='").append(sqlDatabaseName).append('\'');
-    sb.append(", tableNames=").append(Arrays.toString(getTableNames()));
-    sb.append(", teamCollection='").append(teamCollection).append('\'');
-    sb.append(", teamTable='").append(teamTable).append('\'');
-    sb.append(", userName='").append(userName).append('\'');
-    sb.append('}');
-    return sb.toString();
+    String sb = "DatabaseLoginUser{" + "choice='" + choice + '\'' +
+        ", collectionNames=" + Arrays.toString(getCollectionNames()) +
+        ", mongoConnectorName='" + mongoConnectorName + '\'' +
+        ", mongoDatabaseName='" + mongoDatabaseName + '\'' +
+        ", password='" + password + '\'' +
+        ", questionCollection='" + questionCollection + '\'' +
+        ", questionTable='" + questionTable + '\'' +
+        ", schoolCollection='" + schoolCollection + '\'' +
+        ", schoolTable='" + schoolTable + '\'' +
+        ", sqlConnectorName='" + sqlConnectorName + '\'' +
+        ", sqlDatabaseName='" + sqlDatabaseName + '\'' +
+        ", tableNames=" + Arrays.toString(getTableNames()) +
+        ", teamCollection='" + teamCollection + '\'' +
+        ", teamTable='" + teamTable + '\'' +
+        ", userName='" + userName + '\'' +
+        '}';
+    return sb;
   }
 
   public String getPassword() {
     return password;
   }
-
 
   public String getSchoolTable() {
     return schoolTable;
@@ -129,11 +149,11 @@ public class DatabaseLoginUser {
     return mongoDatabaseName;
   }
 
-  public String[] getTableNames() {
+  private String[] getTableNames() {
     return new String[]{schoolTable, teamTable, questionTable};
   }
 
-  public String[] getCollectionNames() {
+  private String[] getCollectionNames() {
     return new String[]{schoolCollection, teamCollection, questionCollection};
   }
 }

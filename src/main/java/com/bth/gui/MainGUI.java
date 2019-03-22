@@ -4,25 +4,17 @@ import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
-import com.bth.gui.controller.DatabaseLoginUser;
 import com.bth.gui.controller.GUIController;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamOutput;
-import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnector;
-import com.bth.io.database.mongodb.mongodbcontroller.MongoDBController;
-import com.bth.io.database.sql.sqlconnector.SQLConnector;
-import com.bth.io.database.sql.sqlcontroller.SQLController;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoCollection;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +38,6 @@ public class MainGUI {
   private GUIController controller;
   private LoginDatabase database;
   private CsvDirectoryChoice csvDirectoryChoice;
-  private Connection connection;
-  private MongoCollection<BasicDBObject> collection;
 
   private List<RoundOffStatsQuestion> questionsStats;
   private List<StatsSchool> statsSchools;
@@ -71,22 +61,20 @@ public class MainGUI {
     ArrayList<JComponent> list = addAllToList();
     controller.setEnabledForAll(list, false);
 
+    controller.append(database);
+    controller.append(csvDirectoryChoice);
+
     this.insertActionListener(list);
 
     loginDatabaseButton.addActionListener(e1 ->
-        database.frame.setVisible(true));
+        controller.getLoginDatabase().getFrame().setVisible(true));
 
-    database.confirmButton.addActionListener(new DatabaseButtonListener());
+    database.confirmButton.addActionListener(
+        new DatabaseButtonListener());
 
-    exitButton.addActionListener(e -> {
-      if (SQLConnector.isConnected()) SQLConnector.disconnect();
-      if (MongoDBConnector.isConnected()) MongoDBConnector.disconnect();
-      System.exit(1);
-    });
+    CSVInputFileButton.addActionListener(e -> controller.getCsvDirectoryChoice().getFrame().setVisible(true));
 
-    CSVInputFileButton.addActionListener(e -> {
-      csvDirectoryChoice.frame.setVisible(true);
-    });
+    exitButton.addActionListener(e -> System.exit(1));
   }
 
   private ArrayList<JComponent> addAllToList() {
@@ -112,108 +100,116 @@ public class MainGUI {
   class OutputIntegrationListener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
-      System.out.println(e.getActionCommand().trim().toLowerCase().trim());
 
       String directory = ExamOutput.getDirectory();
-      DatabaseLoginUser sqlormdb = SQLConnector.databaseLoginUser == null ? MongoDBConnector.user : null;
-      String[] tableName;
-      if (sqlormdb != null) {
-        tableName = sqlormdb.getTableNames();
 
-        switch (e.getActionCommand().toLowerCase().trim()) {
-          case ("teams to csv"):
-            System.out.println("Printing StatsTeam information to " + directory + " ...");
-            ExamOutput.printToCSV_Teams(statsTeams);
-            System.out.println("Printed!");
-            break;
-          case ("schools to csv"):
-            System.out.println("Printing StatsSchool information to " + directory + " ...");
-            ExamOutput.printToCSV_Schools(statsSchools);
-            System.out.println("Printed!");
-            break;
-          case ("questions to csv"):
-            System.out.println("Printing StatsQuestion information to " + directory + " ...");
-            ExamOutput.printToCSV_Questions(questionsStats);
-            System.out.println("Printed!");
-            break;
-          case ("questions to database"):
-            if (GUIController.dbChoice) // SQL insertion StatsQuestions
-            {
-              connection = database.getConnection();
-              if (connection != null) {
-                System.out.println("Inserting " + e.getActionCommand() + " into database...");
-                try {
-                  SQLController.insertIntoDatabase(connection, null, null, questionsStats, sqlormdb.getSqlDatabaseName(), tableName[2]);
-                } catch (SQLException e1) {
-                  e1.printStackTrace();
-                }
-                System.out.println("Inserted!");
-              } else {
-                System.out.println("MySQL connection is null, try again.");
-              }
-            } else // MongoDB insertion StatsQuestions
-            {
-              System.out.println("Inserting " + e.getActionCommand() + " into database...");
-              collection = MongoDBConnector.getCollectionFromInputCollection(sqlormdb.getQuestionCollection());
-              MongoDBController.insertIntoMongoDatabase(collection, null, null, questionsStats);
-              System.out.println("Inserted!");
+      switch (e.getActionCommand().toLowerCase().trim()) {
+        case ("teams to csv"):
+          System.out.println("Printing StatsTeam information to " + directory + " ...");
+          ExamOutput.printToCSV_Teams(statsTeams);
+          System.out.println("Printed!");
+          break;
+        case ("schools to csv"):
+          System.out.println("Printing StatsSchool information to " + directory + " ...");
+          ExamOutput.printToCSV_Schools(statsSchools);
+          System.out.println("Printed!");
+          break;
+        case ("questions to csv"):
+          System.out.println("Printing StatsQuestion information to " + directory + " ...");
+          ExamOutput.printToCSV_Questions(questionsStats);
+          System.out.println("Printed!");
+          break;
+        case ("q1-q14 to csv"):
+          System.out.println("Printing question 1-14 into " + directory + " ...");
+          ExamOutput.printQuestionsToCSV(exams);
+          System.out.println("Printing!");
+          break;
+        case ("questions to database"):
+          if (GUIController.dbChoice) // SQL insertion StatsQuestions
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            try {
+              controller.insertIntoMySQLDatabase(null,
+                  null, questionsStats,
+                  controller.getLoginDatabase().getMySqlConnection().getUser().getQuestionTable());
+            } catch (SQLException e1) {
+              e1.printStackTrace();
             }
-            break;
-          case ("schools to database"):
-            if (GUIController.dbChoice) // SQL insertion StatsSchool
-            {
-              connection = database.getConnection();
-              if (connection != null) {
-                System.out.println("Inserting " + e.getActionCommand() + " into database...");
-                try {
-                  SQLController.insertIntoDatabase(connection, null, statsSchools, null, sqlormdb.getSqlDatabaseName(), tableName[0]);
-                } catch (SQLException e1) {
-                  e1.printStackTrace();
-                }
-                System.out.println("Inserted!");
-              } else {
-                System.out.println("MySQL connection is null, try again.");
-              }
-            } else // MongoDB insertion StatsSchool
-            {
-              System.out.println("Inserting " + e.getActionCommand() + " into database...");
-              collection = MongoDBConnector.getCollectionFromInputCollection(sqlormdb.getSchoolCollection());
-              MongoDBController.insertIntoMongoDatabase(collection, statsSchools, null, null);
-              System.out.println("Inserted!");
-            }
-          case ("teams to database"):
-            if (GUIController.dbChoice) // SQL insertion StatsTeams
-            {
-              connection = database.getConnection();
-              if (connection != null) {
-                System.out.println("Inserting " + e.getActionCommand() + " into database...");
-                try {
-                  SQLController.insertIntoDatabase(connection, statsTeams, null, null, sqlormdb.getSqlDatabaseName(), tableName[1]);
-                } catch (SQLException e1) {
-                  e1.printStackTrace();
-                }
-                System.out.println("Inserted!");
-              } else {
-                System.out.println("MySQL connection is null, try again.");
-              }
-            } else // MongoDB insertion StatsTeams
-            {
-              System.out.println("Inserting " + e.getActionCommand() + " into database...");
-              collection = MongoDBConnector.getCollectionFromInputCollection(sqlormdb.getTeamCollection());
-              MongoDBController.insertIntoMongoDatabase(collection, null, statsTeams, null);
-              System.out.println("Inserted!");
-            }
-            break;
-          case ("q1-q14 to csv"):
-            System.out.println("Inserting question 1-14 into " + ExamOutput.getDirectory() + " ...");
-            ExamOutput.printQuestionsToCSV(exams);
+
             System.out.println("Inserted!");
-          default:
-            break;
-        }
+
+          } else // MongoDB insertion StatsQuestions
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            controller.insertIntoMongoDatabase(null, null, questionsStats,
+                null,
+                null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionTable());
+
+            System.out.println("Inserted!");
+          }
+          break;
+        case ("schools to database"):
+          if (GUIController.dbChoice) // SQL insertion StatsSchool
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            try {
+              controller.insertIntoMySQLDatabase(null,
+                  statsSchools, null,
+                  controller.getLoginDatabase().getMySqlConnection().getUser().getSchoolTable());
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
+
+            System.out.println("Inserted!");
+
+          } else // MongoDB insertion StatsSchool
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            controller.insertIntoMongoDatabase(statsSchools, null, null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getSchoolCollection(),
+                null,
+                null);
+
+            System.out.println("Inserted!");
+          }
+          break;
+        case ("teams to database"):
+          if (GUIController.dbChoice) // SQL insertion StatsTeams
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            try {
+              controller.insertIntoMySQLDatabase(statsTeams,
+                  null, null,
+                  controller.getLoginDatabase().getMySqlConnection().getUser().getTeamTable());
+            } catch (SQLException e1) {
+              e1.printStackTrace();
+            }
+
+            System.out.println("Inserted!");
+          } else // MongoDB insertion StatsTeams
+          {
+            System.out.println("Inserting " + e.getActionCommand() + " into database...");
+
+            controller.insertIntoMongoDatabase(null, statsTeams, null,
+                null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamCollection(),
+                null);
+
+            System.out.println("Inserted!");
+          }
+          break;
+        default:
+          break;
       }
     }
   }
+
 
   // Inner class for Database login
   class DatabaseButtonListener implements ActionListener {
