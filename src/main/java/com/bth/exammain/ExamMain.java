@@ -11,9 +11,7 @@ public class ExamMain {
       "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/src/main/resources/data/csvfiles/Deltävlingstentamen_2019_03_21.csv";
 
   public static void main(final String... args) {
-    java.awt.EventQueue.invokeLater(() -> {
-      ChooseDirectory chooseDirectory = new ChooseDirectory();
-    });
+    java.awt.EventQueue.invokeLater(ChooseDirectory::new);
 
     java.awt.EventQueue.invokeLater(() -> {
       ExamAnalysis examAnalysis = new ExamAnalysis(dir);
