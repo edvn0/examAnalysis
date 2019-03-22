@@ -17,14 +17,12 @@ public class CsvDirectoryChoice {
   public JPanel filePanel;
   public JPanel buttonPanel;
   public JLabel dirLabel;
-  public JFrame frame;
+  private JFrame frame;
 
   private File directory;
-  private File url;
 
   public CsvDirectoryChoice() {
     directory = null;
-    url = null;
 
     frame = new JFrame("In which directory should CSV be outputted?");
     frame.setContentPane(this.primaryPanel);
@@ -42,13 +40,15 @@ public class CsvDirectoryChoice {
       frame.dispose();
     });
 
-    exitButton.addActionListener(e -> {
-      frame.dispose();
-    });
+    exitButton.addActionListener(e -> frame.dispose());
   }
 
   public File getDirectory() {
     return directory;
+  }
+
+  public Component getFrame() {
+    return frame;
   }
 
   {
@@ -122,5 +122,6 @@ public class CsvDirectoryChoice {
   public JComponent $$$getRootComponent$$$() {
     return primaryPanel;
   }
+
 
 }

@@ -8,12 +8,13 @@ import com.bth.exams.ExamSchool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 
 public class ExamOutput {
   // This will be dynamically changed by the CSV input file.
-  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/java/com.bth/data/output";
+  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/resources/data/output";
 
   public static void printToCSV_Teams(List<StatsTeam> teamList) {
     teamList.sort(Comparator.comparing(StatsTeam::getScore));
@@ -145,6 +146,7 @@ public class ExamOutput {
         }
         writer.write("\n");
       }
+      writer.write("Latest Update: " + LocalDate.now().toString() + " by Edwin Carlsson, S.E.R.O.");
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();
