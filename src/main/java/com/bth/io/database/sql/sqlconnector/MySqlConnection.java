@@ -15,10 +15,19 @@ public class MySqlConnection {
     this.user = user;
     try {
       connection = DriverManager.getConnection(user.getSqlConnectorName(), user.getUserName(), user.getPassword());
-      System.out.println("You were connected to MySQL. Database: " + user.getSqlDatabaseName() + " at time:" + LocalDate.now().toString());
+      System.out.println(this.toString());
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "You were connected to a MySQL Database. " +
+        "Info:\nDatabase:"
+        + user.getSqlDatabaseName() +
+        "\nAs User:" + user.getUserName() +
+        "\nAt time:" + LocalDate.now().toString();
   }
 
   public Connection getConnection() {

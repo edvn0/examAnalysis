@@ -109,7 +109,7 @@ public class GUIController {
    * @param teamList List of teams
    * @param schoolList List of schools
    * @param rosqList List of questions
-   * @throws SQLException Because SQL sucks
+   * @throws SQLException if NoInputFound
    */
   public void insertIntoMySQLDatabase(List<StatsTeam> teamList,
                                       List<StatsSchool> schoolList,

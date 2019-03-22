@@ -8,18 +8,26 @@ import com.mongodb.client.MongoDatabase;
 import java.time.LocalDate;
 
 public class MongoDBConnection {
-  private final MongoClientURI uri;
   private final MongoClient client;
   private final MongoDatabase database;
   private final DatabaseLoginUser user;
 
   public MongoDBConnection(DatabaseLoginUser user) {
     this.user = user;
-    uri = new MongoClientURI(user.getMongoConnectorName());
+    MongoClientURI uri = new MongoClientURI(user.getMongoConnectorName());
     client = new MongoClient(uri);
     database = client.getDatabase(user.getMongoDatabaseName());
 
-    System.out.println("You were connected to MongoDB. Database: " + database.getName() + " at : " + LocalDate.now().toString());
+    System.out.println(this.toString());
+  }
+
+  @Override
+  public String toString() {
+    return "You were connected to a MongoDB Database. " +
+        "Info:\nDatabase:"
+        + user.getMongoDatabaseName() +
+        "\nAs User:" + user.getUserName() +
+        "\nAt time:" + LocalDate.now().toString();
   }
 
   public void disconnect() {
