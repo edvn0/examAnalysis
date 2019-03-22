@@ -14,7 +14,7 @@ import java.util.List;
 public class ExamOutput {
 
   // This will be dynamically changed by the CSV input file.
-  private static String directory = "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/resources/data/output";
+  private static String directory = "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/src/main/resources/data/output";
 
   public static void printToCSV_Teams(List<StatsTeam> teamList) {
     teamList.sort(Comparator.comparing(StatsTeam::getScore));

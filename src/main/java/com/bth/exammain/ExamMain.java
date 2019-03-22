@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 public class ExamMain {
 
   private static String dir =
-      "/Users/edwincarlsson/Documents/Programmering/Java-programmering/src/main/resources/data/csvfiles/Deltävlingstentamen_2019_03_21.csv";
+      "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/src/main/resources/data/csvfiles/Deltävlingstentamen_2019_03_21.csv";
 
   public static void main(final String... args) {
     java.awt.EventQueue.invokeLater(() -> {
