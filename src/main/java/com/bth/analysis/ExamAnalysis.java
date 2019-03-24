@@ -39,7 +39,7 @@ public class ExamAnalysis {
 
     statsTeams = this.generateStatsTeams(examTeams);
     statsSchools = this.generateStatsSchools(examSchools);
-    questionsStats = this.generateQuestionsStats();
+    questionsStats = this.generateQuestionsStats(questionsStats);
   }
 
   //////////////////////////////
@@ -167,7 +167,7 @@ public class ExamAnalysis {
     return new RoundOffStatsQuestion(mean, median, stddev, variance, 1000.00, question);
   }
 
-  private List<RoundOffStatsQuestion> generateQuestionsStats() {
+  private List<RoundOffStatsQuestion> generateQuestionsStats(List<RoundOffStatsQuestion> questions) {
     List<RoundOffStatsQuestion> stats = new ArrayList<>();
 
     for (int i = 0; i < amountOfQuestions; i++) {

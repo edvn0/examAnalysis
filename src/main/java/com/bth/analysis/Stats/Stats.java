@@ -4,7 +4,7 @@ public class Stats {
 
   private double stddev, mean, median, variance;
 
-  Stats(double stddev, double mean, double median, double variance) {
+  public Stats(double stddev, double mean, double median, double variance) {
     this.stddev = stddev;
     this.mean = mean;
     this.median = median;

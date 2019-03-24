@@ -1,6 +1,8 @@
 package com.bth.analysis.Stats.helperobjects;
 
-public class RoundOffStats {
+import com.bth.analysis.Stats.Stats;
+
+public class RoundOffStats extends Stats {
 
   private final double mean;
   private final double median;
@@ -9,6 +11,8 @@ public class RoundOffStats {
 
   public RoundOffStats(double mean, double median, double stddev, double variance,
       double numOfDec) {
+    super(stddev, mean, median, variance);
+
     this.mean = roundOff(mean, numOfDec);
     this.median = roundOff(median, numOfDec);
     this.stddev = roundOff(stddev, numOfDec);

@@ -6,13 +6,9 @@ import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.GUIController;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
+import com.bth.gui.examdirectorygui.ChooseDirectory;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamOutput;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -39,6 +35,7 @@ public class MainGUI {
   public JButton oneToFourteenCSVButton;
   public JButton CSVInputFileButton;
   public JButton loginDatabaseButton;
+  private JButton newPossibilityButton;
 
   private GUIController controller;
 
@@ -78,6 +75,11 @@ public class MainGUI {
         .addActionListener(e -> controller.getCsvDirectoryChoice().getFrame().setVisible(true));
 
     exitButton.addActionListener(e -> System.exit(0));
+
+    System.out.println(schoolsToDatabaseButton.getPreferredSize());
+
+    java.awt.EventQueue.invokeLater(ChooseDirectory::new);
+
   }
 
   private ArrayList<JComponent> addAllToList() {

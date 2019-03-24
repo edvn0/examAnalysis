@@ -16,7 +16,6 @@ import java.util.Objects;
 
 public class ExamInput {
 
-  private static String[] SCHOOLS;
   private final Exam[] exams;
   private final ExamTeam[] examTeams;
   private final String[] teams;
@@ -43,7 +42,7 @@ public class ExamInput {
     // All teams for the java.exams.
     teams = this.teams(this.isFirstRowTimeStamp());
     // Init the school names.
-    SCHOOLS = this.getSchools(this.isFirstRowTimeStamp());
+    String[] SCHOOLS = this.getSchools(this.isFirstRowTimeStamp());
 
     // Inits the lists.
     // First, the java.exams with no school associated.
