@@ -2,21 +2,15 @@ package com.bth.gui.login;
 
 import com.bth.gui.controller.DatabaseLoginUser;
 import com.bth.gui.controller.GUIController;
+import com.bth.io.PropertiesReader;
 import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnection;
 import com.bth.io.database.sql.sqlconnector.MySqlConnection;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.DefaultComboBoxModel;
+import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -64,6 +58,8 @@ public class LoginDatabase {
   private MongoDBConnection mongoDBConnection;
   private MySqlConnection mySqlConnection;
 
+  private PropertiesReader reader;
+
   public LoginDatabase() {
     frame = new JFrame("Login to Database");
     frame.setContentPane(this.primaryPanel);
@@ -73,7 +69,13 @@ public class LoginDatabase {
     frame.setLocationRelativeTo(null);
     frame.setResizable(false);
 
-    // DEV purpose.
+    try {
+      reader = new PropertiesReader(
+          "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/.properties");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    // DEV!
     test();
 
     user = null;
@@ -83,16 +85,16 @@ public class LoginDatabase {
   }
 
   private void test() {
+    System.out.println(reader);
     this.mdbschoolCollectionNameTextField.setText("SchoolStatistics");
     this.mdbteamsCollectionNameTextField.setText("TeamStatistics");
     this.mdbquestionsNameTextField.setText("QuestionStatistics");
-    this.mongoDbConnectStringTextField.setText(
-        "mongodb+srv://edwin-carlsson:Edwin98@examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true");
+    this.mongoDbConnectStringTextField.setText(reader.getProperty("connect.string.for.mongo"));
     this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
     this.UserName.setText("edwin-carlsson");
     this.Password.setText("Edwin98");
 
-    this.sqlconnectorStringTextField.setText("jdbc:mysql://localhost:8889/stats_exams");
+    this.sqlconnectorStringTextField.setText(reader.getProperty("connect.string.for.mysql"));
     this.mySQLDatabaseNameTextField.setText("stats_exams");
     this.sqlschoolsTableNameTextField.setText("school_statistics");
     this.sqlteamsTableNameTextField.setText("team_statistics");
