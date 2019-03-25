@@ -1,13 +1,8 @@
 package com.bth.gui.examdirectorygui;
 
-import com.bth.exammain.ExamMain;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
-import java.awt.Font;
-import java.awt.Insets;
+import com.bth.gui.MainGUI;
 import java.io.File;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -33,7 +28,7 @@ public class ChooseDirectory {
     chosenFile = null;
     confirmButton.addActionListener((e) -> {
       chosenFile = fileChooser1.getSelectedFile();
-      ExamMain.setDir(chosenFile.getAbsolutePath());
+      MainGUI.setFileFromChooseDirectory(chosenFile);
       frame.dispose();
     });
   }
@@ -42,4 +37,7 @@ public class ChooseDirectory {
     return chosenFile;
   }
 
+  public JButton getConfirmButton() {
+    return confirmButton;
+  }
 }

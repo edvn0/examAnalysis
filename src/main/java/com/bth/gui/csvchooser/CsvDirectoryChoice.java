@@ -1,15 +1,9 @@
 package com.bth.gui.csvchooser;
 
 import com.bth.io.ExamOutput;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Insets;
 import java.io.File;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -23,7 +17,6 @@ public class CsvDirectoryChoice {
   public JPanel primaryPanel;
   public JPanel labelPanel;
   public JPanel filePanel;
-  public JPanel buttonPanel;
   public JLabel dirLabel;
   private JFrame frame;
 
@@ -58,6 +51,4 @@ public class CsvDirectoryChoice {
   public Component getFrame() {
     return frame;
   }
-
-
 }

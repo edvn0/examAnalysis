@@ -28,6 +28,10 @@ public class ExamAnalysis {
     this.dir = dir;
   }
 
+  public ExamAnalysis() {
+    this.dir = null;
+  }
+
   public void start() {
     input = new ExamInput(this.dir);
     init();
@@ -85,7 +89,7 @@ public class ExamAnalysis {
         roundOffStats.getStddev(), roundOffStats.getVariance());
   }
 
-  // java.exams for a specific school.
+  // Exams for a specific school.
   private StatsSchool analyseExams(ExamSchool[] schools, String name) {
     double sum = 0;
     final int totLength = amountOfQuestions;
@@ -137,7 +141,6 @@ public class ExamAnalysis {
       StatsTeam statsTeam = analyseExams(teams, team.getTeam());
       teamSet.add(statsTeam);
     }
-
     return new ArrayList<>(teamSet);
   }
 
@@ -167,7 +170,8 @@ public class ExamAnalysis {
     return new RoundOffStatsQuestion(mean, median, stddev, variance, 1000.00, question);
   }
 
-  private List<RoundOffStatsQuestion> generateQuestionsStats(List<RoundOffStatsQuestion> questions) {
+  private List<RoundOffStatsQuestion> generateQuestionsStats(
+      List<RoundOffStatsQuestion> questions) {
     List<RoundOffStatsQuestion> stats = new ArrayList<>();
 
     for (int i = 0; i < amountOfQuestions; i++) {
@@ -233,7 +237,7 @@ public class ExamAnalysis {
   // End helper object
 
   // Help math
-  private double generateMean(double[] array, int length) {
+  public double generateMean(double[] array, int length) {
     double sum = 0;
     for (double d : array) {
       sum += d;
@@ -241,18 +245,18 @@ public class ExamAnalysis {
     return sum / length;
   }
 
-  private double generateMedian(double[] array) {
+  public double generateMedian(double[] array) {
     Arrays.sort(array);
     double midPoint = ((array[(array.length - 1) / 2] + array[array.length / 2]) / 2);
     double midPointMid = array[(array.length - 1) / 2];
     return array.length % 2 == 0 ? midPoint : midPointMid;
   }
 
-  private double generateVariance(double[] scores, double mean, int length) {
+  public double generateVariance(double[] scores, double mean, int length) {
     return getXiSquared(mean, scores) / length;
   }
 
-  private double generateStandardDeviation(double mean, int totLength, double[] averageScores) {
+  public double generateStandardDeviation(double mean, int totLength, double[] averageScores) {
     double xiXbarSum = getXiSquared(mean, averageScores);
     return Math.sqrt(xiXbarSum / totLength);
   }

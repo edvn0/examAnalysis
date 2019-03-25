@@ -26,7 +26,7 @@ public class LoginDatabase {
   public JPanel exitConfirmPanel;
   public JTextArea sqlconnectorStringTextField;
   public JTextField UserName;
-  public JComboBox DBTypeComboBox;
+  public JComboBox<? extends String> DBTypeComboBox;
   public JPasswordField Password;
   public JTextField mdbschoolCollectionNameTextField;
   public JTextField mongoDatabaseNameTextField;
@@ -69,14 +69,15 @@ public class LoginDatabase {
     frame.setLocationRelativeTo(null);
     frame.setResizable(false);
 
+    // DEV!
     try {
       reader = new PropertiesReader(
           "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/.properties");
     } catch (IOException e) {
       e.printStackTrace();
     }
-    // DEV!
     test();
+    // END DEV!
 
     user = null;
 
@@ -85,7 +86,6 @@ public class LoginDatabase {
   }
 
   private void test() {
-    System.out.println(reader);
     this.mdbschoolCollectionNameTextField.setText("SchoolStatistics");
     this.mdbteamsCollectionNameTextField.setText("TeamStatistics");
     this.mdbquestionsNameTextField.setText("QuestionStatistics");
@@ -125,7 +125,7 @@ public class LoginDatabase {
       String userName = UserName.getText();
       char[] password = Password.getPassword();
 
-      String choice = (String) DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
+      String choice = DBTypeComboBox.getItemAt(DBTypeComboBox.getSelectedIndex());
 
       String[] fullInfo = getConnectivityInformation();
 

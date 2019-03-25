@@ -3,6 +3,7 @@ package com.bth.gui.controller;
 import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import com.bth.gui.MainGUI;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamInput;
@@ -27,6 +28,7 @@ public class GUIController {
 
   private CsvDirectoryChoice csvDirectoryChoice;
   private LoginDatabase database;
+  private MainGUI mainGUI;
 
   public GUIController() {
   }
@@ -61,12 +63,20 @@ public class GUIController {
     this.csvDirectoryChoice = csvDirectoryChoice;
   }
 
+  public void append(MainGUI gui) {
+    this.mainGUI = gui;
+  }
+
   public LoginDatabase getLoginDatabase() {
     return database;
   }
 
   public CsvDirectoryChoice getCsvDirectoryChoice() {
     return csvDirectoryChoice;
+  }
+
+  public MainGUI getMainGUI() {
+    return mainGUI;
   }
 
   public void insertIntoMongoDatabase(List<StatsSchool> schoolList,
@@ -113,6 +123,7 @@ public class GUIController {
    * @param rosqList List of questions
    * @throws SQLException if NoInputFound
    */
+  @SuppressWarnings("all")
   public void insertIntoMySQLDatabase(List<StatsTeam> teamList,
       List<StatsSchool> schoolList,
       List<RoundOffStatsQuestion> rosqList, String table) throws SQLException {
@@ -207,6 +218,7 @@ public class GUIController {
     statement.execute();
   }
 
+  @SuppressWarnings("all")
   private boolean checkDatabaseForQuestions(List<RoundOffStatsQuestion> rosqList) {
     int equalQuestions = 0;
     try {

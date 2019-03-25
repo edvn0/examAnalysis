@@ -2,7 +2,15 @@ package com.bth.analysis.Stats;
 
 public class Stats {
 
-  private double stddev, mean, median, variance;
+  private double stddev, mean, median, variance, score;
+
+  public Stats(double stddev, double mean, double median, double variance, double score) {
+    this.stddev = stddev;
+    this.mean = mean;
+    this.median = median;
+    this.variance = variance;
+    this.score = score;
+  }
 
   public Stats(double stddev, double mean, double median, double variance) {
     this.stddev = stddev;
@@ -27,4 +35,7 @@ public class Stats {
     return median;
   }
 
+  public double getScore() {
+    return score;
+  }
 }

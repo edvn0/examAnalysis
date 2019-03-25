@@ -2,15 +2,14 @@ package com.bth.analysis.Stats;
 
 import java.util.Objects;
 
-public class StatsSchool extends Stats {
+public class StatsSchool {
 
   private final String school;
-  private final double score;
+  private final Stats stats;
 
   public StatsSchool(String school, double score, double mean, double median, double stddev,
       double variance) {
-    super(stddev, mean, median, variance);
-    this.score = score;
+    stats = new Stats(stddev, mean, median, variance, score);
     this.school = school;
   }
 
@@ -18,7 +17,7 @@ public class StatsSchool extends Stats {
   public String toString() {
     return
         "TeamName: " + this.school + "\n" +
-            "Score: " + this.score + "\n" +
+            "Score: " + this.stats.getScore() + "\n" +
             "All questions: \n" +
             "Mean: [" + getMean() + "]\n" +
             "Median: [" + getMedian() + "]\n" +
@@ -32,7 +31,7 @@ public class StatsSchool extends Stats {
       return false;
     }
     StatsSchool temp = (StatsSchool) o;
-    return (school.equals(temp.getSchool()) && score == temp.getScore() &&
+    return (school.equals(temp.getSchool()) && this.stats.getScore() == temp.getScore() &&
         getMean() == temp.getMean() &&
         getVariance() == temp.getVariance() &&
         getStddev() == temp.getStddev() &&
@@ -44,10 +43,27 @@ public class StatsSchool extends Stats {
   }
 
   public double getScore() {
-    return score;
+    return this.stats.getScore();
   }
 
   public int hashCode() {
-    return Objects.hash(school, score, getMean(), getMedian(), getStddev(), getVariance());
+    return Objects
+        .hash(school, this.stats.getScore(), getMean(), getMedian(), getStddev(), getVariance());
+  }
+
+  public double getVariance() {
+    return stats.getVariance();
+  }
+
+  public double getStddev() {
+    return stats.getStddev();
+  }
+
+  public double getMean() {
+    return stats.getMean();
+  }
+
+  public double getMedian() {
+    return stats.getMedian();
   }
 }

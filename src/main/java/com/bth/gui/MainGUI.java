@@ -1,5 +1,6 @@
 package com.bth.gui;
 
+import com.bth.analysis.ExamAnalysis;
 import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
@@ -9,19 +10,23 @@ import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.examdirectorygui.ChooseDirectory;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamOutput;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
 public class MainGUI {
 
+  private static File file;
   public JPanel panel1;
   public JLabel DATABASELabel;
   public JLabel CSVLabel;
@@ -35,34 +40,52 @@ public class MainGUI {
   public JButton oneToFourteenCSVButton;
   public JButton CSVInputFileButton;
   public JButton loginDatabaseButton;
-  private JButton newPossibilityButton;
+  private JButton insertEverythingButton;
 
   private GUIController controller;
+  private ChooseDirectory chooseDirectory;
+  private static String dir = "/Users/edwincarlsson/Documents/"
+      + "Programmering/exam_Analysis/src/main/"
+      + "resources/data/csvfiles/Deltävlingstentamen_2019_03_21.csv";
+  private ExamAnalysis examAnalysis;
 
   private List<RoundOffStatsQuestion> questionsStats;
   private List<StatsSchool> statsSchools;
   private List<StatsTeam> statsTeams;
   private ExamSchool[] exams;
 
-  public MainGUI(ExamSchool[] exams, List<RoundOffStatsQuestion> questionsStats,
-      List<StatsSchool> statsSchools, List<StatsTeam> statsTeams) {
-    this.questionsStats = questionsStats;
-    this.statsSchools = statsSchools;
-    this.statsTeams = statsTeams;
-    this.exams = exams;
+  private JFrame frame;
 
+  public MainGUI() {
     controller = new GUIController();
 
     setup();
   }
 
   private void setup() {
+    // Init gui
+    frame = new JFrame("MainGUI");
+    frame.setLocationByPlatform(true);
+    frame.setContentPane(this.panel1);
+    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.pack();
+    frame.setResizable(false);
+    frame.setVisible(true);
+    // End init gui
+
+    // Add all relevant components to a List to manage more easily.
     ArrayList<JComponent> list = addAllToList();
+    // Disable prior to initialisation.
     controller.setEnabledForAll(list, false);
 
     controller.append(new LoginDatabase());
     controller.append(new CsvDirectoryChoice());
+    controller.append(this);
 
+    // Invis until resource directory has been chosen.
+    controller.getMainGUI().getFrame().setVisible(false);
+
+    // Init all the Jbutton listeners
     this.insertActionListener(list);
 
     loginDatabaseButton.addActionListener(e1 ->
@@ -76,10 +99,31 @@ public class MainGUI {
 
     exitButton.addActionListener(e -> System.exit(0));
 
-    System.out.println(schoolsToDatabaseButton.getPreferredSize());
+    java.awt.EventQueue.invokeLater(() -> {
+      chooseDirectory = new ChooseDirectory();
+      chooseDirectory.confirmButton
+          .addActionListener(e -> {
+            // TODO: fix interaction with choosing input directory.
+            controller.getMainGUI().getFrame().setVisible(true);
+            dir = file.getAbsolutePath();
+            examAnalysis = new ExamAnalysis(dir);
+            examAnalysis.start();
+            this.initArrays();
+          });
+    });
 
-    java.awt.EventQueue.invokeLater(ChooseDirectory::new);
 
+  }
+
+  private void initArrays() {
+    this.questionsStats = examAnalysis.getQuestionsStats();
+    this.statsSchools = examAnalysis.getStatsSchools();
+    this.statsTeams = examAnalysis.getStatsTeams();
+    this.exams = examAnalysis.getExamSchools();
+  }
+
+  private Component getFrame() {
+    return this.frame;
   }
 
   private ArrayList<JComponent> addAllToList() {
@@ -91,6 +135,7 @@ public class MainGUI {
     temp.add(schoolsToDatabaseButton);
     temp.add(teamsToDatabaseButton);
     temp.add(questionsToDatabaseButton);
+    temp.add(insertEverythingButton);
     return temp;
   }
 
@@ -211,6 +256,57 @@ public class MainGUI {
             System.out.println("Inserted!");
           }
           break;
+        case "insert everything":
+          long now = System.currentTimeMillis();
+          System.out.println(
+              "Inserting school, team and questions info into both sql and mongodb databases...");
+          try {
+            System.out.println("Inserting questions into SQL...");
+            controller.insertIntoMySQLDatabase(null,
+                null, questionsStats,
+                controller.getLoginDatabase().getMySqlConnection().getUser().getQuestionTable());
+            System.out.println("Inserted questions...");
+            System.out.println("Inserting questions into Mongo...");
+
+            controller.insertIntoMongoDatabase(null, null, questionsStats,
+                null,
+                null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionTable());
+            System.out.println("Inserted questions...");
+            System.out.println("Inserting school stats into SQL...");
+
+            controller.insertIntoMySQLDatabase(null,
+                statsSchools, null,
+                controller.getLoginDatabase().getMySqlConnection().getUser().getSchoolTable());
+            System.out.println("Inserted school stats...");
+            System.out.println("Inserting school stats into Mongo...");
+
+            controller.insertIntoMongoDatabase(statsSchools, null, null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser()
+                    .getSchoolCollection(),
+                null,
+                null);
+            System.out.println("Inserted school stats...");
+            System.out.println("Inserting stats teams into SQL...");
+
+            controller.insertIntoMySQLDatabase(statsTeams,
+                null, null,
+                controller.getLoginDatabase().getMySqlConnection().getUser().getTeamTable());
+            System.out.println("Inserted stats teams...");
+            System.out.println("Inserting stats teams into Mongo...");
+
+            controller.insertIntoMongoDatabase(null, statsTeams, null,
+                null,
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamCollection(),
+                null);
+            System.out.println("Inserted stats teams...");
+            long now2 = System.currentTimeMillis();
+            System.out.println("Total execution time was: " + (now2 - now) + "ms.");
+          } catch (SQLException e2) {
+            e2.printStackTrace();
+          }
+          System.out.println("Finished successfully!");
+          break;
         default:
           break;
       }
@@ -226,5 +322,14 @@ public class MainGUI {
       controller.setEnabledForAll(addAllToList(), true);
       CSVInputFileButton.setEnabled(true);
     }
+  }
+
+  public static void setDir(String dir) {
+    MainGUI.dir = dir;
+  }
+
+  public static void setFileFromChooseDirectory(File file) {
+    System.out.println(file);
+    MainGUI.file = file;
   }
 }
