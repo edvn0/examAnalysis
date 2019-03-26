@@ -23,7 +23,7 @@ public class MongoDBConnection extends DatabaseConnection {
     return "You were connected to a MongoDB Database. " +
         "Info:\nDatabase:"
         + user.getMongoDatabaseName() +
-        "\nAs User:" + user.getUserName() +
+        "\nAs user:" + user.getUserName() +
         "\nAt time:" + LocalDate.now().toString();
   }
 

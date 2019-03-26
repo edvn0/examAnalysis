@@ -8,7 +8,7 @@ public class PropertiesReader extends Properties {
 
   public PropertiesReader(String dir) throws IOException {
     super();
-    FileInputStream inputStream = null;
+    FileInputStream inputStream;
     inputStream = new FileInputStream(dir);
     this.load(inputStream);
     inputStream.close();

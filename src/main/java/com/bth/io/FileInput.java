@@ -22,6 +22,12 @@ class FileInput {
     return values;
   }
 
+  /***
+   * Returns the index of where the questions start or end.
+   * @param startorend <code>true</code> if where they start in the array, <code>false</code> otherwise
+   * @param data the input <code>List<String[]></code> from the input tsv file.
+   * @return <code>int</code>
+   */
   int getIndex(boolean startorend, List<String[]> data) {
     String question =
         startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();

@@ -1,5 +1,6 @@
 package com.bth.gui.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 public class DatabaseLoginUser {
@@ -44,7 +45,7 @@ public class DatabaseLoginUser {
     boolean validatedUser = false;
     try {
       validatedUser = validateUser(userName, password);
-    } catch (InstantiationException e) {
+    } catch (IOException e) {
       e.printStackTrace();
     }
 
@@ -85,13 +86,13 @@ public class DatabaseLoginUser {
     return db;
   }
 
-  private boolean validateUser(String password, char[] user) throws InstantiationException {
+  private boolean validateUser(String password, char[] user) throws IOException {
     if (password != null && user != null) {
       if (password.length() > 0 && password.length() < 16 && user.length > 0 && user.length < 16) {
         return true;
       }
     }
-    throw new InstantiationException("Cannot validate user.");
+    throw new IOException("Cannot validate user.");
   }
 
   @Override

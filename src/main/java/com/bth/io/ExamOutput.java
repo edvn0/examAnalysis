@@ -104,9 +104,19 @@ public class ExamOutput {
         builder.append("\n");
         writer.write(builder.toString());
       }
+      writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+  private static void writeCopyrightAndAuthorInformation(PrintWriter writer) {
+    DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    Date date = new Date();
+    String sdate = format.format(date);
+    writer.write(
+        "Latest Update: " + LocalDate.now().toString() + " "
+            + "by Edwin Carlsson, S.E.R.O. at clock: " + sdate);
   }
 
   public static void printToCSV_Schools(List<StatsSchool> statsSchools) {
@@ -121,6 +131,7 @@ public class ExamOutput {
             statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
             statsSchool.getVariance(), statsSchool, null);
       }
+      writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -156,13 +167,7 @@ public class ExamOutput {
         }
         writer.write("\n");
       }
-      DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-      Date date = new Date();
-      String sdate = format.format(date);
-      System.out.println(sdate);
-      writer.write(
-          "Latest Update: " + LocalDate.now().toString() + " "
-              + "by Edwin Carlsson, S.E.R.O. at clock: " + sdate);
+      writeCopyrightAndAuthorInformation(writer);
 
     } catch (FileNotFoundException e) {
       e.printStackTrace();

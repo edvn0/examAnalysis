@@ -23,7 +23,7 @@ public class GUIController {
 
   public static boolean dbChoice = false; // SQL if TRUE.
 
-  private static MongoDBConnection connection;
+  private static MongoDBConnection mongoDBConnection;
   private static MySqlConnection mySqlConnection;
 
   private CsvDirectoryChoice csvDirectoryChoice;
@@ -52,7 +52,7 @@ public class GUIController {
   }
 
   public static void setConnection(MongoDBConnection conn) {
-    connection = conn;
+    mongoDBConnection = conn;
   }
 
   public void append(LoginDatabase database) {
@@ -113,7 +113,8 @@ public class GUIController {
       }
       use = qColl;
     }
-    connection.getMongoDatabase().getCollection(use, BasicDBObject.class).insertMany(objects);
+    mongoDBConnection.getMongoDatabase().getCollection(use, BasicDBObject.class)
+        .insertMany(objects);
   }
 
   /***
@@ -121,12 +122,23 @@ public class GUIController {
    * @param teamList List of teams
    * @param schoolList List of schools
    * @param rosqList List of questions
+   * @param table table in SQL,
    * @throws SQLException if NoInputFound
    */
   @SuppressWarnings("all")
   public void insertIntoMySQLDatabase(List<StatsTeam> teamList,
       List<StatsSchool> schoolList,
       List<RoundOffStatsQuestion> rosqList, String table) throws SQLException {
+
+    if (mySqlConnection == null && mongoDBConnection == null) {
+      throw new NullPointerException(
+          "MySQL Connection and MongoDB Connection were not online. Try again.");
+    } else if (mySqlConnection == null) {
+      throw new NullPointerException("MySQL Connection was not online. Try again.");
+    } else if (mongoDBConnection == null) {
+      throw new NullPointerException("MongoDB Connection was not online. Try again.");
+    }
+
     if (teamList == null && schoolList != null && rosqList == null) {
       for (StatsSchool school : schoolList) {
         String sql = "insert into " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
@@ -169,6 +181,8 @@ public class GUIController {
         for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
+
+          // Parametrise an SQL query insertion for every RoSQ.
           String sql = "insert into " +
               mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
               " (question, date, mean, median, stddev, variance, max_score) " +

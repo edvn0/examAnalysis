@@ -99,20 +99,18 @@ public class MainGUI {
 
     exitButton.addActionListener(e -> System.exit(0));
 
-    java.awt.EventQueue.invokeLater(() -> {
-      chooseDirectory = new ChooseDirectory();
-      chooseDirectory.confirmButton
-          .addActionListener(e -> {
-            // TODO: fix interaction with choosing input directory.
-            controller.getMainGUI().getFrame().setVisible(true);
-            dir = file.getAbsolutePath();
-            examAnalysis = new ExamAnalysis(dir);
-            examAnalysis.start();
-            this.initArrays();
-          });
+    chooseDirectory = new ChooseDirectory();
+    chooseDirectory.confirmButton.addActionListener(e -> {
+      if (file != null) {
+        examAnalysis = new ExamAnalysis(file.getAbsolutePath());
+      } else {
+        examAnalysis = new ExamAnalysis(
+            chooseDirectory.fileChooser1.getSelectedFile().getAbsolutePath());
+      }
+      examAnalysis.start();
+      this.initArrays();
+      this.frame.setVisible(true);
     });
-
-
   }
 
   private void initArrays() {
@@ -173,7 +171,7 @@ public class MainGUI {
         case ("q1-q14 to csv"):
           System.out.println("Printing question 1-14 into " + directory + " ...");
           ExamOutput.printQuestionsToCSV(exams);
-          System.out.println("Printing!");
+          System.out.println("Printed!");
           break;
         case ("questions to database"):
           if (GUIController.dbChoice) // SQL insertion StatsQuestions

@@ -25,6 +25,8 @@ public class ExamInput {
   private int INDIVIDUAL_SCORES_END;
 
   public ExamInput(String examDirectory) {
+
+    // Inits where the scores are in the tsv file, necessary for future use.
     try {
       FileInput fileInput = new FileInput(examDirectory);
       listOfRowsInData = fileInput.fileInput();

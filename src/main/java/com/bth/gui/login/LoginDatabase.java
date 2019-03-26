@@ -58,12 +58,12 @@ public class LoginDatabase {
   private MongoDBConnection mongoDBConnection;
   private MySqlConnection mySqlConnection;
 
-  private PropertiesReader reader;
+  private final ThreadLocal<PropertiesReader> reader = new ThreadLocal<>();
 
   public LoginDatabase() {
     frame = new JFrame("Login to Database");
     frame.setContentPane(this.primaryPanel);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     frame.pack();
     frame.setVisible(false);
     frame.setLocationRelativeTo(null);
@@ -71,8 +71,8 @@ public class LoginDatabase {
 
     // DEV!
     try {
-      reader = new PropertiesReader(
-          "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/.properties");
+      reader.set(new PropertiesReader(
+          "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/.properties"));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -89,12 +89,13 @@ public class LoginDatabase {
     this.mdbschoolCollectionNameTextField.setText("SchoolStatistics");
     this.mdbteamsCollectionNameTextField.setText("TeamStatistics");
     this.mdbquestionsNameTextField.setText("QuestionStatistics");
-    this.mongoDbConnectStringTextField.setText(reader.getProperty("connect.string.for.mongo"));
+    this.mongoDbConnectStringTextField
+        .setText(reader.get().getProperty("connect.string.for.mongo"));
     this.mongoDatabaseNameTextField.setText("ExamAnalysisDatabase");
     this.UserName.setText("edwin-carlsson");
     this.Password.setText("Edwin98");
 
-    this.sqlconnectorStringTextField.setText(reader.getProperty("connect.string.for.mysql"));
+    this.sqlconnectorStringTextField.setText(reader.get().getProperty("connect.string.for.mysql"));
     this.mySQLDatabaseNameTextField.setText("stats_exams");
     this.sqlschoolsTableNameTextField.setText("school_statistics");
     this.sqlteamsTableNameTextField.setText("team_statistics");
