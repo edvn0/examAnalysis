@@ -7,7 +7,7 @@ import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.GUIController;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
-import com.bth.gui.examdirectorygui.ChooseDirectory;
+import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamOutput;
 import java.awt.Component;
@@ -43,7 +43,6 @@ public class MainGUI {
   private JButton insertEverythingButton;
 
   private GUIController controller;
-  private ChooseDirectory chooseDirectory;
   private static String dir = "/Users/edwincarlsson/Documents/"
       + "Programmering/exam_Analysis/src/main/"
       + "resources/data/csvfiles/Deltävlingstentamen_2019_03_21.csv";
@@ -95,22 +94,20 @@ public class MainGUI {
         new DatabaseButtonListener());
 
     CSVInputFileButton
-        .addActionListener(e -> controller.getCsvDirectoryChoice().getFrame().setVisible(true));
+        .addActionListener(e -> controller.getCsvDirectoryChoice().init());
 
     exitButton.addActionListener(e -> System.exit(0));
 
-    chooseDirectory = new ChooseDirectory();
-    chooseDirectory.confirmButton.addActionListener(e -> {
-      if (file != null) {
-        examAnalysis = new ExamAnalysis(file.getAbsolutePath());
-      } else {
-        examAnalysis = new ExamAnalysis(
-            chooseDirectory.fileChooser1.getSelectedFile().getAbsolutePath());
-      }
-      examAnalysis.start();
-      this.initArrays();
-      this.frame.setVisible(true);
-    });
+    ChooseInputFileFrame chooseDirectory = new ChooseInputFileFrame();
+    if (file != null) {
+      examAnalysis = new ExamAnalysis(file.getAbsolutePath());
+    } else {
+      examAnalysis = new ExamAnalysis(
+          chooseDirectory.fileChooser1.getSelectedFile().getAbsolutePath());
+    }
+    examAnalysis.start();
+    this.initArrays();
+    this.frame.setVisible(true);
   }
 
   private void initArrays() {
@@ -118,6 +115,8 @@ public class MainGUI {
     this.statsSchools = examAnalysis.getStatsSchools();
     this.statsTeams = examAnalysis.getStatsTeams();
     this.exams = examAnalysis.getExamSchools();
+
+    System.out.println("MainGUI.initArrays " + "and size: " + statsSchools.size());
   }
 
   private Component getFrame() {

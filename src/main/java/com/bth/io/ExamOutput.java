@@ -37,6 +37,7 @@ public class ExamOutput {
             null,
             team);
       }
+      writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -124,12 +125,13 @@ public class ExamOutput {
 
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
       writeHeaderWithPrintWriter(writer, false);
-
+      int i = 0;
       for (StatsSchool statsSchool : statsSchools) {
         StringBuilder stringBuilder = new StringBuilder();
         getStringRepresentation(writer, stringBuilder, statsSchool.getScore(),
             statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
             statsSchool.getVariance(), statsSchool, null);
+        i++;
       }
       writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {

@@ -1,5 +1,7 @@
 package com.bth.exams;
 
+import java.util.Objects;
+
 // Kommer att representera poäng för varje lag.
 public class ExamTeam extends Exam {
 
@@ -19,6 +21,27 @@ public class ExamTeam extends Exam {
         "exam=" + exam.toString() +
         ", team=" + team +
         '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ExamTeam)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    ExamTeam examTeam = (ExamTeam) o;
+    return Objects.equals(getExam(), examTeam.getExam()) &&
+        Objects.equals(getTeam(), examTeam.getTeam());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), getExam(), getTeam());
   }
 
   public Exam getExam() {

@@ -2,7 +2,7 @@
 src/main/java/META-INF/
 src/main/resources/
 src/main/java/com/bth/gui/csvchooser/CsvDirectoryChoice.form
-src/main/java/com/bth/gui/examdirectorygui/ChooseDirectory.form
+src/main/java/com/bth/gui/examdirectorygui/ChooseInputFileFrame.form
 src/main/java/com/bth/gui/login/LoginDatabase.form
 src/main/java/com/bth/gui/MainGUI.form
 .properties

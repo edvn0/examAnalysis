@@ -205,6 +205,7 @@ public class ExamAnalysis {
           size++;
         }
       }
+
       ExamSchool[] schoolArray = new ExamSchool[size];
 
       int k = 0;

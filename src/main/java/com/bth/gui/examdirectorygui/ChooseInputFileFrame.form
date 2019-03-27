@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.bth.gui.examdirectorygui.ChooseInputFileFrame">
+  <grid id="27dc6" binding="mainPanel" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="15" left="15" bottom="15" right="15"/>
+    <constraints>
+      <xy x="20" y="20" width="1404" height="600"/>
+    </constraints>
+    <properties>
+      <background color="-2039585"/>
+      <foreground color="-4973171"/>
+      <maximumSize width="400" height="400"/>
+      <minimumSize width="400" height="400"/>
+      <opaque value="true"/>
+      <preferredSize width="400" height="400"/>
+    </properties>
+    <border type="line">
+      <font/>
+      <color color="-4973171"/>
+    </border>
+    <children>
+      <component id="e660a" class="javax.swing.JFileChooser" binding="fileChooser1" default-binding="true">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <doubleBuffered value="true"/>
+        </properties>
+      </component>
+      <component id="d698d" class="javax.swing.JLabel" binding="chooseLabel">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <background color="-2039585"/>
+          <font name="Monaco" size="22" style="1"/>
+          <foreground color="-4973171"/>
+          <text value="Choose the file from which the analysis will be done"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>

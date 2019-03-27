@@ -1,5 +1,7 @@
 package com.bth.exams;
 
+import java.util.Objects;
+
 // Kommer representera poäng i varje skola.
 public class ExamSchool extends Exam {
 
@@ -21,6 +23,26 @@ public class ExamSchool extends Exam {
         '}';
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ExamSchool)) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    ExamSchool that = (ExamSchool) o;
+    return Objects.equals(getExam(), that.getExam()) &&
+        Objects.equals(getSchool(), that.getSchool());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), getExam(), getSchool());
+  }
 
   public String getSchool() {
     return school;

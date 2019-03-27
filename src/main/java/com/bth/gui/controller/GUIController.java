@@ -191,9 +191,16 @@ public class GUIController {
           int maxScore = ExamInput.getMaxScore(q);
           if (maxScore != -1) {
             PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
-            setStatementWithPS(statement, 0,
-                question.getMean(), question.getStddev(),
-                question.getVariance(), question.getMedian(), null, null, sQ, maxScore);
+            setStatementWithPS(statement,
+                0,
+                question.getMean(),
+                question.getStddev(),
+                question.getVariance(),
+                question.getMedian(),
+                null,
+                null,
+                sQ,
+                maxScore);
           } else {
             throw new SQLException("Max Score was not found.");
           }

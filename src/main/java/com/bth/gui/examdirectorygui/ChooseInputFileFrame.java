@@ -6,27 +6,18 @@ import java.io.File;
 import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class ChooseDirectory {
+public class ChooseInputFileFrame {
 
   public JPanel mainPanel;
   public JLabel chooseLabel;
   public JFileChooser fileChooser1;
   public JButton confirmButton;
 
-  private File chosenFile;
-
-  public ChooseDirectory() {
-    JFrame frame = new JFrame("CSV file for Exam Analysis");
-    frame.setContentPane(this.mainPanel);
-    frame.pack();
-    frame.setLocationRelativeTo(null);
-    frame.setVisible(true);
-    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+  public ChooseInputFileFrame() {
     // DEV!
     try {
       fileChooser1.setCurrentDirectory(new File(new PropertiesReader(
@@ -37,13 +28,17 @@ public class ChooseDirectory {
     }
     // END DEV
 
-    chosenFile = null;
-    confirmButton.addActionListener((e) -> {
-      System.out.println(confirmButton);
-      System.out.println(fileChooser1.getSelectedFile());
-      chosenFile = fileChooser1.getSelectedFile();
-      MainGUI.setFileFromChooseDirectory(chosenFile);
-      frame.dispose();
-    });
+    fileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+    fileChooser1.setDialogTitle("CSV Input chooser.");
+    int retVal = fileChooser1.showSaveDialog(null);
+    if (retVal == JFileChooser.APPROVE_OPTION) {
+      if (!fileChooser1.getSelectedFile().isDirectory()) {
+        MainGUI.setFileFromChooseDirectory(fileChooser1.getSelectedFile());
+      } else {
+        JOptionPane.showMessageDialog(null, "Incorrect input.");
+      }
+    }
+
   }
 }
