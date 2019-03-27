@@ -4,12 +4,14 @@ import com.bth.analysis.Stats.StatsSchool;
 import com.bth.analysis.Stats.StatsTeam;
 import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
+import com.bth.exams.ExamTeam;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -139,15 +141,31 @@ public class ExamOutput {
     }
   }
 
-  public static void printQuestionsToCSV(ExamSchool[] exams) {
+  public static void printQuestionsToCSV(ExamSchool[] exams, ExamTeam[] teams) {
     // Headers:
     /*
      * school:
      * questions = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
      */
+
+    List<ExamSchool> sortSchoolExams = Arrays.asList(exams);
+    List<ExamTeam> sortTeamExams = Arrays.asList(teams);
+    sortSchoolExams
+        .forEach((e) -> System.out.println(e.getSchool() + " and code: " + e.getAnonymousCode()));
+    sortTeamExams
+        .forEach((e) -> System.out.println(e.getTeam() + " and code: " + e.getAnonymousCode()));
+
+    sortSchoolExams.sort((Comparator.comparingInt(o -> o.getExam().hashCode())));
+    sortTeamExams.sort(Comparator.comparingInt(o -> o.getExam().hashCode()));
+
+    exams = sortSchoolExams.toArray(new ExamSchool[0]);
+    teams = sortTeamExams.toArray(new ExamTeam[0]);
+
     try (PrintWriter writer = new PrintWriter(directory + "/output_onetofourteenandschools.csv")) {
       writer.write("School,");
       writer.write("Exam Anon Code,");
+      writer.write("Team Name,");
+
       for (int i = 1; i <= 14; i++) {
         if (i < 14) {
           writer.write("q" + i + ",");
@@ -157,20 +175,32 @@ public class ExamOutput {
       }
       writer.write("\n");
 
-      for (ExamSchool schools : exams) {
+      for (int i = 0; i < exams.length; i++) {
+        ExamSchool schools = exams[i];
+        ExamTeam team = teams[i];
+
+        boolean examsAreEqual = false;
+        if (schools.getExam().hashCode() == team.getExam().hashCode()) {
+          examsAreEqual = true;
+        }
         double[] scores = schools.getSeparateScoresForAllQuestions();
         writer.write(schools.getSchool() + ",");
         writer.write(schools.getExam().getAnonymousCode() + ",");
-        for (int i = 0; i < scores.length; i++) {
-          writer.write("" + scores[i]);
-          if (i != 13) {
+        if (examsAreEqual) {
+          writer.write(team.getTeam() + ",");
+        } else {
+          writer.write("Null,");
+        }
+        for (int j = 0; j < scores.length; j++) {
+          writer.write("" + scores[j]);
+          if (j != 13) {
             writer.write(",");
           }
         }
         writer.write("\n");
       }
-      writeCopyrightAndAuthorInformation(writer);
 
+      writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }

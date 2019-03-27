@@ -7,12 +7,14 @@ public class ExamTeam extends Exam {
 
   private Exam exam;
   private String team;
+  private int hashedTeam;
 
   public ExamTeam(Exam exam, String team) {
     super(exam.getScore(), exam.getSeparateScoresForAllQuestions(), exam.getDate(),
         exam.getAnonymousCode());
     this.exam = exam;
     this.team = team;
+    this.hashedTeam = Objects.hash(team);
   }
 
   @Override
@@ -52,4 +54,7 @@ public class ExamTeam extends Exam {
     return team;
   }
 
+  public int getHashedTeam() {
+    return hashedTeam;
+  }
 }

@@ -288,6 +288,11 @@ public class ExamAnalysis {
   public ExamSchool[] getExamSchools() {
     return examSchools;
   }
+
+  public ExamTeam[] getExamTeams() {
+    return examTeams;
+  }
+
   // End getters
 
 }

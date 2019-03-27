@@ -169,7 +169,7 @@ public class MainGUI {
           break;
         case ("q1-q14 to csv"):
           System.out.println("Printing question 1-14 into " + directory + " ...");
-          ExamOutput.printQuestionsToCSV(exams);
+          ExamOutput.printQuestionsToCSV(exams, examAnalysis.getExamTeams());
           System.out.println("Printed!");
           break;
         case ("questions to database"):
