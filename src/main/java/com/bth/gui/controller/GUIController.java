@@ -184,6 +184,9 @@ public class GUIController {
       boolean doesQuestionsExist = checkDatabaseForQuestions(rosqList);
 
       if (!doesQuestionsExist) {
+        System.out.println("*-------------------------------------------------------*");
+        System.out.println("Inserting questions into database, instead of updating..");
+        System.out.println("*-------------------------------------------------------*");
         for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
@@ -212,6 +215,11 @@ public class GUIController {
           }
         }
       } else {
+
+        System.out.println("*-------------------------------------------------------*");
+        System.out.println("Updating entries instead...");
+        System.out.println("*-------------------------------------------------------*");
+
         for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
@@ -289,9 +297,6 @@ public class GUIController {
         double maxscore = Double.parseDouble(rs.getString(8));
         String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
         String sQ = "q".concat(q);
-
-        System.out.println(question + " " + sQ);
-
         if (!(question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0
             && maxscore >= 0)) {
           return false;

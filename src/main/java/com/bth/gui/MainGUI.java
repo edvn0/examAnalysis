@@ -96,9 +96,7 @@ public class MainGUI {
         new DatabaseButtonListener());
 
     CSVInputFileButton
-        .addActionListener(e -> {
-          controller.getCsvDirectoryChoice().init();
-        });
+        .addActionListener(e -> controller.getCsvDirectoryChoice().init());
 
     exitButton.addActionListener(e -> System.exit(0));
 
@@ -165,29 +163,39 @@ public class MainGUI {
 
       switch (e.getActionCommand().toLowerCase().trim()) {
         case ("teams to csv"):
+          System.out.println("*-------------------------------------------------------*");
           System.out.println("Printing StatsTeam information to " + directory + " ...");
+          System.out.println("*-------------------------------------------------------*");
           ExamOutput.printToCSV_Teams(statsTeams);
           System.out.println("Printed!");
           break;
         case ("schools to csv"):
+          System.out.println("*-------------------------------------------------------*");
           System.out.println("Printing StatsSchool information to " + directory + " ...");
+          System.out.println("*-------------------------------------------------------*");
           ExamOutput.printToCSV_Schools(statsSchools);
           System.out.println("Printed!");
           break;
         case ("questions to csv"):
+          System.out.println("*-------------------------------------------------------*");
           System.out.println("Printing StatsQuestion information to " + directory + " ...");
+          System.out.println("*-------------------------------------------------------*");
           ExamOutput.printToCSV_Questions(questionsStats);
           System.out.println("Printed!");
           break;
         case ("q1-q14 to csv"):
+          System.out.println("*-------------------------------------------------------*");
           System.out.println("Printing question 1-14 into " + directory + " ...");
+          System.out.println("*-------------------------------------------------------*");
           ExamOutput.printQuestionsToCSV(exams, examAnalysis.getExamTeams());
           System.out.println("Printed!");
           break;
         case ("questions to database"):
           if (GUIController.dbChoice) // SQL insertion StatsQuestions
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             try {
               controller.insertIntoMySQLDatabase(null,
@@ -201,7 +209,9 @@ public class MainGUI {
 
           } else // MongoDB insertion StatsQuestions
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             controller.insertIntoMongoDatabase(null, null, questionsStats,
                 null,
@@ -214,7 +224,9 @@ public class MainGUI {
         case ("schools to database"):
           if (GUIController.dbChoice) // SQL insertion StatsSchool
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             try {
               controller.insertIntoMySQLDatabase(null,
@@ -228,7 +240,9 @@ public class MainGUI {
 
           } else // MongoDB insertion StatsSchool
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             controller.insertIntoMongoDatabase(statsSchools, null, null,
                 controller.getLoginDatabase().getMongoDBConnection().getUser()
@@ -242,7 +256,9 @@ public class MainGUI {
         case ("teams to database"):
           if (GUIController.dbChoice) // SQL insertion StatsTeams
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             try {
               controller.insertIntoMySQLDatabase(statsTeams,
@@ -255,7 +271,9 @@ public class MainGUI {
             System.out.println("Inserted!");
           } else // MongoDB insertion StatsTeams
           {
+            System.out.println("*-------------------------------------------------------*");
             System.out.println("Inserting " + e.getActionCommand() + " into database...");
+            System.out.println("*-------------------------------------------------------*");
 
             controller.insertIntoMongoDatabase(null, statsTeams, null,
                 null,
@@ -266,9 +284,14 @@ public class MainGUI {
           }
           break;
         case "insert everything":
+
+          // TODO: fix the interaction of when you are connected to one of the two databases...
+
           long now = System.currentTimeMillis();
+          System.out.println("*-------------------------------------------------------*");
           System.out.println(
               "Inserting school, team and questions info into both sql and mongodb databases...");
+          System.out.println("*-------------------------------------------------------*");
           try {
             System.out.println("Inserting questions into SQL...");
             controller.insertIntoMySQLDatabase(null,
