@@ -24,16 +24,27 @@ public class ExamInput {
   private int INDIVIDUAL_SCORES_START;
   private int INDIVIDUAL_SCORES_END;
 
+  /***
+   * Starts the whole process, inits all the information of the arrays from
+   * a FileInput object. Has three "main" objects associated with it:
+   * exams, examTeams, examSchools which are extracted from this object.
+   * @param examDirectory where the csv input file is located.
+   */
   public ExamInput(String examDirectory) {
 
     // Inits where the scores are in the tsv file, necessary for future use.
     try {
       FileInput fileInput = new FileInput(examDirectory);
       listOfRowsInData = fileInput.fileInput();
-      INDIVIDUAL_SCORES_START = fileInput.getIndex(true, listOfRowsInData) != -1 ? fileInput
-          .getIndex(true, listOfRowsInData) : 0;
-      INDIVIDUAL_SCORES_END = fileInput.getIndex(false, listOfRowsInData) != -1 ? fileInput
-          .getIndex(false, listOfRowsInData) : 0;
+
+      INDIVIDUAL_SCORES_START = fileInput
+          .getIndex(true, listOfRowsInData) != -1 ?
+          fileInput.getIndex(true, listOfRowsInData) : 0;
+
+      INDIVIDUAL_SCORES_END = fileInput
+          .getIndex(false, listOfRowsInData) != -1 ?
+          fileInput.getIndex(false, listOfRowsInData) : 0;
+
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -177,6 +188,11 @@ public class ExamInput {
     return schools;
   }
 
+  /***
+   * Returns the max score of a question, stored in an enum.
+   * @param question what question?
+   * @return questions associated max score.
+   */
   public static int getMaxScore(String question) {
     for (Scores scores : Scores.values()) {
       if (Integer.parseInt(question) == scores.index) {

@@ -1,8 +1,8 @@
 package com.bth.io;
 
-import com.bth.analysis.Stats.StatsSchool;
-import com.bth.analysis.Stats.StatsTeam;
-import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import com.bth.analysis.stats.StatsSchool;
+import com.bth.analysis.stats.StatsTeam;
+import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
 import java.io.File;
@@ -148,18 +148,14 @@ public class ExamOutput {
      * questions = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
      */
 
+    // Sort according to hashCode, so that they indices are aligned for the printing.
     List<ExamSchool> sortSchoolExams = Arrays.asList(exams);
     List<ExamTeam> sortTeamExams = Arrays.asList(teams);
-    sortSchoolExams
-        .forEach((e) -> System.out.println(e.getSchool() + " and code: " + e.getAnonymousCode()));
-    sortTeamExams
-        .forEach((e) -> System.out.println(e.getTeam() + " and code: " + e.getAnonymousCode()));
-
-    sortSchoolExams.sort((Comparator.comparingInt(o -> o.getExam().hashCode())));
+    sortSchoolExams.sort(Comparator.comparingInt(o -> o.getExam().hashCode()));
     sortTeamExams.sort(Comparator.comparingInt(o -> o.getExam().hashCode()));
-
     exams = sortSchoolExams.toArray(new ExamSchool[0]);
     teams = sortTeamExams.toArray(new ExamTeam[0]);
+    // End sort.
 
     try (PrintWriter writer = new PrintWriter(directory + "/output_onetofourteenandschools.csv")) {
       writer.write("School,");

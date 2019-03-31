@@ -1,10 +1,11 @@
 package com.bth.gui.controller;
 
-import com.bth.analysis.Stats.StatsSchool;
-import com.bth.analysis.Stats.StatsTeam;
-import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import com.bth.analysis.stats.StatsSchool;
+import com.bth.analysis.stats.StatsTeam;
+import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.gui.MainGUI;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
+import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.ExamInput;
 import com.bth.io.database.mongodb.mongodbconnector.ExamMongoDBObject;
@@ -29,6 +30,7 @@ public class GUIController {
   private CsvDirectoryChoice csvDirectoryChoice;
   private LoginDatabase database;
   private MainGUI mainGUI;
+  private ChooseInputFileFrame chooseInputFileFrame;
 
   public GUIController() {
   }
@@ -133,6 +135,10 @@ public class GUIController {
     if (mySqlConnection == null && mongoDBConnection == null) {
       throw new NullPointerException(
           "MySQL Connection and MongoDB Connection were not online. Try again.");
+    } else if (mySqlConnection != null && mongoDBConnection == null) {
+      System.out.println("You will only input into your SQL database now.");
+    } else if (mySqlConnection == null && mongoDBConnection != null) {
+      System.out.println("You will only input into you Mongo database now.");
     } else if (mySqlConnection == null) {
       throw new NullPointerException("MySQL Connection was not online. Try again.");
     } else if (mongoDBConnection == null) {
@@ -189,7 +195,9 @@ public class GUIController {
               "values (?,?,?,?,?,?,?)";
 
           int maxScore = ExamInput.getMaxScore(q);
-          if (maxScore != -1) {
+          if (maxScore == -1) {
+            throw new SQLException("Max Score was not found.");
+          } else {
             PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
             setStatementWithPS(statement,
                 0,
@@ -201,15 +209,29 @@ public class GUIController {
                 null,
                 sQ,
                 maxScore);
-          } else {
-            throw new SQLException("Max Score was not found.");
           }
+        }
+      } else {
+        for (RoundOffStatsQuestion question : rosqList) {
+          String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
+          String sQ = "q".concat(q);
+
+          String sql = "UPDATE " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
+              " SET mean = ?, stddev = ?, variance = ?, median = ? WHERE question = ?";
+          PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
+          statement.setBigDecimal(1, new BigDecimal(question.getMean()));
+          statement.setBigDecimal(2, new BigDecimal(question.getStddev()));
+          statement.setBigDecimal(3, new BigDecimal(question.getVariance()));
+          statement.setBigDecimal(4, new BigDecimal(question.getMedian()));
+          statement.setString(5, sQ);
+
+          statement.execute();
         }
       }
     } else {
       mySqlConnection.getConnection().close();
       System.err.println("Error! Input either schoolexams or teamexams.");
-      System.exit(-1);
+      System.exit(0);
     }
   }
 
@@ -217,11 +239,14 @@ public class GUIController {
       double mean, double stddev, double variance,
       double median, StatsTeam team, StatsSchool school,
       String question, int maxscore) throws SQLException {
+
     if (question != null && school == null && team == null) {
+
       BigDecimal bdMean = new BigDecimal(mean);
       BigDecimal bdMedian = new BigDecimal(median);
       BigDecimal bdStddev = new BigDecimal(stddev);
       BigDecimal bdVariance = new BigDecimal(variance);
+
       statement.setDate(2, java.sql.Date.valueOf(java.time.LocalDate.now()));
       statement.setString(1, question);
       statement.setBigDecimal(3, bdMean);
@@ -229,19 +254,28 @@ public class GUIController {
       statement.setBigDecimal(5, bdStddev);
       statement.setBigDecimal(6, bdVariance);
       statement.setInt(7, maxscore);
+
     } else if (team == null) {
       statement.setString(1, school.getSchool());
       writeStringToStatement(statement, score, mean, stddev, variance, median);
+
     } else if (school == null) {
+
       statement.setString(1, team.getTeam());
       writeStringToStatement(statement, score, mean, stddev, variance, median);
+
     }
     statement.execute();
   }
 
+  /***
+   * Checks the database Connection if in the questions database,
+   * there are already questions..
+   * @param rosqList
+   * @return
+   */
   @SuppressWarnings("all")
   private boolean checkDatabaseForQuestions(List<RoundOffStatsQuestion> rosqList) {
-    int equalQuestions = 0;
     try {
       ResultSet rs = mySqlConnection.getConnection()
           .prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
@@ -255,17 +289,18 @@ public class GUIController {
         double maxscore = Double.parseDouble(rs.getString(8));
         String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
         String sQ = "q".concat(q);
-        if (question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0
-            && maxscore >= 0) {
-          equalQuestions++;
+
+        System.out.println(question + " " + sQ);
+
+        if (!(question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0
+            && maxscore >= 0)) {
+          return false;
         }
       }
-      // TODO: fix hard coded 14 here, might change in future.
-      return equalQuestions == 14;
     } catch (SQLException e) {
       System.out.println(e.getSQLState());
     }
-    return false;
+    return true;
   }
 
   private void writeStringToStatement(PreparedStatement statement, double score,
@@ -276,5 +311,17 @@ public class GUIController {
     statement.setString(4, "" + stddev);
     statement.setString(5, "" + variance);
     statement.setString(6, "" + median);
+  }
+
+  public void append(ChooseInputFileFrame chooseInputFileFrame) {
+    this.chooseInputFileFrame = chooseInputFileFrame;
+  }
+
+  public ChooseInputFileFrame getChooseInputFileFrame() {
+    return this.chooseInputFileFrame;
+  }
+
+  public void setChooseInputFileFrame(ChooseInputFileFrame fileFrame) {
+    this.chooseInputFileFrame = fileFrame;
   }
 }

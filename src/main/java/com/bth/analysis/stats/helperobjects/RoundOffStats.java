@@ -1,6 +1,6 @@
-package com.bth.analysis.Stats.helperobjects;
+package com.bth.analysis.stats.helperobjects;
 
-import com.bth.analysis.Stats.Stats;
+import com.bth.analysis.stats.Stats;
 
 public class RoundOffStats extends Stats {
 

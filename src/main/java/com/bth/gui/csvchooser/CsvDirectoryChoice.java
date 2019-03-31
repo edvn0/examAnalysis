@@ -15,6 +15,8 @@ public class CsvDirectoryChoice {
   }
 
   public void init() {
+
+    fileChooser1.setVisible(true);
     fileChooser1.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     fileChooser1.setDialogTitle("In which directory should CSV be outputted?");
 

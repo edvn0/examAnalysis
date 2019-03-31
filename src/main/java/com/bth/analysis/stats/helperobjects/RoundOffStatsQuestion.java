@@ -1,4 +1,4 @@
-package com.bth.analysis.Stats.helperobjects;
+package com.bth.analysis.stats.helperobjects;
 
 public class RoundOffStatsQuestion extends RoundOffStats {
 

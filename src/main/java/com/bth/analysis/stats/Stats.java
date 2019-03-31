@@ -1,4 +1,4 @@
-package com.bth.analysis.Stats;
+package com.bth.analysis.stats;
 
 import java.util.Objects;
 

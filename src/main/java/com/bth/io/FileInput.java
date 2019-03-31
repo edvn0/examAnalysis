@@ -31,18 +31,13 @@ class FileInput {
   int getIndex(boolean startorend, List<String[]> data) {
     String question =
         startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();
-    int length = data.get(0).length;
+    String[] inData = data.get(0);
+    int length = inData.length;
 
     for (int j = 0; j < length; j++) {
-      String string = data.get(0)[j].trim().toLowerCase();
-      if (startorend) {
-        if (string.equals(question)) {
-          return j;
-        }
-      } else {
-        if (string.equals(question)) {
-          return j + 1;
-        }
+      String string = inData[j].trim().toLowerCase();
+      if (string.equals(question)) {
+        return startorend ? j : j + 1;
       }
     }
     return -1;

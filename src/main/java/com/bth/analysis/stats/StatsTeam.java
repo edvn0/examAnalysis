@@ -1,4 +1,4 @@
-package com.bth.analysis.Stats;
+package com.bth.analysis.stats;
 
 import java.util.Objects;
 
@@ -15,7 +15,7 @@ public class StatsTeam extends Stats {
   /*
    * TeamName: Name(String)
    * Poäng: Score(Int)
-   * Stats: [Stddev, Mean, Median, Variance]
+   * stats: [Stddev, Mean, Median, Variance]
    */
   @Override
   public String toString() {

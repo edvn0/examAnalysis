@@ -1,9 +1,9 @@
 package com.bth.analysis;
 
-import com.bth.analysis.Stats.StatsSchool;
-import com.bth.analysis.Stats.StatsTeam;
-import com.bth.analysis.Stats.helperobjects.RoundOffStats;
-import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import com.bth.analysis.stats.StatsSchool;
+import com.bth.analysis.stats.StatsTeam;
+import com.bth.analysis.stats.helperobjects.RoundOffStats;
+import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
 import com.bth.io.ExamInput;

@@ -1,9 +1,9 @@
 package com.bth.gui;
 
 import com.bth.analysis.ExamAnalysis;
-import com.bth.analysis.Stats.StatsSchool;
-import com.bth.analysis.Stats.StatsTeam;
-import com.bth.analysis.Stats.helperobjects.RoundOffStatsQuestion;
+import com.bth.analysis.stats.StatsSchool;
+import com.bth.analysis.stats.StatsTeam;
+import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.GUIController;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
@@ -70,19 +71,20 @@ public class MainGUI {
     frame.pack();
     frame.setResizable(false);
     frame.setVisible(true);
+    controller.append(this);
+    controller.getMainGUI().getFrame().setVisible(false);
     // End init gui
 
     // Add all relevant components to a List to manage more easily.
     ArrayList<JComponent> list = addAllToList();
     // Disable prior to initialisation.
     controller.setEnabledForAll(list, false);
-
     controller.append(new LoginDatabase());
+    controller.append(new ChooseInputFileFrame());
     controller.append(new CsvDirectoryChoice());
-    controller.append(this);
 
     // Invis until resource directory has been chosen.
-    controller.getMainGUI().getFrame().setVisible(false);
+    controller.getCsvDirectoryChoice().fileChooser1.setVisible(false);
 
     // Init all the Jbutton listeners
     this.insertActionListener(list);
@@ -94,20 +96,32 @@ public class MainGUI {
         new DatabaseButtonListener());
 
     CSVInputFileButton
-        .addActionListener(e -> controller.getCsvDirectoryChoice().init());
+        .addActionListener(e -> {
+          controller.getCsvDirectoryChoice().init();
+        });
 
     exitButton.addActionListener(e -> System.exit(0));
 
-    ChooseInputFileFrame chooseDirectory = new ChooseInputFileFrame();
     if (file != null) {
       examAnalysis = new ExamAnalysis(file.getAbsolutePath());
     } else {
-      examAnalysis = new ExamAnalysis(
-          chooseDirectory.fileChooser1.getSelectedFile().getAbsolutePath());
+      examAnalysis = null;
     }
-    examAnalysis.start();
-    this.initArrays();
+    if (examAnalysis != null) {
+      examAnalysis.start();
+      this.initArrays();
+    }
     this.frame.setVisible(true);
+  }
+
+  private boolean resetExamAnalysis(boolean isExamNull) {
+    JOptionPane.showMessageDialog(controller.getChooseInputFileFrame().mainPanel,
+        "You need to input a file for this analyser to work. Choose the correct csv file.");
+    if (isExamNull) {
+      this.controller.setChooseInputFileFrame(null);
+      this.controller.append(new ChooseInputFileFrame());
+    }
+    return isExamNull;
   }
 
   private void initArrays() {
@@ -115,8 +129,6 @@ public class MainGUI {
     this.statsSchools = examAnalysis.getStatsSchools();
     this.statsTeams = examAnalysis.getStatsTeams();
     this.exams = examAnalysis.getExamSchools();
-
-    System.out.println("MainGUI.initArrays " + "and size: " + statsSchools.size());
   }
 
   private Component getFrame() {
@@ -319,10 +331,6 @@ public class MainGUI {
       controller.setEnabledForAll(addAllToList(), true);
       CSVInputFileButton.setEnabled(true);
     }
-  }
-
-  public static void setDir(String dir) {
-    MainGUI.dir = dir;
   }
 
   public static void setFileFromChooseDirectory(File file) {

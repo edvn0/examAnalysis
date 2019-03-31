@@ -47,6 +47,7 @@ public class MongoDBConnection extends DatabaseConnection {
     return client != null && database != null;
   }
 
+  //
   @Override
   protected Connection connectToSql(DatabaseLoginUser user) {
     return null;

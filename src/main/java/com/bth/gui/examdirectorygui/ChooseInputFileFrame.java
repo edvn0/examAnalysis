@@ -4,7 +4,6 @@ import com.bth.gui.MainGUI;
 import com.bth.io.PropertiesReader;
 import java.io.File;
 import java.io.IOException;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -15,7 +14,6 @@ public class ChooseInputFileFrame {
   public JPanel mainPanel;
   public JLabel chooseLabel;
   public JFileChooser fileChooser1;
-  public JButton confirmButton;
 
   public ChooseInputFileFrame() {
     // DEV!
@@ -30,7 +28,7 @@ public class ChooseInputFileFrame {
 
     fileChooser1.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-    fileChooser1.setDialogTitle("CSV Input chooser.");
+    fileChooser1.setDialogTitle("Please choose csv file for input");
     int retVal = fileChooser1.showSaveDialog(null);
     if (retVal == JFileChooser.APPROVE_OPTION) {
       if (!fileChooser1.getSelectedFile().isDirectory()) {
