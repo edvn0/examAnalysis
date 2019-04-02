@@ -88,7 +88,8 @@ public class ExamInput {
       }
     }
 
-    return schools.toArray(new String[0]);
+    String[] retArr = new String[schools.size()];
+    return schools.toArray(retArr);
   }
 
   private Exam[] getExamList() {

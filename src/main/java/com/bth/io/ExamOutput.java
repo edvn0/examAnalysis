@@ -28,9 +28,7 @@ public class ExamOutput {
       writeHeaderWithPrintWriter(writer, false);
 
       for (StatsTeam team : teamList) {
-        StringBuilder stringBuilder = new StringBuilder();
-        getStringRepresentation(writer,
-            stringBuilder,
+        String str = getStringRepresentation(
             team.getScore(),
             team.getStddev(),
             team.getMean(),
@@ -38,6 +36,7 @@ public class ExamOutput {
             team.getVariance(),
             null,
             team);
+        writer.write(str);
       }
       writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
@@ -63,9 +62,9 @@ public class ExamOutput {
     writer.write("\n");
   }
 
-  private static void getStringRepresentation(PrintWriter writer, StringBuilder stringBuilder,
-      double score2, double stddev2, double mean2, double median2, double variance2,
-      StatsSchool statsSchool, StatsTeam statsTeam) {
+  private static String getStringRepresentation(double score2, double stddev2, double mean2,
+      double median2, double variance2, StatsSchool statsSchool, StatsTeam statsTeam) {
+    StringBuilder builder = new StringBuilder();
     String name = "";
     if (statsSchool == null) {
       name += statsTeam.getTeam();
@@ -78,21 +77,20 @@ public class ExamOutput {
     String median = "," + median2;
     String variance = "," + variance2;
 
-    stringBuilder.append(name);
-    stringBuilder.append(score);
-    stringBuilder.append(mean);
-    stringBuilder.append(median);
-    stringBuilder.append(stddev);
-    stringBuilder.append(variance);
-    stringBuilder.append('\n');
+    builder.append(name);
+    builder.append(score);
+    builder.append(mean);
+    builder.append(median);
+    builder.append(stddev);
+    builder.append(variance);
+    builder.append('\n');
 
-    writer.write(stringBuilder.toString());
+    return builder.toString();
   }
 
   public static void printToCSV_Questions(List<RoundOffStatsQuestion> questions) {
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_questions.csv"))) {
       writeHeaderWithPrintWriter(writer, true);
-
       for (RoundOffStatsQuestion rosQ : questions) {
         StringBuilder builder = new StringBuilder();
         String q = Integer.toString(Integer.parseInt(rosQ.getQuestion()) + 1);
@@ -116,23 +114,22 @@ public class ExamOutput {
   private static void writeCopyrightAndAuthorInformation(PrintWriter writer) {
     DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     Date date = new Date();
-    String sdate = format.format(date);
+    String sDate = format.format(date);
     writer.write(
         "Latest Update: " + LocalDate.now().toString() + " "
-            + "by Edwin Carlsson, S.E.R.O. at clock: " + sdate);
+            + "by Edwin Carlsson, S.E.R.O. at clock: " + sDate);
   }
 
   public static void printToCSV_Schools(List<StatsSchool> statsSchools) {
     statsSchools.sort(Comparator.comparing(StatsSchool::getScore));
-
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
       writeHeaderWithPrintWriter(writer, false);
       int i = 0;
       for (StatsSchool statsSchool : statsSchools) {
-        StringBuilder stringBuilder = new StringBuilder();
-        getStringRepresentation(writer, stringBuilder, statsSchool.getScore(),
+        String string = getStringRepresentation(statsSchool.getScore(),
             statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
             statsSchool.getVariance(), statsSchool, null);
+        writer.write(string);
         i++;
       }
       writeCopyrightAndAuthorInformation(writer);
@@ -142,12 +139,6 @@ public class ExamOutput {
   }
 
   public static void printQuestionsToCSV(ExamSchool[] exams, ExamTeam[] teams) {
-    // Headers:
-    /*
-     * school:
-     * questions = [1,2,3,4,5,6,7,8,9,10,11,12,13,14]
-     */
-
     // Sort according to hashCode, so that they indices are aligned for the printing.
     List<ExamSchool> sortSchoolExams = Arrays.asList(exams);
     List<ExamTeam> sortTeamExams = Arrays.asList(teams);
@@ -195,13 +186,10 @@ public class ExamOutput {
         }
         writer.write("\n");
       }
-
       writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
-
-
   }
 
   public static void setDirectory(String directory) {
