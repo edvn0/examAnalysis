@@ -1,5 +1,6 @@
 package com.bth.exams;
 
+import com.mongodb.lang.NonNull;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
@@ -62,6 +63,7 @@ public class Exam {
     return date;
   }
 
+  @NonNull
   public double[] getSeparateScoresForAllQuestions() {
     return separateScoresForAllQuestions;
   }

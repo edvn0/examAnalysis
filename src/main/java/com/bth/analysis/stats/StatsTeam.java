@@ -1,5 +1,6 @@
 package com.bth.analysis.stats;
 
+import com.bth.analysis.stats.helperobjects.RoundOffStats;
 import java.util.Objects;
 
 public class StatsTeam extends Stats {
@@ -9,6 +10,12 @@ public class StatsTeam extends Stats {
   public StatsTeam(String team, double score, double mean, double median, double stddev,
       double variance) {
     super(stddev, mean, median, variance, score);
+    this.team = team;
+  }
+
+  public StatsTeam(String team, double score, RoundOffStats stats) {
+    super(stats.getStddev(), stats.getMean(), stats.getMedian(), stats.getVariance(),
+        score);
     this.team = team;
   }
 

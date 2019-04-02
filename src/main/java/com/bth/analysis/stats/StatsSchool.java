@@ -22,7 +22,7 @@ public class StatsSchool extends Stats {
   @Override
   public String toString() {
     return
-        "TeamName: " + this.school + "\n"
+        "School Name: " + this.school + "\n"
             + "Score: " + super.getScore() + "\n"
             + "All questions: \n"
             + "Mean: [" + getMean() + "]\n"

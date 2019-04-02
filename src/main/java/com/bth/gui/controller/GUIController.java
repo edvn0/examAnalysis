@@ -22,8 +22,6 @@ import javax.swing.JComponent;
 
 public class GUIController {
 
-  public static boolean dbChoice = false; // SQL if TRUE.
-
   private static MongoDBConnection mongoDBConnection;
   private static MySqlConnection mySqlConnection;
 

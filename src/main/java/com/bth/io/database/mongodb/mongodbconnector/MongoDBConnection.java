@@ -21,10 +21,10 @@ public class MongoDBConnection extends DatabaseConnection {
   @Override
   public String toString() {
     return "You were connected to a MongoDB Database. " +
-        "Info:\nDatabase:"
+        "Info:\nDatabase: "
         + user.getMongoDatabaseName() +
-        "\nAs user:" + user.getUserName() +
-        "\nAt time:" + LocalDate.now().toString();
+        "\nAs user: " + user.getUserName() +
+        "\nAt time: " + LocalDate.now().toString();
   }
 
   public void disconnect() {

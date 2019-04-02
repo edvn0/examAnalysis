@@ -6,13 +6,13 @@ import com.bth.exams.ExamTeam;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import javax.swing.JOptionPane;
 
 public class ExamInput {
 
@@ -30,25 +30,23 @@ public class ExamInput {
    * exams, examTeams, examSchools which are extracted from this object.
    * @param examDirectory where the csv input file is located.
    */
-  public ExamInput(String examDirectory) {
+  public ExamInput(String examDirectory) throws FileNotFoundException {
 
     // Inits where the scores are in the tsv file, necessary for future use.
-    try {
-      FileInput fileInput = new FileInput(examDirectory);
-      listOfRowsInData = fileInput.fileInput();
+    FileInput fileInput = new FileInput(examDirectory);
+    listOfRowsInData = fileInput.fileInput();
 
-      INDIVIDUAL_SCORES_START = fileInput
-          .getIndex(true, listOfRowsInData) != -1 ?
-          fileInput.getIndex(true, listOfRowsInData) : 0;
+    INDIVIDUAL_SCORES_START = fileInput
+        .getIndex(true, listOfRowsInData) != -1 ?
+        fileInput.getIndex(true, listOfRowsInData) : 0;
 
-      INDIVIDUAL_SCORES_END = fileInput
-          .getIndex(false, listOfRowsInData) != -1 ?
-          fileInput.getIndex(false, listOfRowsInData) : 0;
+    INDIVIDUAL_SCORES_END = fileInput
+        .getIndex(false, listOfRowsInData) != -1 ?
+        fileInput.getIndex(false, listOfRowsInData) : 0;
 
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
     if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) {
+      JOptionPane.showMessageDialog(null, "Could not find the file, try again.", "Error",
+          JOptionPane.ERROR_MESSAGE);
       System.exit(0);
     }
 
@@ -112,7 +110,8 @@ public class ExamInput {
 
       int code = Objects.hash(listOfRowsInData.get(i)[2 + timeStampDependentIndex]);
 
-      exams[i - 1] = insertExam(score, scores, date, code);
+      // Inserts the exam at index in the field Exam[].
+      insertExam(exams, i - 1, score, scores, date, code);
     }
 
     return exams;
@@ -131,26 +130,20 @@ public class ExamInput {
   private ExamTeam[] getExamTeamList() {
     ExamTeam[] examTeams;
     int isTimeStampDependent = this.isFirstRowTimeStamp();
-
-    // P1: Init an array with exactly the size of java.exams[] where the team is the same.
     int sizeOfExamTeamSchool = 0;
     for (int i = 1; i < listOfRowsInData.size(); i++) {
       sizeOfExamTeamSchool++;
     }
-
     examTeams = new ExamTeam[sizeOfExamTeamSchool];
-    // P2: Return the array with all those java.exams with teams in common.
-
     for (int i = 0; i < examTeams.length; i++) {
       int index = i + 1;
       examTeams[index - 1] = new ExamTeam(this.exams[index - 1],
-          (listOfRowsInData.get(index)[2 + isTimeStampDependent]));
+          listOfRowsInData.get(index)[2 + isTimeStampDependent]);
     }
-
     return examTeams;
   }
 
-  // Gets the individual scores
+  // Gets the individual scores from the FileInput CSV file.
   private double[] getScoresFromRowData(String[] input) {
     int end = (this.INDIVIDUAL_SCORES_END);
     int start = (this.INDIVIDUAL_SCORES_START);
@@ -164,22 +157,20 @@ public class ExamInput {
     return list;
   }
 
-  private Exam insertExam(double score, double[] scores, Date date, int anonymousCode) {
-    return new Exam(score,
+  private void insertExam(Exam[] exams, int index, double score, double[] scores, Date date,
+      int anonymousCode) {
+    exams[index] = new Exam(score,
         scores, date, anonymousCode);
   }
 
   // Helper function that sets the array examSchools to all the java.exams + the school name.
   private ExamSchool[] setExamSchoolList(int isTimeStampDependent) {
     int sizeOfExamSchoolArray = 0;
-
     for (int i = 1; i < listOfRowsInData.size(); i++) {
       sizeOfExamSchoolArray++;
     }
 
-    // P2
     ExamSchool[] schools = new ExamSchool[sizeOfExamSchoolArray];
-
     for (int i = 0; i < schools.length; i++) {
       int index = i + 1;
       schools[i] = new ExamSchool(listOfRowsInData.get(index)[isTimeStampDependent], this.exams[i]);
@@ -200,63 +191,6 @@ public class ExamInput {
       }
     }
     return -1;
-  }
-
-  // Helper function to get the ExamSchool[] with all java.exams associated with input school.
-  private ExamSchool[] getExamSchoolsBySchool(String school) {
-    int size = 0;
-    for (ExamSchool examSchool : this.examSchools) {
-      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim())) {
-        size++;
-      }
-    }
-
-    ExamSchool[] examSchools = new ExamSchool[size];
-
-    int k = 0;
-    for (ExamSchool examSchool : this.examSchools) {
-      if (examSchool.getSchool().toLowerCase().trim().equals(school.toLowerCase().trim())) {
-        examSchools[k++] = new ExamSchool(school.toLowerCase().trim(), examSchool);
-      }
-    }
-    return examSchools;
-  }
-
-  /*
-  Retrieve an array like so:
-  arr[0] = Alla tentor som associeras med 101
-  arr[1] = Alla tentor som associeras med 1103
-  arr[n] = Alla tentor som associeras med codes[n]
-  */
-  public List<ExamTeam[]> getExamTeamArrayByTeams() {
-    List<ExamTeam[]> list = new ArrayList<>();
-
-    for (String i : this.teams) {
-      ExamTeam[] loopArray = this.getExamTeamsByTeam(i);
-      list.add(loopArray);
-    }
-
-    return list;
-  }
-
-  // Helper function to get the ExamTeams[] with all java.exams associated with input code.
-  private ExamTeam[] getExamTeamsByTeam(String team) {
-    int size = 0;
-    for (ExamTeam examTeam : this.examTeams) {
-      if (examTeam.getTeam().equals(team)) {
-        size++;
-      }
-    }
-
-    ExamTeam[] teams = new ExamTeam[size];
-
-    int k = 0;
-    for (ExamTeam e : this.examTeams) {
-      if (e.getTeam().equals(team)) {
-        teams[k++] = new ExamTeam(e.getExam(), team);
-      }
-    }
-    return teams;
   }
 
   public ExamTeam[] getExamTeams() {

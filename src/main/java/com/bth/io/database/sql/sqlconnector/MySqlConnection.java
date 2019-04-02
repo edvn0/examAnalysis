@@ -36,12 +36,15 @@ public class MySqlConnection extends DatabaseConnection {
   }
 
   public boolean isConnected() {
+    if (connection == null) {
+      return false;
+    }
     try {
       return connection.isClosed();
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    return false;
+    return true;
   }
 
   public void disconnect() {

@@ -153,11 +153,9 @@ public class LoginDatabase {
         if (choice.equals("MySQL")) {
           mySqlConnection = new MySqlConnection(user);
           GUIController.setConnection(mySqlConnection);
-          GUIController.dbChoice = true;
         } else {
           mongoDBConnection = new MongoDBConnection(user);
           GUIController.setConnection(mongoDBConnection);
-          GUIController.dbChoice = false;
         }
       } catch (Exception e1) {
         e1.printStackTrace();

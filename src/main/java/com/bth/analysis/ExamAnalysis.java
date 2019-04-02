@@ -7,6 +7,7 @@ import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
 import com.bth.io.ExamInput;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class ExamAnalysis {
     this.dir = null;
   }
 
-  public void start() {
+  public void start() throws FileNotFoundException {
     input = new ExamInput(this.dir);
     init();
   }
@@ -43,7 +44,7 @@ public class ExamAnalysis {
 
     statsTeams = this.generateStatsTeams(examTeams);
     statsSchools = this.generateStatsSchools(examSchools);
-    questionsStats = this.generateQuestionsStats(questionsStats);
+    questionsStats = this.generateQuestionsStats();
   }
 
   //////////////////////////////
@@ -54,16 +55,15 @@ public class ExamAnalysis {
   private StatsTeam analyseExams(ExamTeam[] exams, String name) {
     double sum;
     ExamTeam teamSameName = this.getExamTeamFromName(exams, name);
+    boolean isNull = teamSameName == null;
 
-    /*
-    Every examteam[i] has an array with scores[j].
-    Average scores is a combined array with averages of every
-    question for every team. This is easier to work with and to analyse.
-    */
     double[] averageScores = new double[amountOfQuestions];
-    for (int i = 1; i < teamSameName.getSeparateScoresForAllQuestions().length; i++) {
-      int index = i - 1;
-      averageScores[index] = teamSameName.getSeparateScoresForAllQuestions()[i];
+
+    if (!isNull) {
+      for (int i = 1; i < teamSameName.getSeparateScoresForAllQuestions().length; i++) {
+        int index = i - 1;
+        averageScores[index] = teamSameName.getSeparateScoresForAllQuestions()[i];
+      }
     }
 
     // MEAN
@@ -85,8 +85,7 @@ public class ExamAnalysis {
     // Round off all values into an object for refactoring.
     RoundOffStats roundOffStats = this.getRoundOffObject(mean, median, standardDeviation, variance);
 
-    return new StatsTeam(name, totalScore, roundOffStats.getMean(), roundOffStats.getMedian(),
-        roundOffStats.getStddev(), roundOffStats.getVariance());
+    return new StatsTeam(name, totalScore, roundOffStats);
   }
 
   // Exams for a specific school.
@@ -151,7 +150,6 @@ public class ExamAnalysis {
       StatsSchool statsSchool = analyseExams(schools, school.getSchool());
       teamSet.add(statsSchool);
     }
-
     return new ArrayList<>(teamSet);
   }
 
@@ -170,8 +168,7 @@ public class ExamAnalysis {
     return new RoundOffStatsQuestion(mean, median, stddev, variance, 1000.00, question);
   }
 
-  private List<RoundOffStatsQuestion> generateQuestionsStats(
-      List<RoundOffStatsQuestion> questions) {
+  private List<RoundOffStatsQuestion> generateQuestionsStats() {
     List<RoundOffStatsQuestion> stats = new ArrayList<>();
 
     for (int i = 0; i < amountOfQuestions; i++) {
@@ -198,6 +195,7 @@ public class ExamAnalysis {
 
   // Helper function which gets an array with all the schools sharing a name.
   private ExamSchool[] getExamSchoolArrayFromName(ExamSchool[] schools, String name) {
+    ExamSchool[] schoolArray = null;
     if (name != null) {
       int size = 0;
       for (ExamSchool es : schools) {
@@ -206,7 +204,7 @@ public class ExamAnalysis {
         }
       }
 
-      ExamSchool[] schoolArray = new ExamSchool[size];
+      schoolArray = new ExamSchool[size];
 
       int k = 0;
       for (ExamSchool es : schools) {
@@ -214,26 +212,21 @@ public class ExamAnalysis {
           schoolArray[k++] = new ExamSchool(name, es.getExam());
         }
       }
-
-      return schoolArray;
-    } else {
-      return null;
     }
+    return schoolArray;
   }
 
   // Helper function which gets an array with all the teams sharing a name.
   private ExamTeam getExamTeamFromName(ExamTeam[] exams, String name) {
+    ExamTeam teamsWithSameName = null;
     if (name != null) {
-      ExamTeam teamsWithSameName = null;
       for (ExamTeam et : exams) {
         if (et.getTeam().toLowerCase().trim().equals(name.toLowerCase().trim())) {
           teamsWithSameName = new ExamTeam(et.getExam(), et.getTeam());
         }
       }
-      return teamsWithSameName;
-    } else {
-      return null;
     }
+    return teamsWithSameName;
   }
   // End helper object
 
