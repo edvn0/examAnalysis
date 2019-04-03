@@ -1,6 +1,6 @@
 package com.bth.gui.csvchooser;
 
-import com.bth.io.ExamOutput;
+import com.bth.io.output.ExamOutput;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;

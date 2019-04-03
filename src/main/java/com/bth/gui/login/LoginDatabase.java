@@ -1,10 +1,12 @@
 package com.bth.gui.login;
 
-import com.bth.gui.controller.DatabaseLoginUser;
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 import com.bth.gui.controller.GUIController;
-import com.bth.io.PropertiesReader;
-import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnection;
-import com.bth.io.database.sql.sqlconnector.MySqlConnection;
+import com.bth.gui.controller.loginusers.MongoDBUser;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.io.input.PropertiesReader;
+import com.bth.io.output.database.mongodb.mongodbconnector.MongoDBConnection;
+import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +22,7 @@ import javax.swing.JTextField;
 
 public class LoginDatabase {
 
+  private final ThreadLocal<PropertiesReader> reader = new ThreadLocal<>();
   public JPanel primaryPanel;
   public JButton exitButton;
   public JButton confirmButton;
@@ -52,13 +55,9 @@ public class LoginDatabase {
   public JTextArea mongoDbConnectStringTextField;
   public JLabel mongoDbDatabaseNameLabel;
   private JFrame frame;
-
   private DatabaseLoginUser user;
-
   private MongoDBConnection mongoDBConnection;
   private MySqlConnection mySqlConnection;
-
-  private final ThreadLocal<PropertiesReader> reader = new ThreadLocal<>();
 
   public LoginDatabase() {
     frame = new JFrame("Login to Database");
@@ -118,6 +117,21 @@ public class LoginDatabase {
     return this.confirmButton;
   }
 
+  private String[] getConnectivityInformation() {
+    return new String[]{
+        sqlconnectorStringTextField.getText(),
+        mySQLDatabaseNameTextField.getText(),
+        sqlschoolsTableNameTextField.getText(),
+        sqlteamsTableNameTextField.getText(),
+        sqlquestionsTableNameTextField.getText(),
+        mongoDbConnectStringTextField.getText(),
+        mongoDatabaseNameTextField.getText(),
+        mdbschoolCollectionNameTextField.getText(),
+        mdbteamsCollectionNameTextField.getText(),
+        mdbquestionsNameTextField.getText(),
+    };
+  }
+
   // Local class for getting DBObject
   class ConfirmButtonListener implements ActionListener {
 
@@ -147,14 +161,15 @@ public class LoginDatabase {
       String questionCollection = fullInfo[9];
 
       try {
-        user = new DatabaseLoginUser(userName, password, choice, sqlConnectorName, sqlDatabaseName,
-            schoolTable, teamTable, questionTable, mongoConnectorName, mongoDatabaseName,
-            schoolCollection, teamCollection, questionCollection);
         if (choice.equals("MySQL")) {
-          mySqlConnection = new MySqlConnection(user);
+          mySqlConnection = new MySqlConnection(
+              new SQLLoginUser(userName, password, sqlDatabaseName, teamTable, schoolTable,
+                  questionTable, sqlConnectorName));
           GUIController.setConnection(mySqlConnection);
         } else {
-          mongoDBConnection = new MongoDBConnection(user);
+          mongoDBConnection = new MongoDBConnection(
+              new MongoDBUser(userName, password, mongoDatabaseName, schoolCollection,
+                  teamCollection, questionCollection, mongoConnectorName));
           GUIController.setConnection(mongoDBConnection);
         }
       } catch (Exception e1) {
@@ -162,20 +177,5 @@ public class LoginDatabase {
       }
       frame.dispose();
     }
-  }
-
-  private String[] getConnectivityInformation() {
-    return new String[]{
-        sqlconnectorStringTextField.getText(),
-        mySQLDatabaseNameTextField.getText(),
-        sqlschoolsTableNameTextField.getText(),
-        sqlteamsTableNameTextField.getText(),
-        sqlquestionsTableNameTextField.getText(),
-        mongoDbConnectStringTextField.getText(),
-        mongoDatabaseNameTextField.getText(),
-        mdbschoolCollectionNameTextField.getText(),
-        mdbteamsCollectionNameTextField.getText(),
-        mdbquestionsNameTextField.getText(),
-    };
   }
 }

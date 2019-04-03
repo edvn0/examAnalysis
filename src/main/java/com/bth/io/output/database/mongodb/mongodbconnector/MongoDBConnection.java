@@ -1,7 +1,8 @@
-package com.bth.io.database.mongodb.mongodbconnector;
+package com.bth.io.output.database.mongodb.mongodbconnector;
 
-import com.bth.gui.controller.DatabaseLoginUser;
-import com.bth.io.database.DatabaseConnection;
+import com.bth.gui.controller.loginusers.MongoDBUser;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.io.output.database.DatabaseConnection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
@@ -12,9 +13,9 @@ public class MongoDBConnection extends DatabaseConnection {
 
   private MongoClient client;
   private MongoDatabase database;
-  private DatabaseLoginUser user;
+  private MongoDBUser user;
 
-  public MongoDBConnection(DatabaseLoginUser user) {
+  public MongoDBConnection(MongoDBUser user) {
     database = connectToMongo(user);
   }
 
@@ -22,7 +23,7 @@ public class MongoDBConnection extends DatabaseConnection {
   public String toString() {
     return "You were connected to a MongoDB Database. " +
         "Info:\nDatabase: "
-        + user.getMongoDatabaseName() +
+        + user +
         "\nAs user: " + user.getUserName() +
         "\nAt time: " + LocalDate.now().toString();
   }
@@ -35,7 +36,7 @@ public class MongoDBConnection extends DatabaseConnection {
     return client;
   }
 
-  public DatabaseLoginUser getUser() {
+  public MongoDBUser getUser() {
     return user;
   }
 
@@ -49,16 +50,16 @@ public class MongoDBConnection extends DatabaseConnection {
 
   //
   @Override
-  protected Connection connectToSql(DatabaseLoginUser user) {
+  protected Connection connectToSql(SQLLoginUser user) {
     return null;
   }
 
   @Override
-  protected MongoDatabase connectToMongo(DatabaseLoginUser user) {
+  protected MongoDatabase connectToMongo(MongoDBUser user) {
     this.user = user;
-    MongoClientURI uri = new MongoClientURI(user.getMongoConnectorName());
+    MongoClientURI uri = new MongoClientURI(user.getConnector());
     client = new MongoClient(uri);
-    database = client.getDatabase(user.getMongoDatabaseName());
+    database = client.getDatabase(user.getDatabaseName());
 
     System.out.println(this.toString());
 

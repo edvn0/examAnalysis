@@ -1,9 +1,9 @@
-package com.bth.io.database.mongodb.mongodbconnector;
+package com.bth.io.output.database.mongodb.mongodbconnector;
 
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
-import com.bth.io.ExamInput;
+import com.bth.io.input.ExamInput;
 import com.mongodb.BasicDBObject;
 
 public class ExamMongoDBObject extends BasicDBObject {

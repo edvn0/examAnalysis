@@ -6,7 +6,7 @@ import com.bth.analysis.stats.helperobjects.RoundOffStats;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
-import com.bth.io.ExamInput;
+import com.bth.io.input.ExamInput;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;

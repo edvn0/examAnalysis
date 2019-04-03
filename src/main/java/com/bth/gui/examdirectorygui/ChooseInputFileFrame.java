@@ -1,7 +1,7 @@
 package com.bth.gui.examdirectorygui;
 
 import com.bth.gui.MainGUI;
-import com.bth.io.PropertiesReader;
+import com.bth.io.input.PropertiesReader;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFileChooser;

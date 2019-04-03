@@ -9,7 +9,7 @@ import com.bth.gui.controller.GUIController;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
-import com.bth.io.ExamOutput;
+import com.bth.io.output.ExamOutput;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,7 +23,6 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 
 public class MainGUI {
 
@@ -61,7 +60,6 @@ public class MainGUI {
 
   public MainGUI() throws FileNotFoundException {
     controller = new GUIController();
-
     setup();
   }
 
@@ -146,104 +144,52 @@ public class MainGUI {
     return loginDatabaseButton;
   }
 
-  public void setLoginDatabaseButton(JButton loginDatabaseButton) {
-    this.loginDatabaseButton = loginDatabaseButton;
-  }
-
   public JPanel getPanel1() {
     return panel1;
-  }
-
-  public void setPanel1(JPanel panel1) {
-    this.panel1 = panel1;
   }
 
   public JLabel getDATABASELabel() {
     return DATABASELabel;
   }
 
-  public void setDATABASELabel(JLabel DATABASELabel) {
-    this.DATABASELabel = DATABASELabel;
-  }
-
   public JLabel getCSVLabel() {
     return CSVLabel;
-  }
-
-  public void setCSVLabel(JLabel CSVLabel) {
-    this.CSVLabel = CSVLabel;
   }
 
   public JButton getQuestionsToDatabaseButton() {
     return questionsToDatabaseButton;
   }
 
-  public void setQuestionsToDatabaseButton(JButton questionsToDatabaseButton) {
-    this.questionsToDatabaseButton = questionsToDatabaseButton;
-  }
-
   public JButton getTeamsToDatabaseButton() {
     return teamsToDatabaseButton;
-  }
-
-  public void setTeamsToDatabaseButton(JButton teamsToDatabaseButton) {
-    this.teamsToDatabaseButton = teamsToDatabaseButton;
   }
 
   public JButton getSchoolsToDatabaseButton() {
     return schoolsToDatabaseButton;
   }
 
-  public void setSchoolsToDatabaseButton(JButton schoolsToDatabaseButton) {
-    this.schoolsToDatabaseButton = schoolsToDatabaseButton;
-  }
-
   public JButton getExitButton() {
     return exitButton;
-  }
-
-  public void setExitButton(JButton exitButton) {
-    this.exitButton = exitButton;
   }
 
   public JButton getQuestionsToCSVButton() {
     return questionsToCSVButton;
   }
 
-  public void setQuestionsToCSVButton(JButton questionsToCSVButton) {
-    this.questionsToCSVButton = questionsToCSVButton;
-  }
-
   public JButton getTeamsToCSVButton() {
     return teamsToCSVButton;
-  }
-
-  public void setTeamsToCSVButton(JButton teamsToCSVButton) {
-    this.teamsToCSVButton = teamsToCSVButton;
   }
 
   public JButton getSchoolsToCSVButton() {
     return schoolsToCSVButton;
   }
 
-  public void setSchoolsToCSVButton(JButton schoolsToCSVButton) {
-    this.schoolsToCSVButton = schoolsToCSVButton;
-  }
-
   public JButton getOneToFourteenCSVButton() {
     return oneToFourteenCSVButton;
   }
 
-  public void setOneToFourteenCSVButton(JButton oneToFourteenCSVButton) {
-    this.oneToFourteenCSVButton = oneToFourteenCSVButton;
-  }
-
   public JButton getCSVInputFileButton() {
     return CSVInputFileButton;
-  }
-
-  public void setCSVInputFileButton(JButton CSVInputFileButton) {
-    this.CSVInputFileButton = CSVInputFileButton;
   }
 
   private Component getFrame() {
@@ -319,7 +265,7 @@ public class MainGUI {
             controller.insertIntoMongoDatabase(null, null, questionsStats,
                 null,
                 null,
-                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionTable());
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionColl());
 
             System.out.println("Inserted!");
 
@@ -332,7 +278,7 @@ public class MainGUI {
             controller.insertIntoMongoDatabase(null, null, questionsStats,
                 null,
                 null,
-                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionTable());
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getQuestionColl());
 
             try {
               controller.insertIntoMySQLDatabase(null,
@@ -368,8 +314,7 @@ public class MainGUI {
             System.out.println("*-------------------------------------------------------*");
 
             controller.insertIntoMongoDatabase(statsSchools, null, null,
-                controller.getLoginDatabase().getMongoDBConnection().getUser()
-                    .getSchoolCollection(),
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getSchoolColl(),
                 null,
                 null);
 
@@ -381,7 +326,7 @@ public class MainGUI {
 
             controller.insertIntoMongoDatabase(statsSchools, null, null,
                 controller.getLoginDatabase().getMongoDBConnection().getUser()
-                    .getSchoolCollection(),
+                    .getSchoolColl(),
                 null,
                 null);
 
@@ -419,7 +364,7 @@ public class MainGUI {
 
             controller.insertIntoMongoDatabase(null, statsTeams, null,
                 null,
-                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamCollection(),
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamColl(),
                 null);
 
             System.out.println("Inserted!");
@@ -430,7 +375,7 @@ public class MainGUI {
 
             controller.insertIntoMongoDatabase(null, statsTeams, null,
                 null,
-                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamCollection(),
+                controller.getLoginDatabase().getMongoDBConnection().getUser().getTeamColl(),
                 null);
 
             try {
@@ -474,7 +419,7 @@ public class MainGUI {
                 null,
                 null,
                 controller.getLoginDatabase().getMongoDBConnection().getUser()
-                    .getQuestionTable());
+                    .getQuestionColl());
             System.out.println("Inserted questions...");
             System.out.println("Inserting school stats into SQL...");
 
@@ -491,7 +436,7 @@ public class MainGUI {
                 null,
                 null,
                 controller.getLoginDatabase().getMongoDBConnection().getUser()
-                    .getSchoolCollection(),
+                    .getSchoolColl(),
                 null,
                 null);
             System.out.println("Inserted school stats...");
@@ -511,7 +456,7 @@ public class MainGUI {
                 null,
                 null,
                 controller.getLoginDatabase().getMongoDBConnection().getUser()
-                    .getTeamCollection(),
+                    .getTeamColl(),
                 null);
             System.out.println("Inserted stats teams...");
             long now2 = System.currentTimeMillis();

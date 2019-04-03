@@ -7,10 +7,10 @@ import com.bth.gui.MainGUI;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
-import com.bth.io.ExamInput;
-import com.bth.io.database.mongodb.mongodbconnector.ExamMongoDBObject;
-import com.bth.io.database.mongodb.mongodbconnector.MongoDBConnection;
-import com.bth.io.database.sql.sqlconnector.MySqlConnection;
+import com.bth.io.input.ExamInput;
+import com.bth.io.output.database.mongodb.mongodbconnector.ExamMongoDBObject;
+import com.bth.io.output.database.mongodb.mongodbconnector.MongoDBConnection;
+import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import com.mongodb.BasicDBObject;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -31,10 +31,18 @@ public class GUIController {
   private ChooseInputFileFrame chooseInputFileFrame;
 
   public GUIController() {
+    csvDirectoryChoice = null;
+    database = null;
+    mainGUI = null;
+    chooseInputFileFrame = null;
   }
 
   public static void setConnection(MySqlConnection conn) {
     mySqlConnection = conn;
+  }
+
+  public static void setConnection(MongoDBConnection conn) {
+    mongoDBConnection = conn;
   }
 
   public MongoDBConnection getMDBConnection() {
@@ -49,10 +57,6 @@ public class GUIController {
     for (JComponent c : component) {
       c.setEnabled(value);
     }
-  }
-
-  public static void setConnection(MongoDBConnection conn) {
-    mongoDBConnection = conn;
   }
 
   public void append(LoginDatabase database) {
@@ -145,7 +149,7 @@ public class GUIController {
 
     if (teamList == null && schoolList != null && rosqList == null) {
       for (StatsSchool school : schoolList) {
-        String sql = "insert into " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
+        String sql = "insert into " + mySqlConnection.getUser().getDatabaseName() + "." + table +
             " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
         setStatementWithPS(statement,
@@ -162,7 +166,7 @@ public class GUIController {
     } else if (schoolList == null && teamList != null && rosqList == null) {
 
       for (StatsTeam team : teamList) {
-        String sql = "insert into " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
+        String sql = "insert into " + mySqlConnection.getUser().getDatabaseName() + "." + table +
             " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
         setStatementWithPS(statement,
@@ -191,7 +195,7 @@ public class GUIController {
 
           // Parametrise an SQL query insertion for every RoSQ.
           String sql = "insert into " +
-              mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
+              mySqlConnection.getUser().getDatabaseName() + "." + table +
               " (question, date, mean, median, stddev, variance, max_score) " +
               "values (?,?,?,?,?,?,?)";
 
@@ -222,7 +226,7 @@ public class GUIController {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
           String sQ = "q".concat(q);
 
-          String sql = "UPDATE " + mySqlConnection.getUser().getSqlDatabaseName() + "." + table +
+          String sql = "UPDATE " + mySqlConnection.getUser().getDatabaseName() + "." + table +
               " SET mean = ?, stddev = ?, variance = ?, median = ? WHERE question = ?";
           PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
           statement.setBigDecimal(1, new BigDecimal(question.getMean()));

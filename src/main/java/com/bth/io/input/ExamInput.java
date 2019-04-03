@@ -1,4 +1,14 @@
-package com.bth.io;
+/*
+ * Copyright (c) 2018-2019 Edwin Carlsson
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+package com.bth.io.input;
 
 import com.bth.exams.Exam;
 import com.bth.exams.ExamSchool;
@@ -64,6 +74,20 @@ public class ExamInput {
     this.examTeams = this.getExamTeamList();
   }
 
+  /***
+   * Returns the max score of a question, stored in an enum.
+   * @param question what question?
+   * @return questions associated max score.
+   */
+  public static int getMaxScore(String question) {
+    for (Scores scores : Scores.values()) {
+      if (Integer.parseInt(question) == scores.index) {
+        return scores.max;
+      }
+    }
+    return -1;
+  }
+
   private String[] teams(int isTimeStampDependent) {
     HashSet<String> stringHashSet = new HashSet<>();
     for (String[] s : listOfRowsInData) {
@@ -92,8 +116,11 @@ public class ExamInput {
     return schools.toArray(retArr);
   }
 
+  /***
+   * Start-point for the exam data structure.
+   * @return a list of all exams in the csv file.
+   */
   private Exam[] getExamList() {
-    // Format the java.data.
     Exam[] exams = new Exam[listOfRowsInData.size() - 1];
     int timeStampDependentIndex = isFirstRowTimeStamp();
 
@@ -178,20 +205,6 @@ public class ExamInput {
     }
 
     return schools;
-  }
-
-  /***
-   * Returns the max score of a question, stored in an enum.
-   * @param question what question?
-   * @return questions associated max score.
-   */
-  public static int getMaxScore(String question) {
-    for (Scores scores : Scores.values()) {
-      if (Integer.parseInt(question) == scores.index) {
-        return scores.max;
-      }
-    }
-    return -1;
   }
 
   public ExamTeam[] getExamTeams() {

@@ -1,7 +1,8 @@
-package com.bth.io.database.sql.sqlconnector;
+package com.bth.io.output.database.sql.sqlconnector;
 
-import com.bth.gui.controller.DatabaseLoginUser;
-import com.bth.io.database.DatabaseConnection;
+import com.bth.gui.controller.loginusers.MongoDBUser;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.io.output.database.DatabaseConnection;
 import com.mongodb.client.MongoDatabase;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,10 +11,10 @@ import java.time.LocalDate;
 
 public class MySqlConnection extends DatabaseConnection {
 
-  private DatabaseLoginUser user;
+  private SQLLoginUser user;
   private Connection connection;
 
-  public MySqlConnection(DatabaseLoginUser user) {
+  public MySqlConnection(SQLLoginUser user) {
     this.user = user;
     connection = connectToSql(this.user);
   }
@@ -22,7 +23,7 @@ public class MySqlConnection extends DatabaseConnection {
   public String toString() {
     return "You were connected to a MySQL Database. " +
         "Info:\nDatabase:"
-        + user.getSqlDatabaseName() +
+        + user.getDatabaseName() +
         "\nAs User:" + user.getUserName() +
         "\nAt time:" + LocalDate.now().toString();
   }
@@ -31,7 +32,7 @@ public class MySqlConnection extends DatabaseConnection {
     return connection;
   }
 
-  public DatabaseLoginUser getUser() {
+  public SQLLoginUser getUser() {
     return user;
   }
 
@@ -56,11 +57,11 @@ public class MySqlConnection extends DatabaseConnection {
   }
 
   @Override
-  protected Connection connectToSql(DatabaseLoginUser user) {
+  protected Connection connectToSql(SQLLoginUser user) {
     Connection connection = null;
     try {
       connection = DriverManager
-          .getConnection(user.getSqlConnectorName(), user.getUserName(), user.getPassword());
+          .getConnection(user.getConnector(), user.getUserName(), user.getPassword());
       System.out.println(this.toString());
     } catch (SQLException e) {
       e.printStackTrace();
@@ -69,7 +70,7 @@ public class MySqlConnection extends DatabaseConnection {
   }
 
   @Override
-  protected MongoDatabase connectToMongo(DatabaseLoginUser user) {
+  protected MongoDatabase connectToMongo(MongoDBUser user) {
     return null;
   }
 }
