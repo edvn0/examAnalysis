@@ -10,18 +10,35 @@
 
 package com.bth.io.input;
 
+import com.bth.exams.ExamSchool;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-class FileInput {
+public class FileInput {
 
   private Scanner scanner;
 
-  public FileInput(String dir) throws FileNotFoundException {
+  FileInput(String dir) throws FileNotFoundException {
     scanner = new Scanner(new File(dir));
+  }
+
+  public static int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
+    int[] j = new int[schools.length];
+    for (int i = 0; i < statsSchools.length; i++) {
+      for (int k = 0; k < schools.length; k++) {
+        if (statsSchools[i].getSchool().equals(schools[k])) {
+          j[k]++;
+        }
+      }
+    }
+
+    System.out.println(Arrays.toString(j));
+
+    return j;
   }
 
   public List<String[]> fileInput() {

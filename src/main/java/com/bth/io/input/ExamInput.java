@@ -10,6 +10,7 @@
 
 package com.bth.io.input;
 
+import com.bth.analysis.stats.StatsSchool;
 import com.bth.exams.Exam;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
@@ -33,6 +34,8 @@ public class ExamInput {
   private List<String[]> listOfRowsInData;
   private int INDIVIDUAL_SCORES_START;
   private int INDIVIDUAL_SCORES_END;
+  public static int[] amountOfSameSchools;
+  public static String[] schools;
 
   /***
    * Starts the whole process, inits all the information of the arrays from
@@ -63,13 +66,14 @@ public class ExamInput {
     // All teams for the java.exams.
     teams = this.teams(this.isFirstRowTimeStamp());
     // Init the school names.
-    String[] SCHOOLS = this.getSchools(this.isFirstRowTimeStamp());
+    schools = this.getSchools(this.isFirstRowTimeStamp());
 
     // Inits the lists.
     // First, the java.exams with no school associated.
     this.exams = this.getExamList();
     // Second, exam with the school, sorted lexicographically with the schools.
     this.examSchools = this.getExamSchoolList();
+    amountOfSameSchools = FileInput.getAmountOfExamsFromSameSchool(this.examSchools, schools);
     // Third, exam with team name.
     this.examTeams = this.getExamTeamList();
   }
@@ -83,6 +87,16 @@ public class ExamInput {
     for (Scores scores : Scores.values()) {
       if (Integer.parseInt(question) == scores.index) {
         return scores.max;
+      }
+    }
+    return -1;
+  }
+
+  public static int getSchoolIndex(StatsSchool statsSchool) {
+    for (int i = 0; i < schools.length; i++) {
+      String school = schools[i];
+      if (statsSchool.getSchool().equals(school)) {
+        return amountOfSameSchools[i];
       }
     }
     return -1;

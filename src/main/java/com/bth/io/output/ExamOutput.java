@@ -70,6 +70,9 @@ public class ExamOutput {
       writer.write(",");
       writer.write("Max Score");
     }
+    if (!questions) {
+      writer.write(",Amount of exams for school");
+    }
     writer.write("\n");
   }
 
@@ -87,6 +90,11 @@ public class ExamOutput {
     String mean = "," + mean2;
     String median = "," + median2;
     String variance = "," + variance2;
+    String amountOfQuestions = null;
+    if (statsSchool != null) {
+      amountOfQuestions =
+          "," + (ExamInput.getSchoolIndex(statsSchool));
+    }
 
     builder.append(name);
     builder.append(score);
@@ -94,6 +102,9 @@ public class ExamOutput {
     builder.append(median);
     builder.append(stddev);
     builder.append(variance);
+    if (amountOfQuestions != null) {
+      builder.append(amountOfQuestions);
+    }
     builder.append('\n');
 
     return builder.toString();
@@ -135,13 +146,12 @@ public class ExamOutput {
     statsSchools.sort(Comparator.comparing(StatsSchool::getScore));
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
       writeHeaderWithPrintWriter(writer, false);
-      int i = 0;
       for (StatsSchool statsSchool : statsSchools) {
         String string = getStringRepresentation(statsSchool.getScore(),
             statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
             statsSchool.getVariance(), statsSchool, null);
         writer.write(string);
-        i++;
+        System.out.println(ExamInput.getSchoolIndex(statsSchool));
       }
       writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {

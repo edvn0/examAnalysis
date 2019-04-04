@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-version '1.6-SNAPSHOT'
+version '1.8-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -25,14 +25,6 @@ task fatJar(type: Jar) {
     baseName = project.name
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
-}
-
-jar {
-    manifest {
-        attributes(
-                'Main-Class': 'com.bth.exammain.ExamMain'
-        )
-    }
 }
 
 application {

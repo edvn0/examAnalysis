@@ -3,7 +3,7 @@ package com.bth.gui.controller;
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
-import com.bth.gui.MainGUI;
+import com.bth.gui.MainGui;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
 import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
@@ -20,20 +20,20 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
 
-public class GUIController {
+public class GuiController {
 
   private static MongoDBConnection mongoDBConnection;
   private static MySqlConnection mySqlConnection;
 
   private CsvDirectoryChoice csvDirectoryChoice;
   private LoginDatabase database;
-  private MainGUI mainGUI;
+  private MainGui mainGui;
   private ChooseInputFileFrame chooseInputFileFrame;
 
-  public GUIController() {
+  public GuiController() {
     csvDirectoryChoice = null;
     database = null;
-    mainGUI = null;
+    mainGui = null;
     chooseInputFileFrame = null;
   }
 
@@ -67,8 +67,12 @@ public class GUIController {
     this.csvDirectoryChoice = csvDirectoryChoice;
   }
 
-  public void append(MainGUI gui) {
-    this.mainGUI = gui;
+  public void append(MainGui gui) {
+    this.mainGui = gui;
+  }
+
+  public void append(ChooseInputFileFrame chooseInputFileFrame) {
+    this.chooseInputFileFrame = chooseInputFileFrame;
   }
 
   public LoginDatabase getLoginDatabase() {
@@ -79,50 +83,50 @@ public class GUIController {
     return csvDirectoryChoice;
   }
 
-  public MainGUI getMainGUI() {
-    return mainGUI;
+  public MainGui getMainGui() {
+    return mainGui;
   }
 
   public void insertIntoMongoDatabase(List<StatsSchool> schoolList,
       List<StatsTeam> teamList,
       List<RoundOffStatsQuestion> questionList,
-      String sColl, String tColl, String qColl) {
+      String schoolColl, String teamColl, String questionColl) {
     boolean schoolListNull = schoolList == null;
     boolean teamListNull = teamList == null;
     boolean questionListNull = questionList == null;
-    boolean schoolTeamListNull =
+    boolean questionsAreNotNull =
         schoolListNull && teamListNull && !questionListNull; // => we will insert questions
-    boolean schoolQuestionListNull =
+    boolean teamsAreNotNull =
         schoolListNull && questionListNull && !teamListNull; // => we will insert teams
-    boolean teamQuestionNull =
+    boolean schoolsAreNotNull =
         teamListNull && questionListNull && !schoolListNull; // => we will insert schools
 
     List<BasicDBObject> objects = new ArrayList<>();
 
     String use = null;
 
-    if (teamQuestionNull) {
+    if (schoolsAreNotNull) {
       for (StatsSchool school : schoolList) {
         objects.add(ExamMongoDBObject.toDBObject(school));
       }
-      use = sColl;
-    } else if (schoolQuestionListNull) {
+      use = schoolColl;
+    } else if (teamsAreNotNull) {
       for (StatsTeam team : teamList) {
         objects.add(ExamMongoDBObject.toDBObject(team));
       }
-      use = tColl;
-    } else if (schoolTeamListNull) {
+      use = teamColl;
+    } else if (questionsAreNotNull) {
       for (RoundOffStatsQuestion question : questionList) {
         objects.add(ExamMongoDBObject.toDBObject(question));
       }
-      use = qColl;
+      use = questionColl;
     }
     mongoDBConnection.getMongoDatabase().getCollection(use, BasicDBObject.class)
         .insertMany(objects);
   }
 
   /***
-   *
+   * <p>Inserts teams, schools or questions or all into both or one database.</p>
    * @param teamList List of teams
    * @param schoolList List of schools
    * @param rosqList List of questions
@@ -149,8 +153,12 @@ public class GUIController {
 
     if (teamList == null && schoolList != null && rosqList == null) {
       for (StatsSchool school : schoolList) {
-        String sql = "insert into " + mySqlConnection.getUser().getDatabaseName() + "." + table +
-            " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+        String sql = "insert into "
+            + mySqlConnection.getUser().getDatabaseName()
+            + "."
+            + table
+            + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
         setStatementWithPS(statement,
             school.getScore(),
@@ -166,8 +174,12 @@ public class GUIController {
     } else if (schoolList == null && teamList != null && rosqList == null) {
 
       for (StatsTeam team : teamList) {
-        String sql = "insert into " + mySqlConnection.getUser().getDatabaseName() + "." + table +
-            " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+        String sql = "insert into "
+            + mySqlConnection.getUser().getDatabaseName()
+            + "."
+            + table
+            + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
+
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
         setStatementWithPS(statement,
             team.getScore(),
@@ -182,7 +194,8 @@ public class GUIController {
       }
     } else if (schoolList == null && teamList == null && rosqList != null) {
 
-      // Inserts the questions 1-14 into stats_exams.questions if the questions already do not exist.
+      // Inserts the questions 1-14 into stats_exams.questions
+      // if the questions already do not exist.
       boolean doesQuestionsExist = checkDatabaseForQuestions(rosqList);
 
       if (!doesQuestionsExist) {
@@ -191,13 +204,15 @@ public class GUIController {
         System.out.println("*-------------------------------------------------------*");
         for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
-          String sQ = "q".concat(q);
+          String questionString = "q".concat(q);
 
           // Parametrise an SQL query insertion for every RoSQ.
-          String sql = "insert into " +
-              mySqlConnection.getUser().getDatabaseName() + "." + table +
-              " (question, date, mean, median, stddev, variance, max_score) " +
-              "values (?,?,?,?,?,?,?)";
+          String sql = "insert into "
+              + mySqlConnection.getUser().getDatabaseName()
+              + "."
+              + table
+              + " (question, date, mean, median, stddev, variance, max_score) "
+              + "values (?,?,?,?,?,?,?)";
 
           int maxScore = ExamInput.getMaxScore(q);
           if (maxScore == -1) {
@@ -212,7 +227,7 @@ public class GUIController {
                 question.getMedian(),
                 null,
                 null,
-                sQ,
+                questionString,
                 maxScore);
           }
         }
@@ -224,16 +239,20 @@ public class GUIController {
 
         for (RoundOffStatsQuestion question : rosqList) {
           String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
-          String sQ = "q".concat(q);
+          String questionString = "q".concat(q);
 
-          String sql = "UPDATE " + mySqlConnection.getUser().getDatabaseName() + "." + table +
-              " SET mean = ?, stddev = ?, variance = ?, median = ? WHERE question = ?";
+          String sql = "UPDATE "
+              + mySqlConnection.getUser().getDatabaseName()
+              + "."
+              + table
+              + " SET mean = ?, stddev = ?, variance = ?, median = ? WHERE question = ?";
+
           PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
           statement.setBigDecimal(1, new BigDecimal(question.getMean()));
           statement.setBigDecimal(2, new BigDecimal(question.getStddev()));
           statement.setBigDecimal(3, new BigDecimal(question.getVariance()));
           statement.setBigDecimal(4, new BigDecimal(question.getMedian()));
-          statement.setString(5, sQ);
+          statement.setString(5, questionString);
 
           statement.execute();
         }
@@ -279,10 +298,10 @@ public class GUIController {
   }
 
   /***
-   * Checks the database Connection if in the questions database,
-   * there are already questions..
-   * @param rosqList
-   * @return
+   *<p>Checks the database Connection if in the questions database,
+   * there are already questions..</p>
+   * @param rosqList list of the questions in the database
+   * @return true if they exist. ("Not" what we want.)
    */
   @SuppressWarnings("all")
   private boolean checkDatabaseForQuestions(List<RoundOffStatsQuestion> rosqList) {
@@ -298,8 +317,9 @@ public class GUIController {
         double variance = Double.parseDouble(rs.getString(7));
         double maxscore = Double.parseDouble(rs.getString(8));
         String q = Integer.toString(Integer.parseInt(rosqList.get(k++).getQuestion()) + 1);
-        String sQ = "q".concat(q);
-        if (!(question.equals(sQ) && mean >= 0 && median >= 0 && stddev >= 0 && variance >= 0
+        String questionString = "q".concat(q);
+        if (!(question.equals(questionString) && mean >= 0 && median >= 0 && stddev >= 0
+            && variance >= 0
             && maxscore >= 0)) {
           return false;
         }
@@ -318,10 +338,6 @@ public class GUIController {
     statement.setString(4, "" + stddev);
     statement.setString(5, "" + variance);
     statement.setString(6, "" + median);
-  }
-
-  public void append(ChooseInputFileFrame chooseInputFileFrame) {
-    this.chooseInputFileFrame = chooseInputFileFrame;
   }
 
   public ChooseInputFileFrame getChooseInputFileFrame() {
