@@ -57,7 +57,7 @@ public class MySqlConnection extends DatabaseConnection {
   }
 
   @Override
-  protected Connection connectToSql(SQLLoginUser user) {
+  public Connection connectToSql(SQLLoginUser user) {
     Connection connection = null;
     try {
       connection = DriverManager

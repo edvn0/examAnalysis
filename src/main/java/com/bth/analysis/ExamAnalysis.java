@@ -6,6 +6,7 @@ import com.bth.analysis.stats.helperobjects.RoundOffStats;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
 import com.bth.io.input.ExamInput;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.DoubleStream;
 
 public class ExamAnalysis {
 
@@ -29,8 +31,9 @@ public class ExamAnalysis {
     this.dir = dir;
   }
 
-  public ExamAnalysis() {
+  public ExamAnalysis(SQLLoginUser sql) {
     this.dir = null;
+    input = new ExamInput(sql);
   }
 
   public void start() throws FileNotFoundException {
@@ -74,7 +77,7 @@ public class ExamAnalysis {
     double variance = generateVariance(averageScores, mean, amountOfQuestions);
 
     // STDDEV
-    double standardDeviation = generateStandardDeviation(mean, amountOfQuestions, averageScores);
+    double standardDeviation = generateStandardDeviation(averageScores, mean, amountOfQuestions);
 
     // Median
     double median = generateMedian(averageScores);
@@ -97,7 +100,7 @@ public class ExamAnalysis {
     final int arrayLength = schoolsWithSameName.length;
 
     double[] averageScores = new double[totLength];
-    double averageScore = 0;
+    double averageScore;
 
     // This makes an average score array from the full school, to do stats java.analysis on.
     for (ExamSchool examSchool : schoolsWithSameName) {
@@ -106,6 +109,10 @@ public class ExamAnalysis {
         averageScores[j] += sepscores[j];
       }
     }
+
+    DoubleStream stream = Arrays.stream(averageScores);
+    averageScore = stream.sum();
+
     for (int i = 0; i < averageScores.length; i++) {
       averageScore += averageScores[i];
       averageScores[i] = averageScores[i] / arrayLength;
@@ -122,7 +129,7 @@ public class ExamAnalysis {
     double variance = this.generateVariance(averageScores, mean, totLength);
 
     // Standard deviation
-    double standardDeviation = this.generateStandardDeviation(mean, totLength, averageScores);
+    double standardDeviation = this.generateStandardDeviation(averageScores, mean, totLength);
 
     // Median
     double median = generateMedian(averageScores);
@@ -187,7 +194,7 @@ public class ExamAnalysis {
 
     double mean = generateMean(scoresForIndex, scoresForIndex.length);
     double median = generateMedian(scoresForIndex);
-    double stddev = generateStandardDeviation(mean, scoresForIndex.length, scoresForIndex);
+    double stddev = generateStandardDeviation(scoresForIndex, mean, scoresForIndex.length);
     double variance = generateVariance(scoresForIndex, mean, scoresForIndex.length);
 
     return getRoundOffQuestionsObject(String.valueOf(index), mean, median, stddev, variance);
@@ -247,15 +254,15 @@ public class ExamAnalysis {
   }
 
   public double generateVariance(double[] scores, double mean, int length) {
-    return getXiSquared(mean, scores) / length;
+    return getXiSquared(scores, mean) / length;
   }
 
-  public double generateStandardDeviation(double mean, int totLength, double[] averageScores) {
-    double xiXbarSum = getXiSquared(mean, averageScores);
+  public double generateStandardDeviation(double[] averageScores, double mean, int totLength) {
+    double xiXbarSum = getXiSquared(averageScores, mean);
     return Math.sqrt(xiXbarSum / totLength);
   }
 
-  private double getXiSquared(double mean, double[] averageScores) {
+  private double getXiSquared(double[] averageScores, double mean) {
     double xiXbarSum = 0;
     for (double xi : averageScores) {
       double meanDiff = xi - mean;

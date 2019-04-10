@@ -11,8 +11,13 @@
 package com.bth.io.input;
 
 import com.bth.exams.ExamSchool;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,16 +26,21 @@ import java.util.Scanner;
 public class FileInput {
 
   private Scanner scanner;
+  private MySqlConnection connection;
 
   FileInput(String dir) throws FileNotFoundException {
     scanner = new Scanner(new File(dir));
   }
 
-  public static int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
+  public FileInput(SQLLoginUser user) {
+    connection = new MySqlConnection(user);
+  }
+
+  static int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
     int[] j = new int[schools.length];
-    for (int i = 0; i < statsSchools.length; i++) {
+    for (ExamSchool statsSchool : statsSchools) {
       for (int k = 0; k < schools.length; k++) {
-        if (statsSchools[i].getSchool().equals(schools[k])) {
+        if (statsSchool.getSchool().equals(schools[k])) {
           j[k]++;
         }
       }
@@ -39,6 +49,35 @@ public class FileInput {
     System.out.println(Arrays.toString(j));
 
     return j;
+  }
+
+  /***
+   * Uses the SQL Login-Connection system to dynamically move input
+   * files from a file structure to a database structure instead.
+   * You will here specify your input database.
+   * @return ArrayList<String [ ]> with all rows in database.
+   */
+  public List<String[]> fileInputFromDatabase() {
+    PreparedStatement statement;
+    ResultSet set;
+    List<String[]> strings = new ArrayList<>();
+    try {
+      statement = connection.getConnection()
+          .prepareStatement("select * from stats_exams.answers_from_exams");
+      set = statement.executeQuery();
+
+      while (set.next()) {
+        String[] temp = new String[20];
+        for (int i = 0; i < temp.length; i++) {
+          temp[i] = set.getString(i + 1);
+        }
+        strings.add(temp);
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return strings;
   }
 
   public List<String[]> fileInput() {
@@ -55,7 +94,7 @@ public class FileInput {
    * @param data the input <code>List<String[]></code> from the input tsv file.
    * @return <code>int</code>
    */
-  public int getIndex(boolean startorend, List<String[]> data) {
+  int getIndex(boolean startorend, List<String[]> data) {
     String question =
         startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();
     String[] inData = data.get(0);

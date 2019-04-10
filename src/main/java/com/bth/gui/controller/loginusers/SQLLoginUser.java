@@ -31,6 +31,12 @@ public class SQLLoginUser extends DatabaseLoginUser {
     this.questionTable = questionTable;
   }
 
+  public SQLLoginUser(String userName, char[] password, String inputTable, String connector) {
+    super(userName, password);
+    this.connector = connector;
+    this.databaseName = inputTable;
+  }
+
   public String validateDatabase(String db) throws Exception {
     boolean startsWithMySql = db.startsWith("jdbc:mysql://");
     if (!startsWithMySql) {

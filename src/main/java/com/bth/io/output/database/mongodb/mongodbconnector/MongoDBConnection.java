@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class MongoDBConnection extends DatabaseConnection {
 
   private MongoClient client;
-  private MongoDatabase database;
   private MongoDBUser user;
+  private MongoDatabase database;
 
   public MongoDBConnection(MongoDBUser user) {
     database = connectToMongo(user);

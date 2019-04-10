@@ -3,8 +3,9 @@ package com.bth.gui.controller;
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
-import com.bth.gui.MainGui;
+import com.bth.gui.MainGUI.MainGui;
 import com.bth.gui.csvchooser.CsvDirectoryChoice;
+import com.bth.gui.dbinput.ExamsFromDatabaseInput;
 import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
 import com.bth.gui.login.LoginDatabase;
 import com.bth.io.input.ExamInput;
@@ -29,6 +30,7 @@ public class GuiController {
   private LoginDatabase database;
   private MainGui mainGui;
   private ChooseInputFileFrame chooseInputFileFrame;
+  private ExamsFromDatabaseInput examsFromDatabaseInput;
 
   public GuiController() {
     csvDirectoryChoice = null;
@@ -69,6 +71,10 @@ public class GuiController {
 
   public void append(MainGui gui) {
     this.mainGui = gui;
+  }
+
+  public void append(ExamsFromDatabaseInput examsFromDatabaseInput) {
+    this.examsFromDatabaseInput = examsFromDatabaseInput;
   }
 
   public void append(ChooseInputFileFrame chooseInputFileFrame) {
@@ -160,7 +166,8 @@ public class GuiController {
             + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
 
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
-        setStatementWithPS(statement,
+
+        statement = setStatementWithPS(statement,
             school.getScore(),
             school.getMean(),
             school.getStddev(),
@@ -170,6 +177,8 @@ public class GuiController {
             school,
             null,
             0);
+
+        statement.execute();
       }
     } else if (schoolList == null && teamList != null && rosqList == null) {
 
@@ -181,7 +190,8 @@ public class GuiController {
             + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
 
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
-        setStatementWithPS(statement,
+
+        statement = setStatementWithPS(statement,
             team.getScore(),
             team.getMean(),
             team.getStddev(),
@@ -191,6 +201,8 @@ public class GuiController {
             null,
             null,
             0);
+
+        statement.execute();
       }
     } else if (schoolList == null && teamList == null && rosqList != null) {
 
@@ -219,7 +231,7 @@ public class GuiController {
             throw new SQLException("Max Score was not found.");
           } else {
             PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
-            setStatementWithPS(statement,
+            statement = setStatementWithPS(statement,
                 0,
                 question.getMean(),
                 question.getStddev(),
@@ -229,6 +241,8 @@ public class GuiController {
                 null,
                 questionString,
                 maxScore);
+
+            statement.execute();
           }
         }
       } else {
@@ -264,7 +278,7 @@ public class GuiController {
     }
   }
 
-  private void setStatementWithPS(PreparedStatement statement, double score,
+  private PreparedStatement setStatementWithPS(PreparedStatement statement, double score,
       double mean, double stddev, double variance,
       double median, StatsTeam team, StatsSchool school,
       String question, int maxscore) throws SQLException {
@@ -294,7 +308,7 @@ public class GuiController {
       writeStringToStatement(statement, score, mean, stddev, variance, median);
 
     }
-    statement.execute();
+    return statement;
   }
 
   /***
@@ -308,6 +322,7 @@ public class GuiController {
     try {
       ResultSet rs = mySqlConnection.getConnection()
           .prepareStatement("SELECT * FROM stats_exams.questions").executeQuery();
+
       int k = 0;
       while (rs.next()) {
         String question = rs.getString(2);
@@ -321,13 +336,13 @@ public class GuiController {
         if (!(question.equals(questionString) && mean >= 0 && median >= 0 && stddev >= 0
             && variance >= 0
             && maxscore >= 0)) {
-          return false;
+          return true;
         }
       }
     } catch (SQLException e) {
       System.out.println(e.getSQLState());
     }
-    return true;
+    return false;
   }
 
   private void writeStringToStatement(PreparedStatement statement, double score,
@@ -346,5 +361,9 @@ public class GuiController {
 
   public void setChooseInputFileFrame(ChooseInputFileFrame fileFrame) {
     this.chooseInputFileFrame = fileFrame;
+  }
+
+  public ExamsFromDatabaseInput getExamsFromDatabaseInput() {
+    return this.examsFromDatabaseInput;
   }
 }

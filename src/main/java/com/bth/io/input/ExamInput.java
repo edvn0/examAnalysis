@@ -14,6 +14,7 @@ import com.bth.analysis.stats.StatsSchool;
 import com.bth.exams.Exam;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
+import com.bth.gui.controller.loginusers.SQLLoginUser;
 import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -45,7 +46,6 @@ public class ExamInput {
    */
   public ExamInput(String examDirectory) throws FileNotFoundException {
 
-    // Inits where the scores are in the tsv file, necessary for future use.
     FileInput fileInput = new FileInput(examDirectory);
     listOfRowsInData = fileInput.fileInput();
 
@@ -63,8 +63,8 @@ public class ExamInput {
       System.exit(0);
     }
 
-    // All teams for the java.exams.
-    teams = this.teams(this.isFirstRowTimeStamp());
+    // All getTeams for the java.exams.
+    teams = this.getTeams(this.isFirstRowTimeStamp());
     // Init the school names.
     schools = this.getSchools(this.isFirstRowTimeStamp());
 
@@ -76,6 +76,33 @@ public class ExamInput {
     amountOfSameSchools = FileInput.getAmountOfExamsFromSameSchool(this.examSchools, schools);
     // Third, exam with team name.
     this.examTeams = this.getExamTeamList();
+  }
+
+  public ExamInput(SQLLoginUser user) {
+    FileInput fileInput = new FileInput(user);
+    listOfRowsInData = fileInput.fileInputFromDatabase();
+
+    INDIVIDUAL_SCORES_START = fileInput
+        .getIndex(true, listOfRowsInData) != -1 ?
+        fileInput.getIndex(true, listOfRowsInData) : 0;
+
+    INDIVIDUAL_SCORES_END = fileInput
+        .getIndex(false, listOfRowsInData) != -1 ?
+        fileInput.getIndex(false, listOfRowsInData) : 0;
+
+    if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) {
+      JOptionPane.showMessageDialog(null, "Could not find the file, try again.", "Error",
+          JOptionPane.ERROR_MESSAGE);
+      System.exit(0);
+    }
+
+    this.teams = this.getTeams(this.isFirstRowTimeStamp());
+    schools = this.getSchools(this.isFirstRowTimeStamp());
+
+    this.exams = this.getExamList();
+    this.examSchools = this.getExamSchoolList();
+    this.examTeams = this.getExamTeamList();
+
   }
 
   /***
@@ -102,7 +129,7 @@ public class ExamInput {
     return -1;
   }
 
-  private String[] teams(int isTimeStampDependent) {
+  private String[] getTeams(int isTimeStampDependent) {
     HashSet<String> stringHashSet = new HashSet<>();
     for (String[] s : listOfRowsInData) {
       if (!s[isTimeStampDependent].equals("Skola")) {

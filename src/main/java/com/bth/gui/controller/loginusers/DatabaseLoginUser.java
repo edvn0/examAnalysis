@@ -28,11 +28,9 @@ public abstract class DatabaseLoginUser {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("DatabaseLoginUser{");
-    sb.append("password='").append(password).append('\'');
-    sb.append(", userName='").append(userName).append('\'');
-    sb.append('}');
-    return sb.toString();
+    return "DatabaseLoginUser{" + "password='" + password + '\''
+        + ", userName='" + userName + '\''
+        + '}';
   }
 
   public String getUserName() {

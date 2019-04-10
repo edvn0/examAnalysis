@@ -36,6 +36,7 @@ public class ExamOutput {
     teamList.sort(Comparator.comparing(StatsTeam::getScore));
 
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_teams.csv"))) {
+
       writeHeaderWithPrintWriter(writer, false);
 
       for (StatsTeam team : teamList) {
@@ -49,7 +50,9 @@ public class ExamOutput {
             team);
         writer.write(str);
       }
+
       writeCopyrightAndAuthorInformation(writer);
+
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -144,7 +147,9 @@ public class ExamOutput {
 
   public static void printToCSV_Schools(List<StatsSchool> statsSchools) {
     statsSchools.sort(Comparator.comparing(StatsSchool::getScore));
+
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
+
       writeHeaderWithPrintWriter(writer, false);
       for (StatsSchool statsSchool : statsSchools) {
         String string = getStringRepresentation(statsSchool.getScore(),
