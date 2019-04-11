@@ -1,14 +1,9 @@
 package com.bth.gui.controller;
 
+import com.bth.analysis.ExamAnalysis;
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
-import com.bth.gui.MainGUI.MainGui;
-import com.bth.gui.csvchooser.CsvDirectoryChoice;
-import com.bth.gui.dbinput.ExamsFromDatabaseInput;
-import com.bth.gui.examdirectorygui.ChooseInputFileFrame;
-import com.bth.gui.login.LoginDatabase;
-import com.bth.io.input.ExamInput;
 import com.bth.io.output.database.mongodb.mongodbconnector.ExamMongoDBObject;
 import com.bth.io.output.database.mongodb.mongodbconnector.MongoDBConnection;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
@@ -19,87 +14,29 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
 
-public class GuiController {
+public class DatabaseOutputController {
 
-  private static MongoDBConnection mongoDBConnection;
-  private static MySqlConnection mySqlConnection;
+  private MongoDBConnection mongoDBConnection;
+  private MySqlConnection mySqlConnection;
 
-  private CsvDirectoryChoice csvDirectoryChoice;
-  private LoginDatabase database;
-  private MainGui mainGui;
-  private ChooseInputFileFrame chooseInputFileFrame;
-  private ExamsFromDatabaseInput examsFromDatabaseInput;
-
-  public GuiController() {
-    csvDirectoryChoice = null;
-    database = null;
-    mainGui = null;
-    chooseInputFileFrame = null;
-  }
-
-  public static void setConnection(MySqlConnection conn) {
+  public void setConnection(MySqlConnection conn) {
     mySqlConnection = conn;
   }
 
-  public static void setConnection(MongoDBConnection conn) {
+  public void setConnection(MongoDBConnection conn) {
     mongoDBConnection = conn;
-  }
-
-  public MongoDBConnection getMDBConnection() {
-    return this.database.getMongoDBConnection();
-  }
-
-  public MySqlConnection getMySqlConnection() {
-    return this.database.getMySqlConnection();
-  }
-
-  public void setEnabledForAll(ArrayList<JComponent> component, boolean value) {
-    for (JComponent c : component) {
-      c.setEnabled(value);
-    }
-  }
-
-  public void append(LoginDatabase database) {
-    this.database = database;
-  }
-
-  public void append(CsvDirectoryChoice csvDirectoryChoice) {
-    this.csvDirectoryChoice = csvDirectoryChoice;
-  }
-
-  public void append(MainGui gui) {
-    this.mainGui = gui;
-  }
-
-  public void append(ExamsFromDatabaseInput examsFromDatabaseInput) {
-    this.examsFromDatabaseInput = examsFromDatabaseInput;
-  }
-
-  public void append(ChooseInputFileFrame chooseInputFileFrame) {
-    this.chooseInputFileFrame = chooseInputFileFrame;
-  }
-
-  public LoginDatabase getLoginDatabase() {
-    return database;
-  }
-
-  public CsvDirectoryChoice getCsvDirectoryChoice() {
-    return csvDirectoryChoice;
-  }
-
-  public MainGui getMainGui() {
-    return mainGui;
   }
 
   public void insertIntoMongoDatabase(List<StatsSchool> schoolList,
       List<StatsTeam> teamList,
       List<RoundOffStatsQuestion> questionList,
-      String schoolColl, String teamColl, String questionColl) {
+      String schoolColl, String teamColl, String questionColl, ExamAnalysis examAnalysis) {
+
     boolean schoolListNull = schoolList == null;
     boolean teamListNull = teamList == null;
     boolean questionListNull = questionList == null;
+
     boolean questionsAreNotNull =
         schoolListNull && teamListNull && !questionListNull; // => we will insert questions
     boolean teamsAreNotNull =
@@ -123,7 +60,7 @@ public class GuiController {
       use = teamColl;
     } else if (questionsAreNotNull) {
       for (RoundOffStatsQuestion question : questionList) {
-        objects.add(ExamMongoDBObject.toDBObject(question));
+        objects.add(ExamMongoDBObject.toDBObject(question, examAnalysis));
       }
       use = questionColl;
     }
@@ -140,9 +77,9 @@ public class GuiController {
    * @throws SQLException if NoInputFound
    */
   @SuppressWarnings("all")
-  public void insertIntoMySQLDatabase(List<StatsTeam> teamList,
-      List<StatsSchool> schoolList,
-      List<RoundOffStatsQuestion> rosqList, String table) throws SQLException {
+  public void insertIntoMySQLDatabase(List<StatsSchool> schoolList, List<StatsTeam> teamList,
+      List<RoundOffStatsQuestion> rosqList, String schoolTable, String teamTable,
+      String questionTable, ExamAnalysis examAnalysis) throws SQLException {
 
     if (mySqlConnection == null && mongoDBConnection == null) {
       throw new NullPointerException(
@@ -162,7 +99,7 @@ public class GuiController {
         String sql = "insert into "
             + mySqlConnection.getUser().getDatabaseName()
             + "."
-            + table
+            + schoolTable
             + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
 
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
@@ -186,7 +123,7 @@ public class GuiController {
         String sql = "insert into "
             + mySqlConnection.getUser().getDatabaseName()
             + "."
-            + table
+            + teamTable
             + " (name,score,mean,standarddev,variance,median) values (?,?,?,?,?,?)";
 
         PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
@@ -222,11 +159,11 @@ public class GuiController {
           String sql = "insert into "
               + mySqlConnection.getUser().getDatabaseName()
               + "."
-              + table
+              + questionTable
               + " (question, date, mean, median, stddev, variance, max_score) "
               + "values (?,?,?,?,?,?,?)";
 
-          int maxScore = ExamInput.getMaxScore(q);
+          int maxScore = examAnalysis.getQuestionMaxScore(question);
           if (maxScore == -1) {
             throw new SQLException("Max Score was not found.");
           } else {
@@ -258,7 +195,7 @@ public class GuiController {
           String sql = "UPDATE "
               + mySqlConnection.getUser().getDatabaseName()
               + "."
-              + table
+              + questionTable
               + " SET mean = ?, stddev = ?, variance = ?, median = ? WHERE question = ?";
 
           PreparedStatement statement = mySqlConnection.getConnection().prepareStatement(sql);
@@ -355,15 +292,14 @@ public class GuiController {
     statement.setString(6, "" + median);
   }
 
-  public ChooseInputFileFrame getChooseInputFileFrame() {
-    return this.chooseInputFileFrame;
+  public MySqlConnection getSqlConnection() {
+    return this.mySqlConnection;
   }
 
-  public void setChooseInputFileFrame(ChooseInputFileFrame fileFrame) {
-    this.chooseInputFileFrame = fileFrame;
+  public MongoDBConnection getMongoDBConnection() {
+    return this.mongoDBConnection;
   }
 
-  public ExamsFromDatabaseInput getExamsFromDatabaseInput() {
-    return this.examsFromDatabaseInput;
+  public void verifyUser(String userName, char[] pass, String connector) {
   }
 }

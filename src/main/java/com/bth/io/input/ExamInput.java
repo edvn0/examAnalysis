@@ -30,13 +30,16 @@ public class ExamInput {
 
   private final Exam[] exams;
   private final ExamTeam[] examTeams;
-  private final String[] teams;
   private ExamSchool[] examSchools;
-  private List<String[]> listOfRowsInData;
+
+  private static int[] amountOfSameSchools;
   private int INDIVIDUAL_SCORES_START;
   private int INDIVIDUAL_SCORES_END;
-  public static int[] amountOfSameSchools;
-  public static String[] schools;
+  private final String[] teams;
+  public String[] schools;
+
+  private List<String[]> listOfRowsInData;
+  private List<String[]> listFromDatabase;
 
   /***
    * Starts the whole process, inits all the information of the arrays from
@@ -50,12 +53,12 @@ public class ExamInput {
     listOfRowsInData = fileInput.fileInput();
 
     INDIVIDUAL_SCORES_START = fileInput
-        .getIndex(true, listOfRowsInData) != -1 ?
-        fileInput.getIndex(true, listOfRowsInData) : 0;
+        .getIndex(true, listOfRowsInData, "Fråga 1 Poäng", "Fråga 14 Poäng") != -1 ?
+        fileInput.getIndex(true, listOfRowsInData, "Fråga 1 Poäng", "Fråga 14 Poäng") : 0;
 
     INDIVIDUAL_SCORES_END = fileInput
-        .getIndex(false, listOfRowsInData) != -1 ?
-        fileInput.getIndex(false, listOfRowsInData) : 0;
+        .getIndex(false, listOfRowsInData, "Fråga 1 Poäng", "Fråga 14 Poäng") != -1 ?
+        fileInput.getIndex(false, listOfRowsInData, "Fråga 1 Poäng", "Fråga 14 Poäng") : 0;
 
     if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) {
       JOptionPane.showMessageDialog(null, "Could not find the file, try again.", "Error",
@@ -64,45 +67,36 @@ public class ExamInput {
     }
 
     // All getTeams for the java.exams.
-    teams = this.getTeams(this.isFirstRowTimeStamp());
+    teams = this.getTeams(listOfRowsInData);
     // Init the school names.
-    schools = this.getSchools(this.isFirstRowTimeStamp());
+    schools = this.getSchools(listOfRowsInData);
 
     // Inits the lists.
     // First, the java.exams with no school associated.
-    this.exams = this.getExamList();
+    this.exams = this.getExamList(listOfRowsInData);
     // Second, exam with the school, sorted lexicographically with the schools.
-    this.examSchools = this.getExamSchoolList();
-    amountOfSameSchools = FileInput.getAmountOfExamsFromSameSchool(this.examSchools, schools);
+    this.examSchools = this.getExamSchoolList(listOfRowsInData);
+    amountOfSameSchools = this.getAmountOfExamsFromSameSchool(this.examSchools, schools);
     // Third, exam with team name.
-    this.examTeams = this.getExamTeamList();
+    this.examTeams = this.getExamTeamList(listOfRowsInData);
   }
 
   public ExamInput(SQLLoginUser user) {
     FileInput fileInput = new FileInput(user);
-    listOfRowsInData = fileInput.fileInputFromDatabase();
+    listFromDatabase = fileInput.fileInputFromDatabase();
 
     INDIVIDUAL_SCORES_START = fileInput
-        .getIndex(true, listOfRowsInData) != -1 ?
-        fileInput.getIndex(true, listOfRowsInData) : 0;
-
+        .getMetaDataQuestionIndex(fileInput.getResultSet(), "q1", "q14", true);
     INDIVIDUAL_SCORES_END = fileInput
-        .getIndex(false, listOfRowsInData) != -1 ?
-        fileInput.getIndex(false, listOfRowsInData) : 0;
+        .getMetaDataQuestionIndex(fileInput.getResultSet(), "q1", "q14", false);
 
-    if (INDIVIDUAL_SCORES_END == 0 && INDIVIDUAL_SCORES_START == 0) {
-      JOptionPane.showMessageDialog(null, "Could not find the file, try again.", "Error",
-          JOptionPane.ERROR_MESSAGE);
-      System.exit(0);
-    }
+    this.teams = this.getTeams(listFromDatabase);
+    schools = this.getSchools(listFromDatabase);
 
-    this.teams = this.getTeams(this.isFirstRowTimeStamp());
-    schools = this.getSchools(this.isFirstRowTimeStamp());
-
-    this.exams = this.getExamList();
-    this.examSchools = this.getExamSchoolList();
-    this.examTeams = this.getExamTeamList();
-
+    this.exams = this.getExamList(listFromDatabase);
+    this.examSchools = this.getExamSchoolList(listFromDatabase);
+    amountOfSameSchools = this.getAmountOfExamsFromSameSchool(this.examSchools, schools);
+    this.examTeams = this.getExamTeamList(listFromDatabase);
   }
 
   /***
@@ -110,8 +104,8 @@ public class ExamInput {
    * @param question what question?
    * @return questions associated max score.
    */
-  public static int getMaxScore(String question) {
-    for (Scores scores : Scores.values()) {
+  public int getMaxScore(String question) {
+    for (ScoreEnum scores : ScoreEnum.values()) {
       if (Integer.parseInt(question) == scores.index) {
         return scores.max;
       }
@@ -119,9 +113,23 @@ public class ExamInput {
     return -1;
   }
 
-  public static int getSchoolIndex(StatsSchool statsSchool) {
-    for (int i = 0; i < schools.length; i++) {
-      String school = schools[i];
+  public int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
+    // TODO: this might be the bug for TODO in ExamOutput. Test!
+    int[] j = new int[schools.length];
+    for (ExamSchool statsSchool : statsSchools) {
+      for (int k = 0; k < schools.length; k++) {
+        if (statsSchool.getSchool().toLowerCase().trim().equals(schools[k].toLowerCase().trim())) {
+          j[k]++;
+        }
+      }
+    }
+
+    return j;
+  }
+
+  public int getSchoolIndex(StatsSchool statsSchool) {
+    for (int i = 0; i < this.schools.length; i++) {
+      String school = this.schools[i];
       if (statsSchool.getSchool().equals(school)) {
         return amountOfSameSchools[i];
       }
@@ -129,28 +137,24 @@ public class ExamInput {
     return -1;
   }
 
-  private String[] getTeams(int isTimeStampDependent) {
+  private String[] getTeams(List<String[]> data) {
     HashSet<String> stringHashSet = new HashSet<>();
-    for (String[] s : listOfRowsInData) {
-      if (!s[isTimeStampDependent].equals("Skola")) {
-        stringHashSet.add(s[3]);
-      }
+    for (String[] s : data) {
+      stringHashSet.add(s[3]);
     }
 
     return stringHashSet.toArray(new String[0]);
   }
 
-  private int isFirstRowTimeStamp() {
-    return listOfRowsInData.get(0)[0].equals("Tidstämpel") ? 1 : 0;
+  private int isFirstRowTimeStamp(List<String[]> data) {
+    return data.get(0)[0].equals("Tidstämpel") ? 1 : 0;
   }
 
-  private String[] getSchools(int isTimeStampDependent) {
+  private String[] getSchools(List<String[]> data) {
     HashSet<String> schools = new HashSet<>();
 
-    for (String[] row : listOfRowsInData) {
-      if (!row[isTimeStampDependent].equals("Skola")) {
-        schools.add(row[isTimeStampDependent]);
-      }
+    for (String[] row : data) {
+      schools.add(row[1]);
     }
 
     String[] retArr = new String[schools.size()];
@@ -160,63 +164,61 @@ public class ExamInput {
   /***
    * Start-point for the exam data structure.
    * @return a list of all exams in the csv file.
+   * @param listData input data
    */
-  private Exam[] getExamList() {
-    Exam[] exams = new Exam[listOfRowsInData.size() - 1];
-    int timeStampDependentIndex = isFirstRowTimeStamp();
+  private Exam[] getExamList(List<String[]> listData) {
+    Exam[] exams = new Exam[listData.size()];
+    for (int i = 0; i < exams.length; i++) {
+      String[] row = listData.get(i);
 
-    for (int i = 1; i < listOfRowsInData.size(); i++) {
-      double score = Double.parseDouble(listOfRowsInData.get(i)[3 + timeStampDependentIndex]);
-      double[] scores = getScoresFromRowData(listOfRowsInData.get(i));
+      double[] scores = getScoresFromRowData(row);
+      double score = Double.parseDouble(row[INDIVIDUAL_SCORES_END]);
 
-      Date date = new Date();
-      SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+      SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-mm-dd");
+      Date date = null;
       try {
-        date = format.parse(listOfRowsInData.get(i)[1 + timeStampDependentIndex]);
+        date = dateFormat.parse(row[3]);
       } catch (ParseException e) {
         e.printStackTrace();
       }
 
-      int code = Objects.hash(listOfRowsInData.get(i)[2 + timeStampDependentIndex]);
+      int anonCode = Objects.hash(score, scores, date);
 
-      // Inserts the exam at index in the field Exam[].
-      insertExam(exams, i - 1, score, scores, date, code);
+      exams[i] = new Exam(score, scores, date, anonCode);
     }
-
     return exams;
   }
 
   // Main function, sorts the examSchoolsarray lexicographically,
   // and inits the examSchoolsarray..
-  private ExamSchool[] getExamSchoolList() {
-    this.examSchools = setExamSchoolList(this.isFirstRowTimeStamp());
+  private ExamSchool[] getExamSchoolList(List<String[]> list) {
+    this.examSchools = setExamSchoolList(list);
 
     Arrays.sort(examSchools, Comparator.comparing(ExamSchool::getSchool));
 
     return examSchools;
   }
 
-  private ExamTeam[] getExamTeamList() {
+  private ExamTeam[] getExamTeamList(List<String[]> list) {
     ExamTeam[] examTeams;
-    int isTimeStampDependent = this.isFirstRowTimeStamp();
     int sizeOfExamTeamSchool = 0;
-    for (int i = 1; i < listOfRowsInData.size(); i++) {
+    for (int i = 0; i < list.size(); i++) {
       sizeOfExamTeamSchool++;
     }
     examTeams = new ExamTeam[sizeOfExamTeamSchool];
     for (int i = 0; i < examTeams.length; i++) {
-      int index = i + 1;
-      examTeams[index - 1] = new ExamTeam(this.exams[index - 1],
-          listOfRowsInData.get(index)[2 + isTimeStampDependent]);
+      examTeams[i] = new ExamTeam(this.exams[i],
+          list.get(i)[2]);
     }
     return examTeams;
   }
 
   // Gets the individual scores from the FileInput CSV file.
+  //
   private double[] getScoresFromRowData(String[] input) {
     int end = (this.INDIVIDUAL_SCORES_END);
-    int start = (this.INDIVIDUAL_SCORES_START);
-    int listSize = end - start;
+    int start = (this.INDIVIDUAL_SCORES_START - 1);
+    int listSize = (end - start);
     double[] list = new double[listSize];
 
     for (int i = start; i < end; i++) {
@@ -233,16 +235,17 @@ public class ExamInput {
   }
 
   // Helper function that sets the array examSchools to all the java.exams + the school name.
-  private ExamSchool[] setExamSchoolList(int isTimeStampDependent) {
+  private ExamSchool[] setExamSchoolList(List<String[]> data) {
     int sizeOfExamSchoolArray = 0;
-    for (int i = 1; i < listOfRowsInData.size(); i++) {
+    for (int i = 1; i < data.size(); i++) {
       sizeOfExamSchoolArray++;
     }
 
     ExamSchool[] schools = new ExamSchool[sizeOfExamSchoolArray];
     for (int i = 0; i < schools.length; i++) {
-      int index = i + 1;
-      schools[i] = new ExamSchool(listOfRowsInData.get(index)[isTimeStampDependent], this.exams[i]);
+      String schoolName = data.get(i)[1];
+
+      schools[i] = new ExamSchool(schoolName, this.exams[i]);
     }
 
     return schools;
@@ -256,28 +259,5 @@ public class ExamInput {
     return examSchools;
   }
 
-  private enum Scores {
-    qOne(10, 1),
-    qTwo(2, 2),
-    qThree(4, 3),
-    qFour(4, 4),
-    qFive(10, 5),
-    qSix(10, 6),
-    qSeven(5, 7),
-    qEight(5, 8),
-    qNine(5, 9),
-    qTen(5, 10),
-    qEleven(5, 11),
-    qTwelve(5, 12),
-    qThirteen(5, 13),
-    qFourteen(5, 14);
 
-    private final int max;
-    private final int index;
-
-    Scores(int max, int index) {
-      this.max = max;
-      this.index = index;
-    }
-  }
 }

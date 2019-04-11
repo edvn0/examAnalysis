@@ -27,6 +27,8 @@ public class ExamAnalysis {
   private ExamTeam[] examTeams;
   private ExamSchool[] examSchools;
 
+  private SQLLoginUser user;
+
   public ExamAnalysis(String dir) {
     this.dir = dir;
   }
@@ -36,14 +38,72 @@ public class ExamAnalysis {
     input = new ExamInput(sql);
   }
 
+  public ExamAnalysis() {
+    this.dir = null;
+  }
+
+  public int getAmountOfQuestions() {
+    return amountOfQuestions;
+  }
+
+  public SQLLoginUser getUser() {
+    return user;
+  }
+
+  public void setUser(SQLLoginUser user) {
+    this.user = user;
+  }
+
+  public String getDir() {
+    return dir;
+  }
+
+  public ExamInput getInput() {
+    return input;
+  }
+
+  public void setInput(ExamInput input) {
+    this.input = input;
+  }
+
+  public void setStatsTeams(List<StatsTeam> statsTeams) {
+    this.statsTeams = statsTeams;
+  }
+
+  public void setStatsSchools(List<StatsSchool> statsSchools) {
+    this.statsSchools = statsSchools;
+  }
+
+  public void setQuestionsStats(
+      List<RoundOffStatsQuestion> questionsStats) {
+    this.questionsStats = questionsStats;
+  }
+
+  public void setExamTeams(ExamTeam[] examTeams) {
+    this.examTeams = examTeams;
+  }
+
+  public void setExamSchools(ExamSchool[] examSchools) {
+    this.examSchools = examSchools;
+  }
+
   public void start() throws FileNotFoundException {
     input = new ExamInput(this.dir);
+    init();
+  }
+
+  public void startWithDatabase() {
+    input = new ExamInput(user);
     init();
   }
 
   private void init() {
     examSchools = input.getExamSchools();
     examTeams = input.getExamTeams();
+
+    for (ExamTeam team : examTeams) {
+      System.out.println(team.toString());
+    }
 
     statsTeams = this.generateStatsTeams(examTeams);
     statsSchools = this.generateStatsSchools(examSchools);
@@ -63,9 +123,8 @@ public class ExamAnalysis {
     double[] averageScores = new double[amountOfQuestions];
 
     if (!isNull) {
-      for (int i = 1; i < teamSameName.getSeparateScoresForAllQuestions().length; i++) {
-        int index = i - 1;
-        averageScores[index] = teamSameName.getSeparateScoresForAllQuestions()[i];
+      for (int i = 0; i < teamSameName.getSeparateScoresForAllQuestions().length; i++) {
+        averageScores[i] = teamSameName.getSeparateScoresForAllQuestions()[i];
       }
     }
 
@@ -83,6 +142,7 @@ public class ExamAnalysis {
     double median = generateMedian(averageScores);
 
     // TOTAL SCORE
+    assert teamSameName != null;
     double totalScore = teamSameName.getScore();
 
     // Round off all values into an object for refactoring.
@@ -114,7 +174,6 @@ public class ExamAnalysis {
     averageScore = stream.sum();
 
     for (int i = 0; i < averageScores.length; i++) {
-      averageScore += averageScores[i];
       averageScores[i] = averageScores[i] / arrayLength;
     }
     averageScore = averageScore / arrayLength;
@@ -179,14 +238,14 @@ public class ExamAnalysis {
     List<RoundOffStatsQuestion> stats = new ArrayList<>();
 
     for (int i = 0; i < amountOfQuestions; i++) {
-      RoundOffStatsQuestion question = this.generateRoundOffStats(i);
+      RoundOffStatsQuestion question = this.generateRoundOffStats(i, examTeams);
       stats.add(question);
     }
 
     return stats;
   }
 
-  private RoundOffStatsQuestion generateRoundOffStats(int index) {
+  private RoundOffStatsQuestion generateRoundOffStats(int index, ExamTeam[] examTeams) {
     double[] scoresForIndex = new double[examTeams.length];
     for (int i = 0; i < scoresForIndex.length; i++) {
       scoresForIndex[i] = examTeams[i].getSeparateScoresForAllQuestions()[index];
@@ -197,7 +256,7 @@ public class ExamAnalysis {
     double stddev = generateStandardDeviation(scoresForIndex, mean, scoresForIndex.length);
     double variance = generateVariance(scoresForIndex, mean, scoresForIndex.length);
 
-    return getRoundOffQuestionsObject(String.valueOf(index), mean, median, stddev, variance);
+    return getRoundOffQuestionsObject(String.valueOf((index + 1)), mean, median, stddev, variance);
   }
 
   // Helper function which gets an array with all the schools sharing a name.
@@ -216,7 +275,7 @@ public class ExamAnalysis {
       int k = 0;
       for (ExamSchool es : schools) {
         if (es.getSchool().trim().toLowerCase().equals(name.trim().toLowerCase())) {
-          schoolArray[k++] = new ExamSchool(name, es.getExam());
+          schoolArray[k++] = es;
         }
       }
     }
@@ -285,12 +344,21 @@ public class ExamAnalysis {
     return questionsStats;
   }
 
+  public int getSchoolIndex(StatsSchool school) {
+    return this.input.getSchoolIndex(school);
+  }
+
   public ExamSchool[] getExamSchools() {
     return examSchools;
   }
 
   public ExamTeam[] getExamTeams() {
     return examTeams;
+  }
+
+  public int getQuestionMaxScore(RoundOffStatsQuestion question) {
+    System.out.println(question.getQuestion());
+    return this.input.getMaxScore(question.getQuestion());
   }
 
   // End getters

@@ -14,8 +14,8 @@ public class SQLLoginUser extends DatabaseLoginUser {
 
   private String teamTable, schoolTable, questionTable, connector, databaseName;
 
-  public SQLLoginUser(String userName, char[] password, String databaseName, String teamTable,
-      String schoolTable,
+  public SQLLoginUser(String userName, char[] password, String databaseName,
+      String schoolTable, String teamTable,
       String questionTable, String connector) {
     super(userName, password);
 
@@ -38,7 +38,9 @@ public class SQLLoginUser extends DatabaseLoginUser {
   }
 
   public String validateDatabase(String db) throws Exception {
+    System.out.println(db);
     boolean startsWithMySql = db.startsWith("jdbc:mysql://");
+    System.out.println(db.startsWith("jdbc:mysql://"));
     if (!startsWithMySql) {
       String exception = "Database is not validated.";
       throw new Exception(exception);

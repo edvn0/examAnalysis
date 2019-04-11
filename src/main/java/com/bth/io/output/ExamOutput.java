@@ -10,12 +10,12 @@
 
 package com.bth.io.output;
 
+import com.bth.analysis.ExamAnalysis;
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
 import com.bth.exams.ExamSchool;
 import com.bth.exams.ExamTeam;
-import com.bth.io.input.ExamInput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -30,9 +30,49 @@ import java.util.List;
 public class ExamOutput {
 
   // This will be dynamically changed by the CSV input file.
-  private static String directory = "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/src/main/resources/data/output";
+  private String directory;
 
-  public static void printToCSV_Teams(List<StatsTeam> teamList) {
+  public ExamOutput() {
+    directory = null;
+  }
+
+  private static String getStringRepresentation(double totalScore, double stdDev, double mean,
+      double median, double variance, StatsSchool statsSchool, StatsTeam statsTeam,
+      int schoolIndex) {
+    StringBuilder builder = new StringBuilder();
+    String name = "";
+    if (statsSchool == null) {
+      name += statsTeam.getTeam();
+    } else if (statsTeam == null) {
+      name += statsSchool.getSchool();
+    }
+    String score = "," + totalScore;
+    String stddev = "," + stdDev;
+    String meanS = "," + mean;
+    String medianS = "," + median;
+    String varianceS = "," + variance;
+    String amountOfQuestions = null;
+    if (statsSchool != null) {
+      // TODO: fix here, this should not return -1.
+      amountOfQuestions =
+          "," + (schoolIndex);
+    }
+
+    builder.append(name);
+    builder.append(score);
+    builder.append(meanS);
+    builder.append(medianS);
+    builder.append(stddev);
+    builder.append(varianceS);
+    if (amountOfQuestions != null) {
+      builder.append(amountOfQuestions);
+    }
+    builder.append('\n');
+
+    return builder.toString();
+  }
+
+  public void printToCSV_Teams(List<StatsTeam> teamList) {
     teamList.sort(Comparator.comparing(StatsTeam::getScore));
 
     try (PrintWriter writer = new PrintWriter(new File(directory + "/output_teams.csv"))) {
@@ -47,12 +87,39 @@ public class ExamOutput {
             team.getMedian(),
             team.getVariance(),
             null,
-            team);
+            team,
+            0);
         writer.write(str);
       }
 
       writeCopyrightAndAuthorInformation(writer);
 
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void printToCSV_Questions(List<RoundOffStatsQuestion> questions,
+      ExamAnalysis examAnalysis) {
+    try (PrintWriter writer = new PrintWriter(new File(directory + "/output_questions.csv"))) {
+
+      writeHeaderWithPrintWriter(writer, true);
+
+      for (RoundOffStatsQuestion rosQ : questions) {
+
+        StringBuilder builder = new StringBuilder();
+        int index = Integer.parseInt(rosQ.getQuestion());
+        String question = String.valueOf(index);
+        builder.append(question).append(",");
+        builder.append(rosQ.getMean()).append(",");
+        builder.append(rosQ.getMedian()).append(",");
+        builder.append(rosQ.getStddev()).append(",");
+        builder.append(rosQ.getVariance()).append(",");
+        builder.append(examAnalysis.getQuestionMaxScore(rosQ));
+        builder.append("\n");
+        writer.write(builder.toString());
+      }
+      writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
@@ -79,56 +146,21 @@ public class ExamOutput {
     writer.write("\n");
   }
 
-  private static String getStringRepresentation(double score2, double stddev2, double mean2,
-      double median2, double variance2, StatsSchool statsSchool, StatsTeam statsTeam) {
-    StringBuilder builder = new StringBuilder();
-    String name = "";
-    if (statsSchool == null) {
-      name += statsTeam.getTeam();
-    } else if (statsTeam == null) {
-      name += statsSchool.getSchool();
-    }
-    String score = "," + score2;
-    String stddev = "," + stddev2;
-    String mean = "," + mean2;
-    String median = "," + median2;
-    String variance = "," + variance2;
-    String amountOfQuestions = null;
-    if (statsSchool != null) {
-      amountOfQuestions =
-          "," + (ExamInput.getSchoolIndex(statsSchool));
-    }
+  public void printToCSV_Schools(List<StatsSchool> statsSchools, ExamAnalysis analysis) {
+    statsSchools.sort(Comparator.comparing(StatsSchool::getScore));
 
-    builder.append(name);
-    builder.append(score);
-    builder.append(mean);
-    builder.append(median);
-    builder.append(stddev);
-    builder.append(variance);
-    if (amountOfQuestions != null) {
-      builder.append(amountOfQuestions);
-    }
-    builder.append('\n');
+    try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
 
-    return builder.toString();
-  }
+      writeHeaderWithPrintWriter(writer, false);
+      for (StatsSchool statsSchool : statsSchools) {
 
-  public static void printToCSV_Questions(List<RoundOffStatsQuestion> questions) {
-    try (PrintWriter writer = new PrintWriter(new File(directory + "/output_questions.csv"))) {
-      writeHeaderWithPrintWriter(writer, true);
-      for (RoundOffStatsQuestion rosQ : questions) {
-        StringBuilder builder = new StringBuilder();
-        String q = Integer.toString(Integer.parseInt(rosQ.getQuestion()) + 1);
-        int index = Integer.parseInt(rosQ.getQuestion()) + 1;
-        String question = String.valueOf(index);
-        builder.append(question).append(",");
-        builder.append(rosQ.getMean()).append(",");
-        builder.append(rosQ.getMedian()).append(",");
-        builder.append(rosQ.getStddev()).append(",");
-        builder.append(rosQ.getVariance()).append(",");
-        builder.append(ExamInput.getMaxScore(q));
-        builder.append("\n");
-        writer.write(builder.toString());
+        int schoolIndex = analysis.getSchoolIndex(statsSchool);
+
+        String string = getStringRepresentation(statsSchool.getScore(),
+            statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
+            statsSchool.getVariance(), statsSchool, null, schoolIndex);
+
+        writer.write(string);
       }
       writeCopyrightAndAuthorInformation(writer);
     } catch (FileNotFoundException e) {
@@ -136,7 +168,20 @@ public class ExamOutput {
     }
   }
 
-  private static void writeCopyrightAndAuthorInformation(PrintWriter writer) {
+  public boolean checkDirectory(String directory) {
+    try {
+      File file = new File(directory);
+      File subfile1 = new File(directory + "/output_schools.csv");
+      File subfile2 = new File(directory + "/output_teams.csv");
+      File subfile3 = new File(directory + "/output_questions.csv");
+    } catch (RuntimeException e) {
+      e.printStackTrace();
+      return false;
+    }
+    return true;
+  }
+
+  private void writeCopyrightAndAuthorInformation(PrintWriter writer) {
     DateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     Date date = new Date();
     String sDate = format.format(date);
@@ -145,26 +190,7 @@ public class ExamOutput {
             + "by Edwin Carlsson, S.E.R.O. at clock: " + sDate);
   }
 
-  public static void printToCSV_Schools(List<StatsSchool> statsSchools) {
-    statsSchools.sort(Comparator.comparing(StatsSchool::getScore));
-
-    try (PrintWriter writer = new PrintWriter(new File(directory + "/output_schools.csv"))) {
-
-      writeHeaderWithPrintWriter(writer, false);
-      for (StatsSchool statsSchool : statsSchools) {
-        String string = getStringRepresentation(statsSchool.getScore(),
-            statsSchool.getStddev(), statsSchool.getMean(), statsSchool.getMedian(),
-            statsSchool.getVariance(), statsSchool, null);
-        writer.write(string);
-        System.out.println(ExamInput.getSchoolIndex(statsSchool));
-      }
-      writeCopyrightAndAuthorInformation(writer);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static void printQuestionsToCSV(ExamSchool[] exams, ExamTeam[] teams) {
+  public void printQuestionsToCSV(ExamSchool[] exams, ExamTeam[] teams) {
     // Sort according to hashCode, so that they indices are aligned for the printing.
     List<ExamSchool> sortSchoolExams = Arrays.asList(exams);
     List<ExamTeam> sortTeamExams = Arrays.asList(teams);
@@ -218,11 +244,7 @@ public class ExamOutput {
     }
   }
 
-  public static String getDirectory() {
-    return directory;
-  }
-
-  public static void setDirectory(String directory) {
-    ExamOutput.directory = directory;
+  public void setDirectory(String s) {
+    this.directory = s;
   }
 }

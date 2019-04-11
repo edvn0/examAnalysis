@@ -1,9 +1,9 @@
 package com.bth.io.output.database.mongodb.mongodbconnector;
 
+import com.bth.analysis.ExamAnalysis;
 import com.bth.analysis.stats.StatsSchool;
 import com.bth.analysis.stats.StatsTeam;
 import com.bth.analysis.stats.helperobjects.RoundOffStatsQuestion;
-import com.bth.io.input.ExamInput;
 import com.mongodb.BasicDBObject;
 
 public class ExamMongoDBObject extends BasicDBObject {
@@ -28,12 +28,12 @@ public class ExamMongoDBObject extends BasicDBObject {
         .append("median", team.getMedian());
   }
 
-  public static BasicDBObject toDBObject(RoundOffStatsQuestion question) {
+  public static BasicDBObject toDBObject(RoundOffStatsQuestion question,
+      ExamAnalysis examAnalysis) {
     int index = Integer.parseInt(question.getQuestion()) + 1;
-    String q = String.valueOf(index);
     return new BasicDBObject()
         .append("name", index)
-        .append("maxScore", ExamInput.getMaxScore(q))
+        .append("maxScore", examAnalysis.getQuestionMaxScore(question))
         .append("mean", question.getMean())
         .append("standarddev", question.getStddev())
         .append("variance", question.getVariance())
