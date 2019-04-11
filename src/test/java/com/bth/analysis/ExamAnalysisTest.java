@@ -18,16 +18,18 @@ import org.junit.Test;
 public class ExamAnalysisTest {
 
   private final double[] VALUES = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  private final ExamAnalysis analysis = new ExamAnalysis();
+  private ExamAnalysis analysis;
 
   @Test
   public void generateMean() {
+    analysis = new ExamAnalysis();
     double mean = analysis.generateMean(VALUES, VALUES.length);
     assertEquals(mean, 5.5, Math.pow(10, -5));
   }
 
   @Test
   public void generateOddMedian() {
+    analysis = new ExamAnalysis();
     double[] oddValues = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     double median = analysis.generateMedian(oddValues);
     Assert.assertEquals(median, 5d, Math.pow(10, -5));
@@ -35,6 +37,7 @@ public class ExamAnalysisTest {
 
   @Test
   public void generateEvenMedian() {
+    analysis = new ExamAnalysis();
     double median = analysis.generateMedian(VALUES);
     Assert.assertEquals(median, (5d + 6d) / 2, Math.pow(10, -3));
   }
@@ -42,6 +45,7 @@ public class ExamAnalysisTest {
 
   @Test
   public void generateVariance() {
+    analysis = new ExamAnalysis();
     double variance = analysis
         .generateVariance(VALUES, analysis.generateMean(VALUES, VALUES.length), VALUES.length);
 
@@ -50,9 +54,10 @@ public class ExamAnalysisTest {
 
   @Test
   public void generateStandardDeviation() {
+    analysis = new ExamAnalysis();
     double stddev = analysis
-        .generateStandardDeviation(analysis.generateMean(VALUES, VALUES.length), VALUES.length,
-            VALUES);
+        .generateStandardDeviation(VALUES, analysis.generateMean(VALUES, VALUES.length),
+            VALUES.length);
     Assert.assertEquals(stddev, 2.8722813d, Math.pow(10, -5));
   }
 }

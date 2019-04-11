@@ -10,16 +10,15 @@
 
 package com.bth.io.input;
 
-import com.bth.exams.ExamSchool;
 import com.bth.gui.controller.loginusers.SQLLoginUser;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -34,21 +33,6 @@ public class FileInput {
 
   public FileInput(SQLLoginUser user) {
     connection = new MySqlConnection(user);
-  }
-
-  static int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
-    int[] j = new int[schools.length];
-    for (ExamSchool statsSchool : statsSchools) {
-      for (int k = 0; k < schools.length; k++) {
-        if (statsSchool.getSchool().equals(schools[k])) {
-          j[k]++;
-        }
-      }
-    }
-
-    System.out.println(Arrays.toString(j));
-
-    return j;
   }
 
   /***
@@ -80,7 +64,7 @@ public class FileInput {
     return strings;
   }
 
-  public List<String[]> fileInput() {
+  List<String[]> fileInput() {
     List<String[]> values = new ArrayList<>();
     while (scanner.hasNext()) {
       values.add(scanner.nextLine().split(","));
@@ -94,9 +78,11 @@ public class FileInput {
    * @param data the input <code>List<String[]></code> from the input tsv file.
    * @return <code>int</code>
    */
-  int getIndex(boolean startorend, List<String[]> data) {
+  int getIndex(boolean startorend, List<String[]> data, String metaDataQ1, String metaDataQ14) {
+    // Todo: identify correct rows.
     String question =
-        startorend ? "Fråga 1 Poäng".toLowerCase().trim() : "Fråga 14 Poäng".toLowerCase().trim();
+        startorend ? metaDataQ1.toLowerCase().trim() : metaDataQ14.toLowerCase().trim();
+
     String[] inData = data.get(0);
     int length = inData.length;
 
@@ -105,6 +91,35 @@ public class FileInput {
       if (string.equals(question)) {
         return startorend ? j : j + 1;
       }
+    }
+    return -1;
+  }
+
+  public ResultSet getResultSet() {
+    try {
+      return connection.getConnection()
+          .prepareStatement("select * from stats_exams.answers_from_exams").executeQuery();
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public int getMetaDataQuestionIndex(ResultSet set, String q1, String q2, boolean start) {
+    ResultSetMetaData metaData;
+    try {
+      metaData = set.getMetaData();
+      for (int i = 1; i < metaData.getColumnCount(); i++) {
+
+        String s = metaData.getColumnName(i).toLowerCase().trim();
+        if (s.equals(q1) && start) {
+          return i;
+        } else if (s.equals(q2) && !start) {
+          return i;
+        }
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
     return -1;
   }
