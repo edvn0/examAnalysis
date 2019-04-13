@@ -44,6 +44,10 @@ public class DatabaseOutputController {
     boolean schoolsAreNotNull =
         teamListNull && questionListNull && !schoolListNull; // => we will insert schools
 
+    System.out.println(questionsAreNotNull);
+    System.out.println(teamsAreNotNull);
+    System.out.println(schoolsAreNotNull);
+
     List<BasicDBObject> objects = new ArrayList<>();
 
     String use = null;
@@ -64,6 +68,7 @@ public class DatabaseOutputController {
       }
       use = questionColl;
     }
+
     mongoDBConnection.getMongoDatabase().getCollection(use, BasicDBObject.class)
         .insertMany(objects);
   }

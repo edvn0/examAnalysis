@@ -114,7 +114,6 @@ public class ExamInput {
   }
 
   public int[] getAmountOfExamsFromSameSchool(ExamSchool[] statsSchools, String[] schools) {
-    // TODO: this might be the bug for TODO in ExamOutput. Test!
     int[] j = new int[schools.length];
     for (ExamSchool statsSchool : statsSchools) {
       for (int k = 0; k < schools.length; k++) {
@@ -144,10 +143,6 @@ public class ExamInput {
     }
 
     return stringHashSet.toArray(new String[0]);
-  }
-
-  private int isFirstRowTimeStamp(List<String[]> data) {
-    return data.get(0)[0].equals("Tidstämpel") ? 1 : 0;
   }
 
   private String[] getSchools(List<String[]> data) {
@@ -226,12 +221,6 @@ public class ExamInput {
     }
 
     return list;
-  }
-
-  private void insertExam(Exam[] exams, int index, double score, double[] scores, Date date,
-      int anonymousCode) {
-    exams[index] = new Exam(score,
-        scores, date, anonymousCode);
   }
 
   // Helper function that sets the array examSchools to all the java.exams + the school name.

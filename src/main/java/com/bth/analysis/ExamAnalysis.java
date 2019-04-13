@@ -101,10 +101,6 @@ public class ExamAnalysis {
     examSchools = input.getExamSchools();
     examTeams = input.getExamTeams();
 
-    for (ExamTeam team : examTeams) {
-      System.out.println(team.toString());
-    }
-
     statsTeams = this.generateStatsTeams(examTeams);
     statsSchools = this.generateStatsSchools(examSchools);
     questionsStats = this.generateQuestionsStats();

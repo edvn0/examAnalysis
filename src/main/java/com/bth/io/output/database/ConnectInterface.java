@@ -8,45 +8,14 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.bth.gui.controller.loginusers;
+package com.bth.io.output.database;
 
-public class SQLLoginUser extends DatabaseLoginUser {
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 
-  private String connector;
+public interface ConnectInterface {
 
-  public SQLLoginUser(String userName, char[] password, String databaseName,
-      String schoolTable, String teamTable,
-      String questionTable, String connector) {
-    super(userName, password, connector, databaseName, schoolTable, teamTable, questionTable);
-    this.connector = connector;
-  }
+  void connect(DatabaseLoginUser u);
 
-  public SQLLoginUser(String userName, char[] password, String inputDatabase, String connector) {
-    super(userName, password, inputDatabase);
-    this.connector = connector;
-  }
+  void disconnect();
 
-  public String getTeamTable() {
-    return super.getTeamColl();
-  }
-
-  public String getSchoolTable() {
-    return super.getSchoolColl();
-  }
-
-  public String getQuestionTable() {
-    return super.getQuestionColl();
-  }
-
-  public String getConnector() {
-    return connector;
-  }
-
-  public String getDatabaseName() {
-    return super.getDatabaseName();
-  }
-
-  public void setConnector(String db) {
-    this.connector = db;
-  }
 }

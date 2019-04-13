@@ -78,9 +78,11 @@ public class CliReader {
     Scanner scanner = new Scanner(System.in);
     while (true) {
       String input = scanner.nextLine();
+
       if (input.equals("exit")) {
         break;
       } else {
+        System.out.println(input);
         strings.add(input);
       }
     }
@@ -101,6 +103,10 @@ public class CliReader {
         strings.remove(index);
       }
     }
+
+    System.out.println("Here");
+    strings.forEach(System.out::println);
+    System.out.println("end here");
     return strings;
   }
 

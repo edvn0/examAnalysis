@@ -1,9 +1,8 @@
 package com.bth.io.output.database.sql.sqlconnector;
 
-import com.bth.gui.controller.loginusers.MongoDBUser;
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 import com.bth.gui.controller.loginusers.SQLLoginUser;
 import com.bth.io.output.database.DatabaseConnection;
-import com.mongodb.client.MongoDatabase;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,15 +13,14 @@ public class MySqlConnection extends DatabaseConnection {
   private SQLLoginUser user;
   private Connection connection;
 
-  public MySqlConnection(SQLLoginUser user) {
-    this.user = user;
-    connection = connectToSql(this.user);
+  public MySqlConnection(DatabaseLoginUser user) {
+    this.user = (SQLLoginUser) user;
   }
 
   @Override
   public String toString() {
     return "You were connected to a MySQL Database. " +
-        "Info:\nDatabase:"
+        "\nInfo:\nDatabase:"
         + user.getDatabaseName() +
         "\nAs User:" + user.getUserName() +
         "\nAt time:" + LocalDate.now().toString();
@@ -51,26 +49,33 @@ public class MySqlConnection extends DatabaseConnection {
   public void disconnect() {
     try {
       connection.close();
+      connection = null;
     } catch (SQLException e) {
       e.printStackTrace();
     }
   }
 
   @Override
-  public Connection connectToSql(SQLLoginUser user) {
+  public boolean validateDatabase(DatabaseLoginUser user) {
+    return user.getConnector().startsWith("jdbc:mysql://");
+  }
+
+  public void connect(DatabaseLoginUser user) {
     Connection connection = null;
-    try {
-      connection = DriverManager
-          .getConnection(user.getConnector(), user.getUserName(), user.getPassword());
-      System.out.println(this.toString());
-    } catch (SQLException e) {
-      e.printStackTrace();
+    if (!isUserValidated(user)) {
+      System.out.println("User could not be validated. Try again.");
+    } else {
+      try {
+        connection = DriverManager
+            .getConnection(user.getConnector(), user.getUserName(), user.getPassword());
+      } catch (SQLException e) {
+        e.printStackTrace();
+      }
     }
-    return connection;
+    this.connection = connection;
   }
 
-  @Override
-  protected MongoDatabase connectToMongo(MongoDBUser user) {
-    return null;
+  public boolean isUserValidated(DatabaseLoginUser user) {
+    return user.validateUser(user.getUserName(), user.getPassword().toCharArray());
   }
 }

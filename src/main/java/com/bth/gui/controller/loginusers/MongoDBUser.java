@@ -18,7 +18,7 @@ public class MongoDBUser extends DatabaseLoginUser {
       String databaseName, String schoolColl,
       String teamColl, String questionColl, String connector) {
 
-    super(userName, password);
+    super(userName, password, connector, databaseName, schoolColl, teamColl, questionColl);
 
     try {
       this.connector = validateDatabase(connector);

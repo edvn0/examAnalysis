@@ -10,7 +10,7 @@
 
 package com.bth.io.input;
 
-import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,8 +31,13 @@ public class FileInput {
     scanner = new Scanner(new File(dir));
   }
 
-  public FileInput(SQLLoginUser user) {
+  public FileInput(DatabaseLoginUser user) {
     connection = new MySqlConnection(user);
+    connection.connect(user);
+  }
+
+  public static boolean validateConnectorString(String connector) {
+    return connector.startsWith("jdbc:mysql://") || connector.startsWith("mongodb+srv://");
   }
 
   /***

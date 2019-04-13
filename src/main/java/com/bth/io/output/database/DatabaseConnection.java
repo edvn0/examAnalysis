@@ -1,13 +1,16 @@
 package com.bth.io.output.database;
 
-import com.bth.gui.controller.loginusers.MongoDBUser;
-import com.bth.gui.controller.loginusers.SQLLoginUser;
-import com.mongodb.client.MongoDatabase;
-import java.sql.Connection;
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 
-public abstract class DatabaseConnection {
+public abstract class DatabaseConnection implements ConnectInterface {
 
-  protected abstract Connection connectToSql(SQLLoginUser user);
+  public abstract void connect(DatabaseLoginUser u);
 
-  protected abstract MongoDatabase connectToMongo(MongoDBUser user);
+  public abstract void disconnect();
+
+  public abstract boolean validateDatabase(DatabaseLoginUser user);
+
+  public abstract boolean isUserValidated(DatabaseLoginUser user);
+
+  protected abstract boolean isConnected();
 }

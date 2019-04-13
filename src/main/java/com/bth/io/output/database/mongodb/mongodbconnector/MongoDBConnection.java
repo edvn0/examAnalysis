@@ -1,22 +1,22 @@
 package com.bth.io.output.database.mongodb.mongodbconnector;
 
+import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 import com.bth.gui.controller.loginusers.MongoDBUser;
-import com.bth.gui.controller.loginusers.SQLLoginUser;
+import com.bth.io.output.database.ConnectInterface;
 import com.bth.io.output.database.DatabaseConnection;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoDatabase;
-import java.sql.Connection;
 import java.time.LocalDate;
 
-public class MongoDBConnection extends DatabaseConnection {
+public class MongoDBConnection extends DatabaseConnection implements ConnectInterface {
 
   private MongoClient client;
   private MongoDBUser user;
   private MongoDatabase database;
 
   public MongoDBConnection(MongoDBUser user) {
-    database = connectToMongo(user);
+    this.user = user;
   }
 
   @Override
@@ -28,8 +28,28 @@ public class MongoDBConnection extends DatabaseConnection {
         "\nAt time: " + LocalDate.now().toString();
   }
 
+  @Override
+  public void connect(DatabaseLoginUser u) {
+    MongoClientURI uri = new MongoClientURI(u.getConnector());
+    client = new MongoClient(uri);
+    this.database = client.getDatabase(u.getDatabaseName());
+
+    System.out.println(this.toString());
+  }
+
   public void disconnect() {
+    database = null;
     client.close();
+  }
+
+  @Override
+  public boolean validateDatabase(DatabaseLoginUser connection) {
+    return connection.getConnector().startsWith("mongodb+srv:");
+  }
+
+  @Override
+  public boolean isUserValidated(DatabaseLoginUser user) {
+    return user.validateUser(user.getUserName(), user.getPassword().toCharArray());
   }
 
   public MongoClient getClient() {
@@ -45,24 +65,12 @@ public class MongoDBConnection extends DatabaseConnection {
   }
 
   public boolean isConnected() {
-    return client != null && database != null;
-  }
+    if (client.getCredential().getUserName() == null) {
+      return false;
+    }
 
-  //
-  @Override
-  protected Connection connectToSql(SQLLoginUser user) {
-    return null;
-  }
-
-  @Override
-  protected MongoDatabase connectToMongo(MongoDBUser user) {
-    this.user = user;
-    MongoClientURI uri = new MongoClientURI(user.getConnector());
-    client = new MongoClient(uri);
-    database = client.getDatabase(user.getDatabaseName());
-
-    System.out.println(this.toString());
-
-    return database;
+    return (client != null && database != null) && database.getName() != null
+        && client.getCredential().getUserName() != null
+        && client.getCredential().getPassword() != null;
   }
 }

@@ -18,6 +18,7 @@ import com.bth.gui.controller.DatabaseOutputController;
 import com.bth.gui.controller.loginusers.MongoDBUser;
 import com.bth.gui.controller.loginusers.SQLLoginUser;
 import com.bth.io.input.CliReader;
+import com.bth.io.input.FileInput;
 import com.bth.io.output.ExamOutput;
 import com.bth.io.output.database.mongodb.mongodbconnector.MongoDBConnection;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
@@ -51,7 +52,8 @@ class ExamProjectHandler {
             + "\n2: Connect to your own databases to output data."
             + "\n3: Output data into CSV files."
             + "\n4: Insert into databases connected to in 2)."
-            + "\n5: Exit.");
+            + "\n5: Disconnect from database."
+            + "\n6: Exit.");
     while (scanner.hasNext()) {
       String input = scanner.nextLine();
       switch (input) {
@@ -62,8 +64,11 @@ class ExamProjectHandler {
           break;
         case "2":
           if (started) {
+            String in = scanner.nextLine().trim();
             // Connect to both databases.
-            initializeDatabaseConnections();
+            initializeDatabaseConnections(in);
+          } else {
+            System.out.println("You need to have the input database connected, try 1 again.");
           }
           main();
           break;
@@ -71,21 +76,46 @@ class ExamProjectHandler {
           if (started) {
             // Output to three (4 dev) csv files.
             initializeExamOutput();
+          } else {
+            System.out.println("You need to have the input database connected, try 1 again.");
           }
           main();
           break;
         case "4":
           if (started && connected) {
             initializeDatabaseInsertions();
+          } else {
+            System.out.println("You were not connected, try again by menu option 1.");
           }
           main();
           break;
         case "5":
-          System.exit(0);
+          System.out.println("Input which database you want to connect, or both by:"
+              + "\n'mongodb','mdb','mongo': Mongo DB connection."
+              + "\n'mysql', 'sql': MySQL database connection."
+              + "\n'both': Both databases.");
+          String select = scanner.next().trim();
+          if (connected) {
+            disconnectFromDatabases(select);
+          } else {
+            System.out.println("The databases are already not connected.");
+          }
           break;
+        case "6":
+          System.exit(0);
         default:
           main();
       }
+    }
+  }
+
+  private void disconnectFromDatabases(String select) {
+    if (select.equals("mongodb") || select.equals("mongo") || select.equals("mdb")) {
+      controller.getSqlConnection().disconnect();
+    } else if (select.equals("sql") || select.equals("mysql")) {
+      controller.getMongoDBConnection().disconnect();
+    } else {
+      System.out.println("Incorrect input, try again.");
     }
   }
 
@@ -98,9 +128,13 @@ class ExamProjectHandler {
     String tTable = controller.getSqlConnection().getUser().getTeamTable();
     String qTable = controller.getSqlConnection().getUser().getQuestionTable();
 
+    System.out.println(sTable + " " + tTable + " " + qTable);
+
     String sColl = controller.getMongoDBConnection().getUser().getSchoolColl();
     String tColl = controller.getMongoDBConnection().getUser().getTeamColl();
     String qColl = controller.getMongoDBConnection().getUser().getQuestionColl();
+
+    System.out.println(sColl + " " + tColl + " " + qColl);
 
     controller.insertIntoMongoDatabase(null, null, questions, sColl, tColl, qColl,
         examAnalysis);
@@ -124,29 +158,88 @@ class ExamProjectHandler {
     }
   }
 
-  private void initializeDatabaseConnections() {
+  private void initializeDatabaseConnections(String in) {
     List<String> s1;
     List<String> s2;
 
+    boolean mdb = false;
+    boolean mysql = false;
+    if (in.equals("mongodb") || in.equals("mongo") || in.equals("mdb")) {
+      mdb = true;
+    } else if (in.equals("sql") || in.equals("mysql")) {
+      mysql = true;
+    } else {
+      System.out.println("Incorrect input, try again.");
+    }
+
+    /* Input from the lists.
+    0 = connector.
+    1 = name of database.
+    2 = name of school output table/collection.
+    3 = name of team output table/collection.
+    4 = name of question output table/collection.
+    5 = username.
+    6 = password.
+    */
+
     // SQL, true => sql
-    s1 = reader.readInputInformationDatabase(true);
-    SQLLoginUser sUser = new SQLLoginUser(s1.get(5), s1.get(6).toCharArray(), s1.get(1), s1.get(2),
-        s1.get(3), s1.get(4), s1.get(0));
+    // boolean whichDatabase = false => sql.
+    if (mysql) {
+      s1 = reader.readInputInformationDatabase(true);
+      SQLLoginUser sUser = new SQLLoginUser(
+          s1.get(5),
+          s1.get(6).toCharArray(),
+          s1.get(1),
+          s1.get(2),
+          s1.get(3),
+          s1.get(4),
+          s1.get(0));
+
+      // Validate databases or return.
+      MySqlConnection sqlConnection = new MySqlConnection(sUser);
+
+      if (!FileInput.validateConnectorString(sUser.getConnector())) {
+        System.out.println("SQL database was not connected. Check your input and try again.");
+        return;
+      }
+
+      controller.setConnection(sqlConnection);
+      controller.getSqlConnection().connect(sUser);
+    }
 
     // MongoDB, false => mongodb.
-    s2 = reader.readInputInformationDatabase(false);
-    MongoDBUser mUser = new MongoDBUser(s2.get(5), s2.get(6).toCharArray(), s2.get(1), s2.get(2),
-        s2.get(3), s2.get(4), s2.get(0));
+    // boolean whichDatabase = true => mongodb.
+    if (mdb) {
+      s2 = reader.readInputInformationDatabase(false);
+      MongoDBUser mUser = new MongoDBUser(
+          s2.get(5),
+          s2.get(6).toCharArray(),
+          s2.get(1),
+          s2.get(2),
+          s2.get(3),
+          s2.get(4),
+          s2.get(0));
 
-    MongoDBConnection mongoDBConnection = new MongoDBConnection(mUser);
-    MySqlConnection sqlConnection = new MySqlConnection(sUser);
+      // Validate databases or return.
+      MongoDBConnection mongoDBConnection = new MongoDBConnection(mUser);
+      if (!FileInput.validateConnectorString(mUser.getConnector())) {
+        System.out.println("MongoDB database was not connected. Check your input and try again.");
+        return;
+      }
 
-    controller.setConnection(sqlConnection);
-    controller.setConnection(mongoDBConnection);
+      controller.setConnection(mongoDBConnection);
+      controller.getMongoDBConnection().connect(mUser);
+    }
 
-    connected = true;
+    if (mdb || mysql) {
+      JOptionPane.showMessageDialog(null, "You were connected!");
+      connected = true;
+      return;
+    }
 
-    JOptionPane.showMessageDialog(null, "You were connected!");
+    JOptionPane
+        .showMessageDialog(null, "You were not connected.", "Error", JOptionPane.ERROR_MESSAGE);
+
   }
 
   private void initializeExamOutput() {
@@ -168,13 +261,28 @@ class ExamProjectHandler {
     List<String> stringList;
     stringList = reader.readInputInformationFromCli();
 
-    String userName = stringList.get(1);
     String connector = stringList.get(0);
+    String userName = stringList.get(1);
+    char[] pass = stringList.get(2)
+        .toCharArray();
     String table = stringList.get(3);
-    char[] pass = stringList.get(2).toCharArray();
+
+    SQLLoginUser user = new SQLLoginUser(userName, pass, table, connector);
+
+    // validate connector.
+    System.out.println("Validating connector.");
+    boolean validatedConnector = FileInput
+        .validateConnectorString(connector);
+
+    if (!validatedConnector) {
+      System.out.println("Could not validate database connector.");
+      return;
+    }
+    System.out.println("Validated connector.");
+    // end connector validation.
 
     examAnalysis
-        .setUser(new SQLLoginUser(userName, pass, table, connector));
+        .setUser(user);
 
     JOptionPane.showMessageDialog(null, "Exam analysis was successfully initiated!");
 
