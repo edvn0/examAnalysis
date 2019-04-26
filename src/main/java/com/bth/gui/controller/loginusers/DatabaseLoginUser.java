@@ -13,7 +13,7 @@ public class DatabaseLoginUser {
 
   private String userName;
   private String password;
-  private String databaseName, connector;
+  private String databaseName, connector, inputTable;
   private String sColl, tColl, qColl; // tables/collections.
 
   DatabaseLoginUser(String userName, char[] password, String connector, String databaseName,
@@ -28,10 +28,10 @@ public class DatabaseLoginUser {
     this.qColl = qColl;
   }
 
-  public DatabaseLoginUser(String userName, char[] password, String inputDatabase) {
+  public DatabaseLoginUser(String userName, char[] password, String inputTable) {
     this.userName = userName;
     this.password = String.copyValueOf(password);
-    this.databaseName = inputDatabase;
+    this.inputTable = inputTable;
   }
 
   public boolean validateUser(String user, char[] password) {
@@ -67,6 +67,10 @@ public class DatabaseLoginUser {
 
   public String getDatabaseName() {
     return databaseName;
+  }
+
+  public String getInputTable() {
+    return inputTable;
   }
 
   public String getConnector() {

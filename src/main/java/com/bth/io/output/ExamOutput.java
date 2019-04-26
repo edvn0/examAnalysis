@@ -29,7 +29,6 @@ import java.util.List;
 
 public class ExamOutput {
 
-  // This will be dynamically changed by the CSV input file.
   private String directory;
 
   public ExamOutput() {

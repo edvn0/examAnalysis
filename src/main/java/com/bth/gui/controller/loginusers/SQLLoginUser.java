@@ -13,6 +13,7 @@ package com.bth.gui.controller.loginusers;
 public class SQLLoginUser extends DatabaseLoginUser {
 
   private String connector;
+  private String databaseName = null;
 
   public SQLLoginUser(String userName, char[] password, String databaseName,
       String schoolTable, String teamTable,
@@ -21,8 +22,8 @@ public class SQLLoginUser extends DatabaseLoginUser {
     this.connector = connector;
   }
 
-  public SQLLoginUser(String userName, char[] password, String inputDatabase, String connector) {
-    super(userName, password, inputDatabase);
+  public SQLLoginUser(String userName, char[] password, String inputTable, String connector) {
+    super(userName, password, inputTable);
     this.connector = connector;
   }
 
@@ -48,5 +49,9 @@ public class SQLLoginUser extends DatabaseLoginUser {
 
   public void setConnector(String db) {
     this.connector = db;
+  }
+
+  public void setDatabaseName(String property) {
+    this.databaseName = property;
   }
 }

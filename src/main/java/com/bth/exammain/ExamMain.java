@@ -2,6 +2,8 @@ package com.bth.exammain;
 
 public class ExamMain {
 
+  public static boolean dev = true;
+
   public static void main(final String... args) {
     /*
      * jdbc:mysql://localhost:8889/stats_exams?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC

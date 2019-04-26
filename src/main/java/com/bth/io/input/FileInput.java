@@ -14,7 +14,6 @@ import com.bth.gui.controller.loginusers.DatabaseLoginUser;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -40,6 +39,18 @@ public class FileInput {
     return connector.startsWith("jdbc:mysql://") || connector.startsWith("mongodb+srv://");
   }
 
+  public static String[] splitConnectorString(String connector) {
+
+    String[] strings = new String[connector.length()];
+
+    if (connector.startsWith("jdbc:mysql://") || connector.startsWith("mongodb+srv://")) {
+      strings = connector.split("//");
+      return strings;
+    } else {
+      return strings;
+    }
+  }
+
   /***
    * Uses the SQL Login-Connection system to dynamically move input
    * files from a file structure to a database structure instead.
@@ -47,16 +58,11 @@ public class FileInput {
    * @return ArrayList<String [ ]> with all rows in database.
    */
   public List<String[]> fileInputFromDatabase() {
-    PreparedStatement statement;
-    ResultSet set;
+    ResultSet set = this.getResultSet();
     List<String[]> strings = new ArrayList<>();
     try {
-      statement = connection.getConnection()
-          .prepareStatement("select * from stats_exams.answers_from_exams");
-      set = statement.executeQuery();
-
       while (set.next()) {
-        String[] temp = new String[20];
+        String[] temp = new String[20]; //TODO check size of db.
         for (int i = 0; i < temp.length; i++) {
           temp[i] = set.getString(i + 1);
         }
@@ -102,15 +108,36 @@ public class FileInput {
 
   public ResultSet getResultSet() {
     try {
+      // TODO: fix this!
+      String query =
+          "select * from " + "stats_exams" + "." + connection.getUser()
+              .getInputTable();
       return connection.getConnection()
-          .prepareStatement("select * from stats_exams.answers_from_exams").executeQuery();
+          .prepareStatement(query).executeQuery();
     } catch (SQLException e) {
       e.printStackTrace();
     }
     return null;
   }
 
-  public int getMetaDataQuestionIndex(ResultSet set, String q1, String q2, boolean start) {
+  /***
+   * P Q R notQ | (P and Q) | (R and not Q) | (P and Q) or (R and not Q) |
+   * s s s f         s             f                     s
+   * s f s s         f             s                     s
+   * f s f f         f             f                     f
+   * f f f s         f             f                     f
+   * s f f s         f             f                     f
+   * s s f f         s             f                     s
+   * f f s s         f             s                     s
+   * f s s f         f             f                     f
+   *
+   * @param q1 first question from input, may be q1 or question1 or else. will make more scalable.
+   * @param q2 second question, where the questions stop.
+   * @param start Index for q1 or q2? True if for q1.
+   * @return index for where in the row this question column is.
+   */
+  public int getMetaDataQuestionIndex(String q1, String q2, boolean start) {
+    ResultSet set = this.getResultSet();
     ResultSetMetaData metaData;
     try {
       metaData = set.getMetaData();

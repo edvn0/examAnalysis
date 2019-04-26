@@ -19,13 +19,14 @@ import com.bth.gui.controller.loginusers.MongoDBUser;
 import com.bth.gui.controller.loginusers.SQLLoginUser;
 import com.bth.io.input.CliReader;
 import com.bth.io.input.FileInput;
+import com.bth.io.input.PropertiesReader;
 import com.bth.io.output.ExamOutput;
 import com.bth.io.output.database.mongodb.mongodbconnector.MongoDBConnection;
 import com.bth.io.output.database.sql.sqlconnector.MySqlConnection;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
-import javax.swing.JOptionPane;
 
 class ExamProjectHandler {
 
@@ -33,6 +34,8 @@ class ExamProjectHandler {
   private ExamAnalysis examAnalysis;
   private CliReader reader;
   private ExamOutput output;
+
+  private PropertiesReader propertiesReader;
 
   private boolean started;
   private boolean connected;
@@ -42,6 +45,14 @@ class ExamProjectHandler {
     examAnalysis = new ExamAnalysis();
     controller = new DatabaseOutputController();
     output = new ExamOutput();
+    if (ExamMain.dev) {
+      try {
+        propertiesReader = new PropertiesReader(
+            "/Users/edwincarlsson/Documents/Programmering/exam_Analysis/.properties");
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   void main() {
@@ -59,14 +70,22 @@ class ExamProjectHandler {
       switch (input) {
         case "1":
           // Input from the database, where all the questions are.
-          initializeExamAnalysis();
+          if (ExamMain.dev) {
+            this.dev_input();
+          } else {
+            initializeExamAnalysis();
+          }
           main();
           break;
         case "2":
           if (started) {
-            String in = scanner.nextLine().trim();
-            // Connect to both databases.
-            initializeDatabaseConnections(in);
+            if (ExamMain.dev) {
+              this.dev_connect();
+            } else {
+              String in = scanner.nextLine().trim();
+              // Connect to both databases.
+              initializeDatabaseConnections(in);
+            }
           } else {
             System.out.println("You need to have the input database connected, try 1 again.");
           }
@@ -109,13 +128,88 @@ class ExamProjectHandler {
     }
   }
 
+  private void dev_connect() {
+    String[] inputsMySql = {
+        propertiesReader.getProperty("connect.string.for.mysql"),
+        propertiesReader.getProperty("mysql.databaseName"),
+        propertiesReader.getProperty("mysql.schoolTable"),
+        propertiesReader.getProperty("mysql.teamTable"),
+        propertiesReader.getProperty("mysql.questionTable"),
+        propertiesReader.getProperty("mysql.username"),
+        propertiesReader.getProperty("mysql.password"),
+    };
+
+    String[] inputsMongoDb = {
+        propertiesReader.getProperty("connect.string.for.mongo"),
+        propertiesReader.getProperty("mongo.databaseName"),
+        propertiesReader.getProperty("mongo.schoolColl"),
+        propertiesReader.getProperty("mongo.teamColl"),
+        propertiesReader.getProperty("mongo.questionColl"),
+        propertiesReader.getProperty("mongo.username"),
+        propertiesReader.getProperty("mongo.password"),
+    };
+
+    SQLLoginUser sUser = new SQLLoginUser(
+        inputsMySql[5],
+        inputsMySql[6].toCharArray(),
+        inputsMySql[1],
+        inputsMySql[2],
+        inputsMySql[3],
+        inputsMySql[4],
+        inputsMySql[0]);
+    MySqlConnection sqlConnection = new MySqlConnection(sUser);
+    controller.setConnection(sqlConnection);
+    controller.getSqlConnection().connect(sUser);
+
+    MongoDBUser mUser = new MongoDBUser(
+        inputsMongoDb[5],
+        inputsMongoDb[6].toCharArray(),
+        inputsMongoDb[1],
+        inputsMongoDb[2],
+        inputsMongoDb[3],
+        inputsMongoDb[4],
+        inputsMongoDb[0]);
+    MongoDBConnection mongoDBConnection = new MongoDBConnection(mUser);
+    controller.setConnection(mongoDBConnection);
+    controller.getMongoDBConnection().connect(mUser);
+
+    connected = true;
+  }
+
+  private void dev_input() {
+    if (propertiesReader != null) {
+      SQLLoginUser user = new SQLLoginUser(
+          propertiesReader.getProperty("mysql.username"),
+          propertiesReader.getProperty("mysql.password").toCharArray(),
+          propertiesReader.getProperty("mysql.inputTable"),
+          propertiesReader.getProperty("connect.string.for.mysql"));
+
+      examAnalysis.setUser(user);
+
+      examAnalysis.startWithDatabase();
+      started = true;
+
+    }
+  }
+
   private void disconnectFromDatabases(String select) {
-    if (select.equals("mongodb") || select.equals("mongo") || select.equals("mdb")) {
-      controller.getSqlConnection().disconnect();
-    } else if (select.equals("sql") || select.equals("mysql")) {
-      controller.getMongoDBConnection().disconnect();
-    } else {
-      System.out.println("Incorrect input, try again.");
+    switch (select) {
+      case "mongodb":
+      case "mongo":
+      case "mdb":
+        controller.getSqlConnection().disconnect();
+        break;
+      case "sql":
+      case "mysql":
+        controller.getMongoDBConnection().disconnect();
+        break;
+      case "both":
+        controller.getMongoDBConnection().disconnect();
+        controller.getSqlConnection().disconnect();
+        break;
+      default:
+        System.out.println("Incorrect input, try again.");
+        break;
     }
   }
 
@@ -232,13 +326,9 @@ class ExamProjectHandler {
     }
 
     if (mdb || mysql) {
-      JOptionPane.showMessageDialog(null, "You were connected!");
       connected = true;
       return;
     }
-
-    JOptionPane
-        .showMessageDialog(null, "You were not connected.", "Error", JOptionPane.ERROR_MESSAGE);
 
   }
 
@@ -250,11 +340,6 @@ class ExamProjectHandler {
     output.printToCSV_Questions(examAnalysis.getQuestionsStats(), examAnalysis);
     output.printToCSV_Schools(examAnalysis.getStatsSchools(), examAnalysis);
     output.printToCSV_Teams(examAnalysis.getStatsTeams());
-
-    JOptionPane
-        .showMessageDialog(null, ""
-            + "Successfully printed to csv files in " + strings.get(0) + "!");
-
   }
 
   private void initializeExamAnalysis() {
@@ -283,8 +368,6 @@ class ExamProjectHandler {
 
     examAnalysis
         .setUser(user);
-
-    JOptionPane.showMessageDialog(null, "Exam analysis was successfully initiated!");
 
     examAnalysis.startWithDatabase();
 

@@ -30,7 +30,7 @@ public class ExamMongoDBObject extends BasicDBObject {
 
   public static BasicDBObject toDBObject(RoundOffStatsQuestion question,
       ExamAnalysis examAnalysis) {
-    int index = Integer.parseInt(question.getQuestion()) + 1;
+    int index = Integer.parseInt(question.getQuestion());
     return new BasicDBObject()
         .append("name", index)
         .append("maxScore", examAnalysis.getQuestionMaxScore(question))

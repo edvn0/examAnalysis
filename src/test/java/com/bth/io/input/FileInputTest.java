@@ -10,7 +10,9 @@
 
 package com.bth.io.input;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -61,7 +63,7 @@ public class FileInputTest {
   public void getIndexStartTest() {
     ResultSet set = fileInput.getResultSet();
 
-    int index = fileInput.getMetaDataQuestionIndex(set, "q1", "q14", true);
+    int index = fileInput.getMetaDataQuestionIndex("q1", "q14", true);
 
     assertEquals("Index should be 5, where the questions start", 5, index);
   }
@@ -70,8 +72,74 @@ public class FileInputTest {
   public void getIndexEndTest() {
     ResultSet set = fileInput.getResultSet();
 
-    int index = fileInput.getMetaDataQuestionIndex(set, "q1", "q14", false);
+    int index = fileInput.getMetaDataQuestionIndex("q1", "q14", false);
 
     assertEquals("Index should be 18, where the questions end", 18, index);
+  }
+
+  @Test
+  public void validateConnectorString_1() {
+    String connector = "jdbc:mysql://localhost:8889/stats_exams?"
+        + "zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    assertTrue(FileInput.validateConnectorString(connector));
+  }
+
+  @Test
+  public void validateConnectorString_2() {
+    String connector = "jdbc:notSQL://localhost:8889/stats_exams?"
+        + "zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    assertFalse(FileInput.validateConnectorString(connector));
+  }
+
+  @Test
+  public void validateConnectorString_3() {
+    String connector = "mongodb+srv://edwin-carlsson:Edwin98@"
+        + "examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true";
+    assertTrue(FileInput.validateConnectorString(connector));
+  }
+
+  @Test
+  public void validateConnectorString_4() {
+    String connector = "notMongoDB+srv://edwin-carlsson:Edwin98@"
+        + "examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true";
+    assertFalse(FileInput.validateConnectorString(connector));
+  }
+
+  @Test
+  public void splitConnectorString_1() {
+    String connector = "mongodb+srv://edwin-carlsson:Edwin98@"
+        + "examanalysiscluster-hsaye.mongodb.net/test?retryWrites=true";
+    String[] strings = FileInput.splitConnectorString(connector);
+
+    assertEquals(
+        "MongoDB string should split into 'mongodb+srv' and '<username>:<password>:cluster...'",
+        "mongodb+srv:", strings[0]);
+
+  }
+
+  @Test
+  public void splitConnectorString_2() {
+    String connector = "jdbc:mysql://localhost:8889/stats_exams?"
+        + "zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    String[] strings = FileInput.splitConnectorString(connector);
+
+    assertEquals("JDBC string should be split into 'jdbc:mysql://' and '<host>/...'",
+        "jdbc:mysql:", strings[0]);
+    assertEquals("JDBC string should be split into 'jdbc:mysql://' and '<host>/...'",
+        "localhost:8889/stats_exams?zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC",
+        strings[1]);
+
+  }
+
+  @Test
+  public void splitConnectorString_3() {
+    String connector = "jdbc:mysql:localhost:8889stats_exams?"
+        + "zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC";
+    String[] strings = FileInput.splitConnectorString(connector);
+
+    String[] strings2 = new String[connector.length()];
+
+    assertArrayEquals("Should contain the same elements (null) since no there is no regex matching",
+        strings, strings2);
   }
 }

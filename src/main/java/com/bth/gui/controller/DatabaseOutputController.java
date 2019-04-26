@@ -157,7 +157,7 @@ public class DatabaseOutputController {
         System.out.println("Inserting questions into database, instead of updating..");
         System.out.println("*-------------------------------------------------------*");
         for (RoundOffStatsQuestion question : rosqList) {
-          String q = Integer.toString(Integer.parseInt(question.getQuestion()) + 1);
+          String q = Integer.toString(Integer.parseInt(question.getQuestion()));
           String questionString = "q".concat(q);
 
           // Parametrise an SQL query insertion for every RoSQ.

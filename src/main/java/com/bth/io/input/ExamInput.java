@@ -86,9 +86,11 @@ public class ExamInput {
     listFromDatabase = fileInput.fileInputFromDatabase();
 
     INDIVIDUAL_SCORES_START = fileInput
-        .getMetaDataQuestionIndex(fileInput.getResultSet(), "q1", "q14", true);
+        .getMetaDataQuestionIndex("q1", "q14",
+            true);
     INDIVIDUAL_SCORES_END = fileInput
-        .getMetaDataQuestionIndex(fileInput.getResultSet(), "q1", "q14", false);
+        .getMetaDataQuestionIndex("q1", "q14",
+            false);
 
     this.teams = this.getTeams(listFromDatabase);
     schools = this.getSchools(listFromDatabase);
